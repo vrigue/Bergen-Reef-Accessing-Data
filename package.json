@@ -10,5 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.15"
   }
 }
