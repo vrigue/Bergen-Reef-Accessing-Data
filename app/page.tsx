@@ -3,6 +3,5 @@ import React from 'react';
 // import App from './App.js';
 
 export default function Page() {
-    <html lang="en"></html>
-    return <h1>Hello, Next.js!</h1>
-  }
+  return <h1>Hello, Home page!</h1>
+}
