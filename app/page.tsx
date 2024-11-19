@@ -1,7 +1,6 @@
 import React from 'react';
 // import { hydrateRoot } from 'react-dom/client';
-// import App from './App.js';
 
 export default function Page() {
-  return <h1>Hello World!</h1>
+  return <h1 className="text-3xl font-bold underline">Hello, Home page!</h1>
 }
