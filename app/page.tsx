@@ -3,5 +3,5 @@ import React from 'react';
 // import App from './App.js';
 
 export default function Page() {
-  return <h1>Hello, Home page!</h1>
+  return <h1>Hello World!</h1>
 }
