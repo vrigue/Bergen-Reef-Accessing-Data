@@ -1,4 +1,6 @@
-// `app/dashboard/page.tsx` is the UI for the `/dashboard` URL
-export default function Page() {
-    return <h1>Hello, Dashboard Page!</h1>
-  }
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+
+export default function Page( {children}) {
+  return <h1>Hello, Dashboard Page!</h1>
+}
+

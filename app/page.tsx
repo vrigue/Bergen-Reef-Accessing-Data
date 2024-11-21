@@ -77,6 +77,9 @@ export default function Page() {
           <Line type="monotone" dataKey="salt" stroke="#82ca9d" />
         </LineChart>
       </ResponsiveContainer>
+      <a href="/api/auth/login">Login</a>
+      <a href="/api/auth/logout">Logout</a>
+
     </div>
   );
 }
