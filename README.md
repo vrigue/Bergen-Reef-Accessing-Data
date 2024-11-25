@@ -7,11 +7,14 @@ Technologies used:
 - MySQL Relational Database
     The database we are using to store data pulled from Apex Fusion 
 
+- Drizzle
+    ORM used to query data in the database, chosen for its more lightweight and SQL-centric approach
+
 - Cron-Job and Raspberry Pi
     Used to pull data from Apex Fusion/the machines in the coral reef lab and deposit it in the database at regular intervals
 
 - HTML/JS/CSS with Tailwind CSS framework
-    visuals within the UI
+    Visuals and styling within the UI
 
 - Next.js
     React framework used to build full stack web applications
@@ -20,4 +23,4 @@ Technologies used:
     Used for creation of graphical visuals
     
 - Auth0
-    authentication technology
+    Authentication technology
