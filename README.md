@@ -2,25 +2,37 @@
 
 An interactive web application that not only displays graphical representations of coral reef information, but also manages the data of the coral reef tanks. 
 
-Technologies used:
+## Technologies used:
 
-- MySQL Relational Database
+- [MySQL Relational Database](https://www.mysql.com/)
     The database we are using to store data pulled from Apex Fusion 
 
-- Drizzle
+- [Drizzle](https://orm.drizzle.team/)
     ORM used to query data in the database, chosen for its more lightweight and SQL-centric approach
 
-- Cron-Job and Raspberry Pi
+- [Cron-Job](https://cron-job.org/) and [Raspberry Pi](https://www.raspberrypi.org/)
     Used to pull data from Apex Fusion/the machines in the coral reef lab and deposit it in the database at regular intervals
 
-- HTML/JS/CSS with Tailwind CSS framework
+- [HTML/JS/CSS](https://developer.mozilla.org/en-US/docs/Web/HTML) with [Tailwind CSS](https://tailwindcss.com/) framework
     Visuals and styling within the UI
 
-- Next.js
+- [Headless UI](https://headlessui.dev/)
+    Works seamlessly with Tailwind CSS for building accessible menu components
+
+- [Heroicons](https://heroicons.com/)
+    SVG icons that work well with Tailwind
+
+- [Next.js](https://nextjs.org/)
     React framework used to build full stack web applications
     
-- Recharts
+- [Recharts](https://recharts.org/)
     Used for creation of graphical visuals
+
+- [AG Grid](https://www.ag-grid.com/)
+    Used to handle large datasets, customizable rows, and pagination
+
+- [React Datepicker](https://reactdatepicker.com/)
+    Advanced date selection features
     
-- Auth0
+- [Auth0](https://auth0.com/)
     Authentication technology
