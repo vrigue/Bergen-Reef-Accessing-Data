@@ -61,8 +61,8 @@ const chartData = [
 export default function Page() {
   return (
     <div>
-      <br></br>
       <h1 className="text-3xl font-bold underline">Hello, Home page!</h1>
+      <a className="text-blue-600" href="/prototype/history" id="test-link"> History! </a>
       <ResponsiveContainer width={"100%"} height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
