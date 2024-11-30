@@ -1,6 +1,6 @@
 'use client'
-import React from 'react';
-import './globals.css'
+import React, { useEffect, useState } from 'react';
+import './globals.css';
 
 import {
   LineChart,
@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
+const chartData = [
   {
     name: "26 Nov.",
     pH: 8.1,
@@ -64,7 +64,7 @@ export default function Page() {
       <br></br>
       <h1 className="text-3xl font-bold underline">Hello, Home page!</h1>
       <ResponsiveContainer width={"100%"} height={300}>
-        <LineChart data={data}>
+        <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
           <YAxis />
@@ -79,6 +79,10 @@ export default function Page() {
           <Line type="monotone" dataKey="salt" stroke="#82ca9d" />
         </LineChart>
       </ResponsiveContainer>
+
+      <h1 className="text-3xl font-bold underline"></h1>
+      <h1 className="text-3xl font-bold underline"></h1>
+
       <a href="/api/auth/login">Login</a>
       <a href="/api/auth/logout">Logout</a>
 

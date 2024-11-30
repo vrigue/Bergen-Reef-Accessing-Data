@@ -9,9 +9,11 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
+    "baseUrl": ".",
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -24,10 +26,10 @@
     ]
   },
   "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "src/**/*",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

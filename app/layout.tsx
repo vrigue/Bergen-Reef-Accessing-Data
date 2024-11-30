@@ -3,8 +3,8 @@ import './globals.css' // These styles apply to every route in the application
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 export const metadata = {
-  title: 'Plumbing',
-  description: 'Due Thursday',
+  title: 'Plumbing Project',
+  description: 'Due Monday 12/2',
 }
 
 export default function RootLayout({
