@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
+import { GetServerSideProps } from 'next';
 import './globals.css';
 
 import {
@@ -59,6 +60,28 @@ const chartData = [
 ];
 
 export default function Page() {
+
+  const [data, setData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/data');
+        const result = await response.json();
+        setData(result);
+      } 
+      catch (error: any) {
+        setError(error.message);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const data1 = "Temperature: " + data[0]?.data;
+  const data2 = "Temperature: " + data[1]?.data;
+
   return (
     <div>
       <h1 className="text-3xl font-bold underline">Hello, Home page!</h1>
@@ -80,8 +103,8 @@ export default function Page() {
         </LineChart>
       </ResponsiveContainer>
 
-      <h1 className="text-3xl font-bold underline"></h1>
-      <h1 className="text-3xl font-bold underline"></h1>
+      <h1 className="text-2xl font-bold">{data1}</h1>
+      <h1 className="text-2xl font-bold">{data2}</h1>
 
       <a href="/api/auth/login">Login</a>
       <a href="/api/auth/logout">Logout</a>
