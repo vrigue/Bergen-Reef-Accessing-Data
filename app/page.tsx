@@ -1,8 +1,9 @@
-'use client'
-import React, { useEffect, useState } from 'react';
-import { GetServerSideProps } from 'next';
-import './globals.css';
-
+"use client";
+import React, { useEffect, useState, Fragment } from "react";
+import clsx from "clsx";
+import { GetServerSideProps } from "next";
+import "./globals.css";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import {
   LineChart,
   Line,
@@ -60,18 +61,16 @@ const chartData = [
 ];
 
 export default function Page() {
-
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch('/api/data');
+        const response = await fetch("/api/data");
         const result = await response.json();
         setData(result);
-      } 
-      catch (error: any) {
+      } catch (error: any) {
         setError(error.message);
       }
     }
@@ -84,8 +83,56 @@ export default function Page() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold underline">Hello, Home page!</h1>
-      <a className="text-blue-600" href="/prototype/history" id="test-link"> History! </a>
+      <TabGroup>
+        <TabList>
+          <Tab as={Fragment}>
+            {({ hover, selected }) => (
+              <button
+                className={clsx(
+                  hover && "underline",
+                  selected && "bg-blue-500 text-white"
+                )}
+              >
+                Home
+              </button>
+            )}
+          </Tab>
+          <Tab as={Fragment}>
+            {({ hover, selected }) => (
+              <button
+                className={clsx(
+                  hover && "underline",
+                  selected && "bg-blue-500 text-white"
+                )}
+              >
+                Data
+              </button>
+            )}
+          </Tab>
+          <Tab as={Fragment}>
+            {({ hover, selected }) => (
+              <button
+                className={clsx(
+                  hover && "underline",
+                  selected && "bg-blue-500 text-white"
+                )}
+              >
+                History
+              </button>
+            )}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>This homepage will allow you to see an overview.</TabPanel>
+          <TabPanel>Get a Data Graph.</TabPanel>
+          <TabPanel>Full Data History.</TabPanel>
+        </TabPanels>
+      </TabGroup>
+      <h1 className="text-3xl font-bold underline">Coral Reef Homepage!</h1>
+      <a className="text-blue-600" href="/data" id="test-link">
+        {" "}
+        See Data In Depth:{" "}
+      </a>
       <ResponsiveContainer width={"100%"} height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -108,7 +155,6 @@ export default function Page() {
 
       <a href="/api/auth/login">Login</a>
       <a href="/api/auth/logout">Logout</a>
-
     </div>
   );
 }
