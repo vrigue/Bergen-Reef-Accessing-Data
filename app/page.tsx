@@ -5,7 +5,7 @@ import { GetServerSideProps } from "next";
 import "./globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { NewspaperIcon, UserIcon } from "@heroicons/react/24/solid";
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { UserProvider } from "@auth0/nextjs-auth0/client";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import {
@@ -89,43 +89,45 @@ export default function Page() {
   return (
     <div>
       <div className="flex items-center justify-between bg-blue-100 p-4 shadow-lg rounded-lg">
-        <div className="text-3xl">
-          {" "}
-          <NewspaperIcon className="size-6 text-blue-500" />
-        </div>
+        <a href="/">
+          <div className="text-3xl">
+            {" "}
+            <NewspaperIcon className="size-6 text-blue-500" />
+          </div>
+        </a>
         <TabGroup defaultIndex={0}>
           <TabList className="flex space-x-4">
-          <a href="/">
-            <Tab as={Fragment}>
-              {({ selected }) => (
-                <button
-                  className={clsx(
-                    "tab-item px-6 py-2 rounded-full transition",
-                    selected
-                      ? "bg-blue-500 text-white font-semibold"
-                      : "bg-blue-200 text-blue-700 hover:bg-blue-300"
-                  )}
-                >
-                  Home
-                </button>
-              )}
-            </Tab>
+            <a href="/">
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button
+                    className={clsx(
+                      "tab-item px-6 py-2 rounded-full transition",
+                      selected
+                        ? "bg-blue-500 text-white font-semibold"
+                        : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                    )}
+                  >
+                    Home
+                  </button>
+                )}
+              </Tab>
             </a>
             <a href="/data">
-            <Tab as={Fragment}>
-              {({ selected }) => (
-                <button
-                  className={clsx(
-                    "tab-item px-6 py-2 rounded-full transition",
-                    selected
-                      ? "bg-blue-500 text-white font-semibold"
-                      : "bg-blue-200 text-blue-700 hover:bg-blue-300"
-                  )}
-                >
-                  Data
-                </button>
-              )}
-            </Tab>
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button
+                    className={clsx(
+                      "tab-item px-6 py-2 rounded-full transition",
+                      selected
+                        ? "bg-blue-500 text-white font-semibold"
+                        : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                    )}
+                  >
+                    Data
+                  </button>
+                )}
+              </Tab>
             </a>
             <Tab as={Fragment}>
               {({ selected }) => (

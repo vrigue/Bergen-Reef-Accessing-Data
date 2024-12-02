@@ -45,9 +45,12 @@ export default function Page() {
   return (
     <div>
       <div className="flex items-center justify-between bg-blue-100 p-4 shadow-lg rounded-lg">
-        <div className="text-3xl">
-          <NewspaperIcon className="size-6 text-blue-500" />
-        </div>
+        <a href="/">
+          <div className="text-3xl">
+            {" "}
+            <NewspaperIcon className="size-6 text-blue-500" />
+          </div>
+        </a>
         <TabGroup defaultIndex={1}>
           <TabList className="flex space-x-4">
             <a href="/">
