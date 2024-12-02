@@ -5,8 +5,8 @@ import { GetServerSideProps } from "next";
 import "./globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { NewspaperIcon, UserIcon } from "@heroicons/react/24/solid";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-import { useAuth0 } from "@auth0/auth0-react";
+import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
+import ProfileClient from "./components/ProfileClient";
 
 import {
   LineChart,
@@ -65,7 +65,6 @@ const chartData = [
 ];
 
 export default function Page() {
-  let { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -176,8 +175,22 @@ export default function Page() {
       <h1 className="text-2xl font-bold">{data1}</h1>
       <h1 className="text-2xl font-bold">{data2}</h1>
 
-      <a href="/api/auth/login">Login</a>
-      <a href="/api/auth/logout">Logout</a>
+      <div className="flex space-x-4">
+        <a
+          href="/api/auth/login"
+          className="bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-600 transition"
+        >
+          Login
+        </a>
+
+        <a
+          href="/api/auth/logout"
+          className="bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-600 transition"
+        >
+          Logout
+        </a>
+      </div>
+      <ProfileClient />
     </div>
   );
 }
