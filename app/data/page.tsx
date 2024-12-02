@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState, Fragment } from "react";
 import clsx from "clsx";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import MyDatePicker from "../components/MyDatePicker";
 import "../globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { NewspaperIcon } from "@heroicons/react/24/solid";
@@ -19,6 +22,8 @@ export default function Page() {
     { field: "type" },
     { field: "data" },
   ]);
+
+  const [startDate, setStartDate] = useState(new Date());
 
   useEffect(() => {
     async function fetchData() {
@@ -114,6 +119,11 @@ export default function Page() {
           columnDefs={colDefs}
           domLayout="autoHeight"
         />
+      </div>
+
+      <h1 className="flex items-center justify-center text-xl font-bold">Select a Date</h1>
+      <div className="flex items-center justify-center">
+        <MyDatePicker />
       </div>
     </div>
   );
