@@ -4,6 +4,10 @@ import clsx from "clsx";
 import { GetServerSideProps } from "next";
 import "./globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import { NewspaperIcon, UserIcon } from "@heroicons/react/24/solid";
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { useAuth0 } from "@auth0/auth0-react";
+
 import {
   LineChart,
   Line,
@@ -61,6 +65,7 @@ const chartData = [
 ];
 
 export default function Page() {
+  let { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,51 +88,67 @@ export default function Page() {
 
   return (
     <div>
-      <TabGroup>
-        <TabList>
-          <Tab as={Fragment}>
-            {({ hover, selected }) => (
-              <button
-                className={clsx(
-                  hover && "underline",
-                  selected && "bg-blue-500 text-white"
-                )}
-              >
-                Home
-              </button>
-            )}
-          </Tab>
-          <Tab as={Fragment}>
-            {({ hover, selected }) => (
-              <button
-                className={clsx(
-                  hover && "underline",
-                  selected && "bg-blue-500 text-white"
-                )}
-              >
-                Data
-              </button>
-            )}
-          </Tab>
-          <Tab as={Fragment}>
-            {({ hover, selected }) => (
-              <button
-                className={clsx(
-                  hover && "underline",
-                  selected && "bg-blue-500 text-white"
-                )}
-              >
-                History
-              </button>
-            )}
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>This homepage will allow you to see an overview.</TabPanel>
-          <TabPanel>Get a Data Graph.</TabPanel>
-          <TabPanel>Full Data History.</TabPanel>
-        </TabPanels>
-      </TabGroup>
+      <div className="flex items-center justify-between bg-blue-100 p-4 shadow-lg rounded-lg">
+        <div className="text-3xl">
+          {" "}
+          <NewspaperIcon className="size-6 text-blue-500" />
+        </div>
+        <TabGroup defaultIndex={0}>
+          <TabList className="flex space-x-4">
+          <a href="/">
+            <Tab as={Fragment}>
+              {({ selected }) => (
+                <button
+                  className={clsx(
+                    "tab-item px-6 py-2 rounded-full transition",
+                    selected
+                      ? "bg-blue-500 text-white font-semibold"
+                      : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                  )}
+                >
+                  Home
+                </button>
+              )}
+            </Tab>
+            </a>
+            <a href="/data">
+            <Tab as={Fragment}>
+              {({ selected }) => (
+                <button
+                  className={clsx(
+                    "tab-item px-6 py-2 rounded-full transition",
+                    selected
+                      ? "bg-blue-500 text-white font-semibold"
+                      : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                  )}
+                >
+                  Data
+                </button>
+              )}
+            </Tab>
+            </a>
+            <Tab as={Fragment}>
+              {({ selected }) => (
+                <button
+                  className={clsx(
+                    "tab-item px-6 py-2 rounded-full transition",
+                    selected
+                      ? "bg-blue-500 text-white font-semibold"
+                      : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                  )}
+                >
+                  History
+                </button>
+              )}
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>Welcome to the Home page!</TabPanel>
+            <TabPanel>View and analyze Data here.</TabPanel>
+            <TabPanel>Check the History of your data.</TabPanel>
+          </TabPanels>
+        </TabGroup>
+      </div>
       <h1 className="text-3xl font-bold underline">Coral Reef Homepage!</h1>
       <a className="text-blue-600" href="/data" id="test-link">
         {" "}
