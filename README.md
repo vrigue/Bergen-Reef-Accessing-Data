@@ -1,6 +1,6 @@
 # Coral-Reef-Capstone
 
-An interactive web application that not only displays graphical representations of coral reef information, but also manages the data of the coral reef tanks. 
+An interactive web application that not only displays graphical representations of coral reef information, but also manages the data of the coral reef tanks. The application will be used in parallel with Apex Fusion in the lab, and displayed on TVS for viewers in the Makerspace. 
 
 ## Technologies used:
 
