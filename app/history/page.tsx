@@ -4,6 +4,7 @@ import clsx from "clsx";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MyDatePicker from "../components/MyDatePicker";
+import HistoryPageGrid from "../components/HistoryPageGrid";
 import "../globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { NewspaperIcon } from "@heroicons/react/24/solid";
@@ -35,8 +36,10 @@ export default function Page() {
         // Update row data based on fetched data
         const formattedData = result.map((item: any, index: number) => ({
           id: index,
-          type: item.type || "Temperature ˚C",
-          data: item.data,
+          datetime: item.datetime, // || "Temperature ˚C",
+          name: item.name,
+          type: item.type,
+          value: item.value,
         }));
         setRowData(formattedData);
       } catch (error: any) {
@@ -113,15 +116,11 @@ export default function Page() {
         </TabGroup>
       </div>
       <h1 className="text-3xl font-bold underline">Data</h1>
-      <div className="ag-theme-quartz" style={{ height: 500 }}>
-        <AgGridReact
-          rowData={rowData}
-          columnDefs={colDefs}
-          domLayout="autoHeight"
-        />
-      </div>
+      <HistoryPageGrid />
 
-      <h1 className="flex items-center justify-center text-xl font-bold">Select a Date</h1>
+      <h1 className="flex items-center justify-center text-xl font-bold">
+        Select a Date
+      </h1>
       <div className="flex items-center justify-center">
         <MyDatePicker />
       </div>

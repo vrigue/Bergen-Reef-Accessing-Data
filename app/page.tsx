@@ -82,9 +82,6 @@ export default function Page() {
     fetchData();
   }, []);
 
-  const data1 = "Temperature: " + data[0]?.data;
-  const data2 = "Temperature: " + data[1]?.data;
-
   return (
     <div>
       <div className="flex items-center justify-between bg-blue-100 p-4 shadow-lg rounded-lg">
@@ -181,9 +178,6 @@ export default function Page() {
           <Line type="monotone" dataKey="salt" stroke="#82ca9d" />
         </LineChart>
       </ResponsiveContainer>
-
-      <h1 className="text-2xl font-bold">{data1}</h1>
-      <h1 className="text-2xl font-bold">{data2}</h1>
 
       <div className="flex space-x-4">
         <a
