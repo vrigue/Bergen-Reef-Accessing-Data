@@ -153,8 +153,18 @@ export default function Page() {
       <h1 className="text-3xl font-bold underline">Coral Reef Homepage!</h1>
       <a className="text-blue-600" href="/data" id="test-link">
         {" "}
-        See Data In Depth:{" "}
+        See Data In Depth:{" "}  
       </a>
+      <br></br>
+      <select>
+        <option>PH</option>
+        <option>Salinity</option>
+        <option>Temperature</option>
+        <option>Oxidation Reduction Potential (ORP)</option>
+        <option>Alkalinity</option>
+        <option>Calcium</option>
+      </select>
+
       <ResponsiveContainer width={"100%"} height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
