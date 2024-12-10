@@ -2,7 +2,6 @@
 import React, { useEffect, useState, Fragment } from "react";
 import clsx from "clsx";
 import { GetServerSideProps } from "next";
-import "./globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { NewspaperIcon, UserIcon } from "@heroicons/react/24/solid";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
