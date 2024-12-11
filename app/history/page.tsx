@@ -1,72 +1,30 @@
 "use client";
 import React, { useEffect, useState, Fragment } from "react";
 import clsx from "clsx";
-import { GetServerSideProps } from "next";
-import "./globals.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import MyDatePicker from "../components/MyDatePicker";
+import HistoryPageGrid from "../components/HistoryPageGrid";
+import "../globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { NewspaperIcon, UserIcon } from "@heroicons/react/24/solid";
-import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
-import ProfileClient from "./components/ProfileClient";
-
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-
-const chartData = [
-  {
-    name: "26 Nov.",
-    pH: 8.1,
-    salt: 3.5,
-    amt: 2400,
-  },
-  {
-    name: "12:00 pm",
-    pH: 8.2,
-    salt: 3.7,
-    amt: 2210,
-  },
-  {
-    name: "27 Nov.",
-    pH: 8.3,
-    salt: 3.5,
-    amt: 2290,
-  },
-  {
-    name: "12:00 pm",
-    pH: 7.9,
-    salt: 3.2,
-    amt: 2000,
-  },
-  {
-    name: "28 Nov.",
-    pH: 8.1,
-    salt: 3.5,
-    amt: 2181,
-  },
-  {
-    name: "12:00 pm",
-    pH: 7.8,
-    salt: 3.6,
-    amt: 2500,
-  },
-  {
-    name: "29 Nov.",
-    pH: 8.05,
-    salt: 3.3,
-    amt: 2100,
-  },
-];
+import { NewspaperIcon } from "@heroicons/react/24/solid";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the Data Grid
 
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // AG Grid
+  const [rowData, setRowData] = useState<any[]>([]);
+  const [colDefs] = useState([
+    { field: "id" },
+    { field: "type" },
+    { field: "data" },
+  ]);
+
+  const [startDate, setStartDate] = useState(new Date());
 
   useEffect(() => {
     async function fetchData() {
@@ -74,6 +32,16 @@ export default function Page() {
         const response = await fetch("/api/data");
         const result = await response.json();
         setData(result);
+
+        // Update row data based on fetched data
+        const formattedData = result.map((item: any, index: number) => ({
+          id: index,
+          datetime: item.datetime, // || "Temperature ˚C",
+          name: item.name,
+          type: item.type,
+          value: item.value,
+        }));
+        setRowData(formattedData);
       } catch (error: any) {
         setError(error.message);
       }
@@ -91,7 +59,7 @@ export default function Page() {
             <NewspaperIcon className="size-6 text-blue-500" />
           </div>
         </a>
-        <TabGroup defaultIndex={0}>
+        <TabGroup defaultIndex={1}>
           <TabList className="flex space-x-4">
             <a href="/">
               <Tab as={Fragment}>
@@ -147,54 +115,15 @@ export default function Page() {
           </TabPanels>
         </TabGroup>
       </div>
-      <h1 className="text-3xl font-bold underline">Coral Reef Homepage!</h1>
-      <a className="text-blue-600" href="/data" id="test-link">
-        {" "}
-        See Data In Depth:{" "}  
-      </a>
-      <br></br>
-      <select>
-        <option>PH</option>
-        <option>Salinity</option>
-        <option>Temperature</option>
-        <option>Oxidation Reduction Potential (ORP)</option>
-        <option>Alkalinity</option>
-        <option>Calcium</option>
-      </select>
+      <h1 className="text-3xl font-bold underline">Data</h1>
+      <HistoryPageGrid />
 
-      <ResponsiveContainer width={"100%"} height={300}>
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="pH"
-            stroke="#8884d8"
-            activeDot={{ r: 8 }}
-          />
-          <Line type="monotone" dataKey="salt" stroke="#82ca9d" />
-        </LineChart>
-      </ResponsiveContainer>
-
-      <div className="flex space-x-4">
-        <a
-          href="/api/auth/login"
-          className="bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-600 transition"
-        >
-          Login
-        </a>
-
-        <a
-          href="/api/auth/logout"
-          className="bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-600 transition"
-        >
-          Logout
-        </a>
+      <h1 className="flex items-center justify-center text-xl font-bold">
+        Select a Date
+      </h1>
+      <div className="flex items-center justify-center">
+        <MyDatePicker />
       </div>
-      <ProfileClient />
     </div>
   );
 }
