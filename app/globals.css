@@ -15,8 +15,17 @@
   }
 } */
 
+@layer base {
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(../public/fonts/Montserrat-VariableFont_wght.ttf) format('tff');
+  }
+}
+
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Times New Roman, Arial, Helvetica, sans-serif;
+  background: rgb(232, 232, 232);
 }
