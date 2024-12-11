@@ -6,12 +6,16 @@ import "../globals.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MyDatePicker from "../components/MyDatePicker";
+import ZoomSlider from "../components/ZoomSlider";
+import StepSlider from "../components/StepSlider";
 
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+
+
 
 import {
   LineChart,
@@ -291,9 +295,17 @@ export default function Page() {
           
 
 
-          <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-3">Enter Date Constraints</h1>
-          <div className="flex space-x-4 justify-center pt-3">
+          <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-5">Enter Date Constraints</h1>
+          <div className="flex space-x-4 justify-center pt-4">
             <MyDatePicker/>
+          </div>
+
+
+          <div>
+            <ZoomSlider/>
+          </div>
+          <div>
+            <StepSlider/>
           </div>
         </div>
       </div>
