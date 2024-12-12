@@ -19,7 +19,41 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const chartData = [
+//static datasets for the interactive graph
+const dataSets = {
+  ph: [
+    { name: 'December 1', value: 100},
+    { name: 'December 2', value: 50},
+    { name: 'December 3', value: 20},
+  ],
+  salinity: [
+    { name: 'December 1', value: 75},
+    { name: 'December 2', value: 100},
+    { name: 'December 3', value: 50},
+  ],
+  temp: [
+    { name: 'December 1', value: 80},
+    { name: 'December 2', value: 120},
+    { name: 'December 3', value: 200},
+  ],
+  orp: [
+    { name: 'December 1', value: 95},
+    { name: 'December 2', value: 20},
+    { name: 'December 3', value: 95},
+  ],
+  alk: [
+    { name: 'December 1', value: 100},
+    { name: 'December 2', value: 200},
+    { name: 'December 3', value: 150},
+  ],
+  calc: [
+    { name: 'December 1', value: 80},
+    { name: 'December 2', value: 50},
+    { name: 'December 3', value: 100},
+  ],
+};
+
+/*const chartData = [
   {
     name: "26 Nov.",
     pH: 8.1,
@@ -62,7 +96,7 @@ const chartData = [
     salt: 3.3,
     amt: 2100,
   },
-];
+]; */
 
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
@@ -81,6 +115,13 @@ export default function Page() {
 
     fetchData();
   }, []);
+
+  //stuff for selecting data according to dropdown in graph
+  const [selectedData, setSelectedData] = React.useState(dataSets.ph);
+
+  const handleChange = (e) => {
+    setSelectedData(dataSets[e.target.value]);
+  };
 
   return (
     <div>
@@ -153,17 +194,22 @@ export default function Page() {
         See Data In Depth:{" "}  
       </a>
       <br></br>
-      <select>
-        <option>PH</option>
-        <option>Salinity</option>
-        <option>Temperature</option>
-        <option>Oxidation Reduction Potential (ORP)</option>
-        <option>Alkalinity</option>
-        <option>Calcium</option>
+
+      <select
+        onChange={handleChange}
+      >
+        <option value="ph">PH</option>
+        <option value="salinity">Salinity</option>
+        <option value="temp">Temperature</option>
+        <option value="orp">Oxidation Reduction Potential (ORP)</option>
+        <option value="alk">Alkalinity</option>
+        <option value="calc">Calcium</option>
       </select>
 
       <ResponsiveContainer width={"100%"} height={300}>
-        <LineChart data={chartData}>
+        <LineChart 
+          data={selectedData}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
           <YAxis />
@@ -171,11 +217,10 @@ export default function Page() {
           <Legend />
           <Line
             type="monotone"
-            dataKey="pH"
+            dataKey="value"
             stroke="#8884d8"
             activeDot={{ r: 8 }}
           />
-          <Line type="monotone" dataKey="salt" stroke="#82ca9d" />
         </LineChart>
       </ResponsiveContainer>
 
