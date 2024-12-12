@@ -20,8 +20,6 @@ export default function HistoryPageGrid() {
     { field: "type" },
     { field: "value" },
   ]);
-  const pagination = true;
-  const paginationPageSize = 500;
   const paginationPageSizeSelector = [5, 500, 1000];
 
   // const [startDate, setStartDate] = useState(new Date()); // prob have to implement in the other thing
@@ -51,13 +49,13 @@ export default function HistoryPageGrid() {
   }, []);
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 500, marginTop: '20px', width: "60%" }}>
+    <div className="ag-theme-quartz center" style={{ height: 500, marginTop: '0px', width: "100%" }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}
         domLayout="autoHeight"
         pagination={true}
-        paginationPageSize={5}
+        paginationPageSize={10}
       />
     </div>
   );

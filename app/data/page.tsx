@@ -9,10 +9,20 @@ import MyDatePicker from "../components/MyDatePicker";
 import ZoomSlider from "../components/ZoomSlider";
 import StepSlider from "../components/StepSlider";
 
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import {
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from "@headlessui/react";
+
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import {
