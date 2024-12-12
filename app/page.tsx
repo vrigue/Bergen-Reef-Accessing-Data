@@ -125,11 +125,11 @@ export default function Page() {
 
   return (
     <div>
-      <div className="flex items-center justify-between bg-blue-100 p-4 shadow-lg rounded-lg">
+      <div className="flex items-center justify-between bg-teal p-4 shadow-lg rounded-lg">
         <a href="/">
           <div className="text-3xl">
             {" "}
-            <NewspaperIcon className="size-6 text-blue-500" />
+            <img src = "/images/coral-logo.png"></img>
           </div>
         </a>
         <TabGroup defaultIndex={0}>
@@ -141,8 +141,8 @@ export default function Page() {
                     className={clsx(
                       "tab-item px-6 py-2 rounded-full transition",
                       selected
-                        ? "bg-blue-500 text-white font-semibold"
-                        : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                        ? "bg-orange text-white font-bold"
+                        : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
                     )}
                   >
                     Home
@@ -157,8 +157,8 @@ export default function Page() {
                     className={clsx(
                       "tab-item px-6 py-2 rounded-full transition",
                       selected
-                        ? "bg-blue-500 text-white font-semibold"
-                        : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                        ? "bg-orange text-white font-bold"
+                        : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
                     )}
                   >
                     Data
@@ -172,8 +172,8 @@ export default function Page() {
                   className={clsx(
                     "tab-item px-6 py-2 rounded-full transition",
                     selected
-                      ? "bg-blue-500 text-white font-semibold"
-                      : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                      ? "bg-orange text-white font-bold"
+                      : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
                   )}
                 >
                   History
@@ -182,12 +182,15 @@ export default function Page() {
             </Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>Welcome to the Home page!</TabPanel>
+            {/*<TabPanel>Welcome to the Home page!</TabPanel>
             <TabPanel>View and analyze Data here.</TabPanel>
-            <TabPanel>Check the History of your data.</TabPanel>
+            <TabPanel>Check the History of your data.</TabPanel>*/}
           </TabPanels>
         </TabGroup>
       </div>
+      
+      
+      
       <h1 className="text-3xl font-bold underline">Coral Reef Homepage!</h1>
       <a className="text-blue-600" href="/data" id="test-link">
         {" "}
@@ -227,14 +230,14 @@ export default function Page() {
       <div className="flex space-x-4">
         <a
           href="/api/auth/login"
-          className="bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-600 transition"
+          className="bg-orange text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
         >
           Login
         </a>
 
         <a
           href="/api/auth/logout"
-          className="bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-600 transition"
+          className="bg-orange text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
         >
           Logout
         </a>
