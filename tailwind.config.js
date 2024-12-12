@@ -6,7 +6,22 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
-  },
+    fontFamily: {
+      'sans': ['"Montserrat"', 'ui-sans-serif', 'system-ui']
+    },
+    extend: {
+      colors: {
+        'teal': '#68bfc6',
+        'medium-teal': '#009da8',
+        'dark-teal': '#3b6769',
+        'light-orange': '#fcd98c',
+        'medium-orange': '#ffca57',
+        'orange': '#ffb734',
+        'dark-orange': '#ffa600',
+        'light-gray': '#e8e8e8',
+        'medium-gray': '#e0e0e0'
+      },
+    },
   plugins: [],
+  }
 }
