@@ -127,7 +127,7 @@ export default function Page() {
           <div className="pt-1.5 pr-8">
             <UserCircleIcon className="size-8 text-orange" />
           </div>
-          <TabGroup defaultIndex={2}>
+          <TabGroup defaultIndex={0}>
             <TabList className="flex space-x-4">
               <a href="/">
                 <Tab as={Fragment}>
