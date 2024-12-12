@@ -3,8 +3,6 @@ import React, { useEffect, useState, Fragment } from "react";
 import clsx from "clsx";
 import "../globals.css";
 
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import MyDatePicker from "../components/MyDatePicker";
 
 import HistoryPageGrid from "../components/HistoryPageGrid";
@@ -64,7 +62,7 @@ export default function Page() {
           <div className="pt-1.5 pr-8">
             <UserCircleIcon className="size-8 text-orange" />
           </div>
-          <TabGroup defaultIndex={1}>
+          <TabGroup defaultIndex={2}>
             <TabList className="flex space-x-4">
               <a href="/">
                 <Tab as={Fragment}>
@@ -105,8 +103,8 @@ export default function Page() {
                       className={clsx(
                         "tab-item px-6 py-2 rounded-full transition",
                         selected
-                          ? "bg-blue-500 text-white font-semibold"
-                          : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                          ? "bg-orange text-white font-bold"
+                          : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
                       )}
                     >
                       History
@@ -115,16 +113,16 @@ export default function Page() {
                 </Tab>
               </a>
             </TabList>
-            {/* <TabPanels>
-            <TabPanel>Welcome to the Home page!</TabPanel>
-            <TabPanel>View and analyze Data here.</TabPanel>
-            <TabPanel>Check the History of your data.</TabPanel>
-          </TabPanels> */}
+            <TabPanels>
+              {/*<TabPanel>Welcome to the Home page!</TabPanel>
+                <TabPanel>View and analyze Data here.</TabPanel>
+                <TabPanel>Check the History of your data.</TabPanel>*/}
+            </TabPanels>
           </TabGroup>
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold underline">Data</h1>
+      <h1 className="text-3xl font-bold underline">History</h1>
       <HistoryPageGrid />
 
       <h1 className="flex items-center justify-center text-xl font-bold">

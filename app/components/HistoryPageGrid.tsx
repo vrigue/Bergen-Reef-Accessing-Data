@@ -1,15 +1,9 @@
 "use client";
 import React, { useEffect, useState, Fragment } from "react";
-import clsx from "clsx";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import MyDatePicker from "../components/MyDatePicker";
 import "../globals.css";
 
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { NewspaperIcon } from "@heroicons/react/24/solid";
-
 import { AgGridReact } from "ag-grid-react";
+
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -28,7 +22,7 @@ export default function HistoryPageGrid() {
   ]);
   const pagination = true;
   const paginationPageSize = 500;
-  const paginationPageSizeSelector = [200, 500, 1000];
+  const paginationPageSizeSelector = [5, 500, 1000];
 
   // const [startDate, setStartDate] = useState(new Date()); // prob have to implement in the other thing
 
@@ -45,7 +39,7 @@ export default function HistoryPageGrid() {
           datetime: item.datetime, // || "Temperature ˚C",
           name: item.name,
           type: item.type,
-          value: item.value
+          value: item.value,
         }));
         setRowData(formattedData);
       } catch (error: any) {
@@ -57,11 +51,13 @@ export default function HistoryPageGrid() {
   }, []);
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 500 }}>
+    <div className="ag-theme-quartz" style={{ height: 500, marginTop: '20px', width: "60%" }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}
         domLayout="autoHeight"
+        pagination={true}
+        paginationPageSize={5}
       />
     </div>
   );
