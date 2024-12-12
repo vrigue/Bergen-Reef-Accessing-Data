@@ -98,6 +98,32 @@ const dataSets = {
   },
 ]; */
 
+const styles = {
+  container: {
+    display: "flex", 
+    flexDirection: "row", 
+    gap:"20px",
+    padding: '0 20px',
+  },
+  leftHalf: {
+    flex: 1, 
+    float: "center",
+    padding: "20px",
+    backgroundColor: "#f9f9f9", 
+  },
+  rightHalf: {
+    flex: 1, // Takes up the other 50%
+    display: "flex",
+    justifyContent: "center", // Centers the graph horizontally
+    alignItems: "center", // Centers the graph vertically
+  },
+  select: {
+    marginTop: "20px",
+    padding: "10px",
+    fontSize: "16px",
+  },
+};
+
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -190,26 +216,161 @@ export default function Page() {
       </div>
       
       
-      
-      <h1 className="text-3xl font-bold underline">Coral Reef Homepage!</h1>
+      <br></br>
+      <h1 className="text-3xl font-bold">Coral Reef Homepage!</h1>
+      <br></br>
       <a className="text-blue-600" href="/data" id="test-link">
         {" "}
         See Data In Depth:{" "}  
       </a>
       <br></br>
 
-      <select
-        onChange={handleChange}
-      >
-        <option value="ph">PH</option>
-        <option value="salinity">Salinity</option>
-        <option value="temp">Temperature</option>
-        <option value="orp">Oxidation Reduction Potential (ORP)</option>
-        <option value="alk">Alkalinity</option>
-        <option value="calc">Calcium</option>
-      </select>
 
-      <ResponsiveContainer width={"100%"} height={300}>
+      <select 
+          style={{ float: 'right', width: '750px', text: 'center'}}
+          onChange={handleChange}
+        >
+          <option value="ph">PH</option>
+          <option value="salinity">Salinity</option>
+          <option value="temp">Temperature</option>
+          <option value="orp">Oxidation Reduction Potential (ORP)</option>
+          <option value="alk">Alkalinity</option>
+          <option value="calc">Calcium</option>
+        </select>
+
+      <br></br>
+      <div style={styles.container}>
+
+      <div style={{...styles.leftHalf, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Rectangle 1 */}
+      <div
+        style={{
+          width: '600px',
+          height: '75px',
+          borderRadius: '15px',
+          backgroundColor: '#ffe59b',
+          padding: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#6fb1ba',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          border: '3px solid #73b8c1',
+        }}
+      >
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>PH</div>
+        <div style={{ fontSize: '16px', fontWeight: 'normal' }}>Value 1</div>
+      </div>
+
+      {/* Rectangle 2 */}
+      <div
+        style={{
+          width: '600px',
+          height: '75px',
+          borderRadius: '15px',
+          backgroundColor: '#ffe59b',
+          padding: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#6fb1ba',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          border: '3px solid #73b8c1',
+        }}
+      >
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>SALINITY</div>
+        <div style={{ fontSize: '16px', fontWeight: 'normal' }}>Value 2</div>
+      </div>
+
+      {/* Rectangle 3 */}
+      <div
+        style={{
+          width: '600px',
+          height: '75px',
+          borderRadius: '15px',
+          backgroundColor: '#ffe59b',
+          padding: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#6fb1ba',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          border: '3px solid #73b8c1',
+        }}
+      >
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>TEMPERATURE</div>
+        <div style={{ backgroundColor: 'light-orange', fontSize: '16px', fontWeight: 'normal' }}>Value 3</div>
+      </div>
+
+      {/* Rectangle 4 */}
+      <div
+        style={{
+          width: '600px',
+          height: '75px',
+          borderRadius: '15px',
+          backgroundColor: '#ffe59b',
+          padding: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#6fb1ba',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          border: '3px solid #73b8c1',
+        }}
+      >
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', marginTop:'5px' }}>OXIDATION REDUCTION POTENTIAL</div>
+        <div style={{ fontSize: '16px', fontWeight: 'normal' }}>Value 4</div>
+      </div>
+
+       {/* Rectangle 5 */}
+       <div
+        style={{
+          width: '600px',
+          height: '75px',
+          borderRadius: '15px',
+          backgroundColor: '#ffe59b',
+          padding: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#6fb1ba',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          border: '3px solid #73b8c1',
+        }}
+      >
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>ALKALINE</div>
+        <div style={{ fontSize: '16px', fontWeight: 'normal' }}>Value 5</div>
+      </div>
+
+      {/* Rectangle 6 */}
+      <div
+        style={{
+          width: '600px',
+          height: '75px',
+          borderRadius: '15px',
+          backgroundColor: '#ffe59b',
+          padding: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#6fb1ba',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          border: '3px solid #73b8c1',
+        }}
+      >
+        <div style={{fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>CALCIUM</div>
+        <div style={{ fontSize: '16px', fontWeight: 'normal' }}>Value 6</div>
+      </div>
+    </div>
+
+
+      <ResponsiveContainer style= {styles.leftHalf} width={"100%"} height={600}>
         <LineChart 
           data={selectedData}
         >
@@ -221,13 +382,19 @@ export default function Page() {
           <Line
             type="monotone"
             dataKey="value"
-            stroke="#8884d8"
+            stroke="#87bdc4"
+            strokeWidth="3px"
             activeDot={{ r: 8 }}
           />
         </LineChart>
       </ResponsiveContainer>
+      </div>
 
-      <div className="flex space-x-4">
+      <br></br>
+      <br></br>
+      <div 
+        className="flex justify-center space-x-4"
+      >
         <a
           href="/api/auth/login"
           className="bg-orange text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
@@ -242,6 +409,8 @@ export default function Page() {
           Logout
         </a>
       </div>
+      <br></br>
+      <br></br>
       <ProfileClient />
     </div>
   );
