@@ -53,6 +53,16 @@ const dataSets = {
   ],
 };
 
+//write ups for the text area
+const infoBoxes = {
+  ph: "PH INFO",
+  salinity: "SALINITY INFO",
+  temp: "TEMPERATURE INFO", 
+  orp: "OXIDATION REDUCTION POTENTIAL INFO",
+  alk: "ALKALINE INFO",
+  calc: "CALCIUM INFO",
+}
+
 const styles = {
   container: {
     display: "flex", 
@@ -102,6 +112,7 @@ export default function Page() {
 
   const handleChange = (e) => {
     setSelectedData(dataSets[e.target.value]);
+
   };
 
   return (
@@ -328,7 +339,11 @@ export default function Page() {
       </div>
 
       {/*CHART*/}
-      <ResponsiveContainer style= {styles.leftHalf} width={"100%"} height={600}>
+      <ResponsiveContainer 
+        style= {styles.leftHalf} 
+        width={"100%"} 
+        height={600}
+      >
         <LineChart 
           data={selectedData}
         >
@@ -346,8 +361,9 @@ export default function Page() {
           />
         </LineChart>
       </ResponsiveContainer>
+      
       </div>
-
+      <textarea> </textarea>
       <br></br>
       <br></br>
       <div 
