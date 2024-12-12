@@ -66,7 +66,7 @@ const infoBoxes = {
 const styles = {
   container: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "row" as "row", // Explicitly cast the type
     gap: "20px",
     padding: "0 20px",
   },
@@ -189,7 +189,7 @@ export default function Page() {
       <br></br>
 
       <select
-        style={{ float: "right", width: "750px", text: "center" }}
+        style={{ float: "right", width: "750px", textAlign: "center" }}
         onChange={handleChange}
       >
         <option value="ph">PH</option>
