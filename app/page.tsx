@@ -178,22 +178,14 @@ export default function Page() {
                 </Tab>
               </a>
             </TabList>
-            <TabPanels>
-              {/*<TabPanel>Welcome to the Home page!</TabPanel>
-                <TabPanel>View and analyze Data here.</TabPanel>
-                <TabPanel>Check the History of your data.</TabPanel>*/}
-            </TabPanels>
           </TabGroup>
         </div>
       </div>
 
       <br></br>
       <h1 className="text-3xl font-bold">Coral Reef Homepage!</h1>
+
       <br></br>
-      {/*<a className="text-blue-600" href="/data" id="test-link">
-        {" "}
-        See Data In Depth:{" "}  
-      </a>*/}
       <br></br>
 
       <select
