@@ -72,7 +72,7 @@ const styles = {
   },
   leftHalf: {
     flex: 1,
-    float: "center",
+    justifyContent: "center",
     padding: "20px",
     backgroundColor: "#f9f9f9",
   },
@@ -183,14 +183,20 @@ export default function Page() {
       </div>
 
       <br></br>
-      <h1 className="text-3xl font-bold">Coral Reef Homepage!</h1>
+      <h1 className="text-3xl font-bold">CoralLab380</h1>
 
       <br></br>
       <br></br>
 
       <select
-        style={{ float: "right", width: "750px", textAlign: "center" }}
+        style={{
+          float: "right",
+          width: "750px",
+          height: "20px",
+          textAlign: "center",
+        }} // could also use "left" here for og
         onChange={handleChange}
+        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
       >
         <option value="ph">PH</option>
         <option value="salinity">Salinity</option>
@@ -429,7 +435,7 @@ export default function Page() {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <textarea> </textarea>
+      <textarea name="testing area" id="test" defaultValue="Enter value here"></textarea>
       <br></br>
       <br></br>
       <div className="flex justify-center space-x-4">
