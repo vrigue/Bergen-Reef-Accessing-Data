@@ -226,24 +226,26 @@ export default function Page() {
                   width: "100%",
                 }}
               >
-                <button
-                  onClick={handleGraphClick}
-                  className="flex justify-center bg-orange text-white px-4 py-2 rounded-lg shadow hover:bg-dark-orange"
-                  style={{
-                    padding: "8px 16px",
-                    fontSize: "16px",
-                    backgroundColor: "#f39c12",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer" />
-                  Graph
-                </button>
+                <a href="/data">
+                  <button
+                    onClick={handleGraphClick}
+                    className="flex justify-center bg-orange text-white px-4 py-2 rounded-lg shadow hover:bg-dark-orange"
+                    style={{
+                      padding: "8px 16px",
+                      fontSize: "16px",
+                      backgroundColor: "#f39c12",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer" />
+                    Graph
+                  </button>
+                </a>
               </div>
             </div>
           </div>
