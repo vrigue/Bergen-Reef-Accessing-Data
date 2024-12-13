@@ -80,8 +80,87 @@ export default function Page() {
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold">CoralLab380</h1>
+      <br></br>
+      <br></br>
 
+      {/* top orange box*/}
+      <div className="bg-light-orange p-6 rounded-lg shadow-lg flex justify-between items-center w-1/2 mx-auto">
+        <div>
+          <h2 className="font-bold text-lg">Admin</h2>
+          <h1 className="text-2xl font-semibold">name</h1>
+          <p className="text-sm">email</p>
+        </div>
+        <div className="flex flex-col space-y-4">
+          <a
+            href="/api/auth/login"
+            className="bg-black text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition text-center"
+          >
+             Login
+          </a>
+          <a
+            href="/api/auth/logout"
+            className="bg-black text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
+          >
+            Logout
+          </a>
+        </div>
+      </div>
+      
+    <br></br>  
+    <div className="flex justify-center">
+      <div className="rounded-md justify-content-center w-2/3 bg-gray-100 p-4" style={{height:400}}>
+
+          <div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
+            <h3 className="font-bold text-lg mb-4">Manage Users</h3>
+            <div className="flex items-center mb-4">
+              <span className="h-4 w-4 bg-black rounded-full inline-block mr-4"></span>
+              <p className="flex-1">Henry Ramirez</p>
+              <select className="border rounded px-2 py-1">
+                <option value="Admin">Admin</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            <div className="flex items-center mb-4">
+              <span className="h-4 w-4 bg-black rounded-full inline-block mr-4"></span>
+              <p className="flex-1">Ben Isecke</p>
+              <select className="border rounded px-2 py-1">
+                <option value="Admin">Admin</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            <div className="flex items-center mb-4">
+              <span className="h-4 w-4 bg-black rounded-full inline-block mr-4"></span>
+              <p className="flex-1">Vrimagha Guejesni</p>
+              <select className="border rounded px-2 py-1">
+                <option value="Admin">Admin</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            
+            <br></br>
+            <br></br>
+
+            <div className="flex justify-center space-x-4">
+              <a
+                href="/api/auth/login"
+                className="bg-black text-white px-6 py-2 rounded-md shadow-lg hover:bg-orange-600 transition text-center"
+              >
+                Navigate to CSV Files
+              </a>
+              <a
+                href="/api/auth/login"
+                className="bg-black text-white px-6 py-2 rounded-md shadow-lg hover:bg-orange-600 transition text-center"
+              >
+                Sync Fusion Files
+              </a>
+            </div>
+
+          </div>
+        
+      </div>
+    </div>
+
+      {/*<br></br>
       <div className="flex justify-center space-x-4">
         <a
           href="/api/auth/login"
@@ -96,7 +175,7 @@ export default function Page() {
         >
           Logout
         </a>
-      </div>
+      </div> */}
       <br></br>
       <br></br>
       <ProfileClient />

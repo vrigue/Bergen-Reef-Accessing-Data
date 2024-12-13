@@ -124,11 +124,7 @@ export default function Page() {
           </div>
         </a>
         <div className="flex items-right justify-between">
-<<<<<<< HEAD
-          <a href="/admin">
-=======
           <a href="/profile">
->>>>>>> ada2b85556708ca5b5f57c98167df37c359f77c0
             <div className="pt-1.5 pr-8">
               <UserCircleIcon className="size-8 text-orange" />
             </div>
@@ -198,11 +194,16 @@ export default function Page() {
         style={{
           float: "right",
           width: "750px",
-          height: "20px",
+          height: "30px",
           textAlign: "center",
+          marginRight: 150,
+          marginTop: -10,
+          border: "1px solid teal",
+          borderLeft:"1px solid black",
+          borderBottom: "whie",
         }} // could also use "left" here for og
         onChange={handleChange}
-        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
       >
         <option value="ph">PH</option>
         <option value="salinity">Salinity</option>
@@ -216,11 +217,11 @@ export default function Page() {
 
       {/*CONTAINER HOLDING ELEMENTS AND GRAPH IN HALVES OF THE SCREEN*/}
       <div style={styles.container}>
+
         {/*ELEMENTS*/}
-        <div
+        <div className="bg-white rounded-lg shadow-lg p-8"
           style={{
-            ...styles.leftHalf,
-            display: "flex",
+
             flexDirection: "column",
             gap: "20px",
           }}
@@ -228,8 +229,8 @@ export default function Page() {
           {/* Rectangle 1 */}
           <div
             style={{
-              width: "600px",
-              height: "75px",
+              width: "500px",
+              height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
               padding: "10px",
@@ -256,11 +257,13 @@ export default function Page() {
             </div>
           </div>
 
+          <br></br>
+
           {/* Rectangle 2 */}
           <div
             style={{
-              width: "600px",
-              height: "75px",
+              width: "500px",
+              height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
               padding: "10px",
@@ -287,11 +290,13 @@ export default function Page() {
             </div>
           </div>
 
+          <br></br>
+
           {/* Rectangle 3 */}
           <div
             style={{
-              width: "600px",
-              height: "75px",
+              width: "500px",
+              height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
               padding: "10px",
@@ -324,11 +329,13 @@ export default function Page() {
             </div>
           </div>
 
+          <br></br>
+
           {/* Rectangle 4 */}
           <div
             style={{
-              width: "600px",
-              height: "75px",
+              width: "500px",
+              height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
               padding: "10px",
@@ -356,11 +363,13 @@ export default function Page() {
             </div>
           </div>
 
+          <br></br>
+
           {/* Rectangle 5 */}
           <div
             style={{
-              width: "600px",
-              height: "75px",
+              width: "500px",
+              height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
               padding: "10px",
@@ -387,11 +396,13 @@ export default function Page() {
             </div>
           </div>
 
+          <br></br>
+
           {/* Rectangle 6 */}
           <div
             style={{
-              width: "600px",
-              height: "75px",
+              width: "500px",
+              height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
               padding: "10px",
@@ -421,7 +432,7 @@ export default function Page() {
 
         {/*CHART*/}
         <ResponsiveContainer
-          style={styles.leftHalf}
+          className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4"
           width={"100%"}
           height={600}
         >
