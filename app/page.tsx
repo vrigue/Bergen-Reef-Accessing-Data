@@ -214,11 +214,10 @@ export default function Page() {
 
       {/*CONTAINER HOLDING ELEMENTS AND GRAPH IN HALVES OF THE SCREEN*/}
       <div style={styles.container}>
-
         {/*ELEMENTS*/}
-        <div className="bg-white rounded-lg shadow-lg p-8"
+        <div
+          className="bg-white rounded-lg shadow-lg p-8"
           style={{
-
             flexDirection: "column",
             gap: "20px",
           }}
@@ -429,10 +428,7 @@ export default function Page() {
 
         {/*CHART*/}
         <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4">
-          <ResponsiveContainer
-            width={"100%"}
-            height={500}
-          >
+          <ResponsiveContainer width={"100%"} height={500}>
             <LineChart data={selectedData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
@@ -450,23 +446,22 @@ export default function Page() {
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}
-          <textarea style={{
+          <textarea
+            style={{
               width: "500px",
               height: "40px",
               borderRadius: "15px",
               border: "1px solid black",
-              textAlign: "center",  
+              textAlign: "center",
               margin: "0 auto",
               display: "block",
-              padding: "10px",}}
-            >
-            INFO ABOUT ELEMENT  
-          </textarea>
+              padding: "10px",
+            }}
+            defaultValue="INFO ABOUT ELEMENT"
+          ></textarea>
         </div>
-
       </div>
-      
-      
+
       {/*<textarea
         name="testing area"
         id="test"
