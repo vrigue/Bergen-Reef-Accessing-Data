@@ -80,9 +80,11 @@ export default function Page() {
           </div>
         </a>
         <div className="flex items-right justify-between">
-          <div className="pt-1.5 pr-8">
-            <UserCircleIcon className="size-8 text-orange" />
-          </div>
+          <a href="/profile">
+            <div className="pt-1.5 pr-8">
+              <UserCircleIcon className="size-8 text-orange" />
+            </div>
+          </a>
           <TabGroup defaultIndex={2}>
             <TabList className="flex space-x-4">
               <a href="/">
@@ -140,7 +142,7 @@ export default function Page() {
       </div>
 
       {/* Content */}
-      <h1 className="text-3xl font-bold underline">History</h1>
+      <h1 className="text-3xl font-bold underline">CoralLab380 History</h1>
       <div className="flex gap-8 mt-6">
         {/* Left Panel */}
         <div

@@ -124,9 +124,11 @@ export default function Page() {
           </div>
         </a>
         <div className="flex items-right justify-between">
-          <div className="pt-1.5 pr-8">
-            <UserCircleIcon className="size-8 text-orange" />
-          </div>
+          <a href="/profile">
+            <div className="pt-1.5 pr-8">
+              <UserCircleIcon className="size-8 text-orange" />
+            </div>
+          </a>
           <TabGroup defaultIndex={0}>
             <TabList className="flex space-x-4">
               <a href="/">
@@ -435,7 +437,11 @@ export default function Page() {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <textarea name="testing area" id="test" defaultValue="Enter value here"></textarea>
+      <textarea
+        name="testing area"
+        id="test"
+        defaultValue="Enter value here"
+      ></textarea>
       <br></br>
       <br></br>
       <div className="flex justify-center space-x-4">
