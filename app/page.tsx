@@ -196,7 +196,7 @@ export default function Page() {
           width: "750px",
           height: "30px",
           textAlign: "center",
-          marginRight: 150,
+          marginRight: 80,
           marginTop: -10,
         }} // could also use "left" here for og
         onChange={handleChange}
