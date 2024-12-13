@@ -77,7 +77,7 @@ const styles = {
     backgroundColor: "#f9f9f9",
   },
   rightHalf: {
-    flex: 1, // Takes up the other 50%
+    flex: 2, // Takes up the other 50%
     display: "flex",
     justifyContent: "center", // Centers the graph horizontally
     alignItems: "center", // Centers the graph vertically
