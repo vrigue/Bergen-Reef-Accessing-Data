@@ -3,7 +3,7 @@ import React, { useEffect, useState, Fragment } from "react";
 import clsx from "clsx";
 import "../globals.css";
 
-import MyDatePicker from "../components/MyDatePicker";
+import DateConstraintElement from "../components/DateConstraintElement";
 
 import HistoryPageGrid from "../components/HistoryPageGrid";
 import {
@@ -18,10 +18,15 @@ import {
   MenuItems,
 } from "@headlessui/react";
 
-import { UserCircleIcon, ChevronDownIcon} from "@heroicons/react/24/solid";
+import {
+  UserCircleIcon,
+  ChevronDownIcon,
+  ArrowPathIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/solid";
 
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the Data Grid
+import "ag-grid-community/styles/ag-theme-quartz.css";
 
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
@@ -31,8 +36,10 @@ export default function Page() {
   const [rowData, setRowData] = useState<any[]>([]);
   const [colDefs] = useState([
     { field: "id" },
+    { field: "datetime" },
+    { field: "name" },
     { field: "type" },
-    { field: "data" },
+    { field: "value" },
   ]);
 
   const [startDate, setStartDate] = useState(new Date());
@@ -44,10 +51,9 @@ export default function Page() {
         const result = await response.json();
         setData(result);
 
-        // Update row data based on fetched data
         const formattedData = result.map((item: any, index: number) => ({
           id: index,
-          datetime: item.datetime, // || "Temperature ˚C",
+          datetime: item.datetime,
           name: item.name,
           type: item.type,
           value: item.value,
@@ -61,13 +67,16 @@ export default function Page() {
     fetchData();
   }, []);
 
+  const handleGraphClick = () => {
+    //for the future
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between bg-teal p-4 shadow-lg rounded-lg">
         <a href="/">
           <div className="text-3xl">
-            {" "}
-            <img src="/images/coral-logo.png"></img>
+            <img src="/images/coral-logo.png" alt="Logo" />
           </div>
         </a>
         <div className="flex items-right justify-between">
@@ -125,114 +134,132 @@ export default function Page() {
                 </Tab>
               </a>
             </TabList>
-            <TabPanels>
-              {/*<TabPanel>Welcome to the Home page!</TabPanel>
-                <TabPanel>View and analyze Data here.</TabPanel>
-                <TabPanel>Check the History of your data.</TabPanel>*/}
-            </TabPanels>
+            <TabPanels></TabPanels>
           </TabGroup>
         </div>
       </div>
 
+      {/* Content */}
       <h1 className="text-3xl font-bold underline">History</h1>
-
-      <div className="flex gap-8 pt-5">
-        {/* Left Menu */}
-        <div className="flex flex-col bg-medium-gray w-1/3 p-6 rounded-lg shadow-md">
-          <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-5">
-            Enter Date Constraints
-          </h1>
-          <div className="flex space-x-4 justify-center pt-4">
-            <MyDatePicker />
+      <div className="flex gap-8 mt-6">
+        {/* Left Panel */}
+        <div
+          className="flex flex-col bg-gray-200 p-6 rounded-lg shadow-md"
+          style={{
+            width: "30%",
+            position: "fixed",
+            top: "20%",
+            height: "60vh",
+            overflowY: "auto",
+          }}
+        >
+          <div className="flex flex-col h-full justify-center">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Enter Date Constraints
+            </h2>
+            <div className="flex flex-col gap-4">
+              {/* DateTime Inputs */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-700">
+                  Start Date:
+                </span>
+                <DateConstraintElement />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-700">
+                  End Date:
+                </span>
+                <DateConstraintElement />
+              </div>
+            </div>
+            {/* Type Selection Menu */}
+            <Menu as="div" className="relative inline-block text-left mt-4">
+              <MenuButton className="inline-flex w-full items-center justify-between px-3 py-2 bg-white rounded-md text-gray-800 shadow ring-1 ring-gray-300">
+                Select Type
+                <ChevronDownIcon className="h-5 w-5 text-gray-500" />
+              </MenuButton>
+              <MenuItems className="absolute mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-10">
+                {["Tmp", "SKIMMERW", "ORP", "SUMPRETURNA", "UVA"].map(
+                  (item) => (
+                    <MenuItem key={item}>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700"
+                          } block px-4 py-2 text-sm`}
+                        >
+                          {item}
+                        </button>
+                      )}
+                    </MenuItem>
+                  )
+                )}
+              </MenuItems>
+            </Menu>
+            {/* Buttons */}
+            <div className="flex justify-center mt-6 space-x-4">
+              <button className="bg-orange text-white px-4 py-2 rounded-lg shadow hover:bg-dark-orange">
+                Apply
+              </button>
+              <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-400">
+                Reset
+              </button>
+            </div>
+            {/* Button Section */}
+            <div
+              className="relative inline-block text-left mt-4"
+              style={{
+                marginTop: "10px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div
+                style={{
+                  marginTop: "10px",
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                <button
+                  onClick={handleGraphClick}
+                  className="flex justify-center bg-orange text-white px-4 py-2 rounded-lg shadow hover:bg-dark-orange"
+                  style={{
+                    padding: "8px 16px",
+                    fontSize: "16px",
+                    backgroundColor: "#f39c12",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer" />
+                  Graph
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right Table */}
-        <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
-          <Menu as="div" className="relative inline-block text-left pt-3">
-            <div>
-              <MenuButton className="inline-flex w-full justify-left gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                Tmp
-                <ChevronDownIcon
-                  aria-hidden="true"
-                  className="-mr-1 size-5 text-gray-400"
-                />
-              </MenuButton>
+        {/* Right Panel */}
+        <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "33%" }}>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Data Table</h2>
+            <div className="flex space-x-3">
+              <a href="/history">
+                <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer" />
+              </a>
             </div>
-
-            <MenuItems
-              transition
-              className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-            >
-              <div className="py-1">
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    Tmp
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    SKIMMERW
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    ORP
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <button
-                    type="submit"
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    SUMPRETURNA
-                  </button>
-                </MenuItem>
-                <MenuItem>
-                  <button
-                    type="submit"
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    UVA
-                  </button>
-                </MenuItem>
-                <MenuItem>
-                  <button
-                    type="submit"
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    HeaterA
-                  </button>
-                </MenuItem>
-                <MenuItem>
-                  <button
-                    type="submit"
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    LEDLampA
-                  </button>
-                </MenuItem>
-                <MenuItem>
-                  <button
-                    type="submit"
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                  >
-                    SUMPRETURNW
-                  </button>
-                </MenuItem>
-              </div>
-            </MenuItems>
-          </Menu>
-          <HistoryPageGrid />
+          </div>
+          <div className="ag-theme-quartz" style={{ height: "400px" }}>
+            <HistoryPageGrid />
+          </div>
         </div>
       </div>
     </div>
