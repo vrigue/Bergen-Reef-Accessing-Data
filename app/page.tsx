@@ -124,9 +124,11 @@ export default function Page() {
           </div>
         </a>
         <div className="flex items-right justify-between">
-          <div className="pt-1.5 pr-8">
-            <UserCircleIcon className="size-8 text-orange" />
-          </div>
+          <a href="/admin">
+            <div className="pt-1.5 pr-8">
+              <UserCircleIcon className="size-8 text-orange" />
+            </div>
+          </a>
           <TabGroup defaultIndex={0}>
             <TabList className="flex space-x-4">
               <a href="/">
