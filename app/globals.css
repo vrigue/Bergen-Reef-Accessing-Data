@@ -33,3 +33,27 @@ body {
 h1 {
   text-align: center;
 }
+
+.ag-theme-balham {
+  background-color: transparent;
+  margin-top: -30px;
+}
+
+.ag-paging-panel > span {
+  color: black !important;
+}
+
+.ag-root-wrapper {
+  position: relative !important;
+}
+
+.ag-root-wrapper-body {
+  margin-top: 40px;
+}
+
+.ag-paging-panel {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  border-top: none !important;
+}

@@ -124,7 +124,11 @@ export default function Page() {
           </div>
         </a>
         <div className="flex items-right justify-between">
+<<<<<<< HEAD
           <a href="/admin">
+=======
+          <a href="/profile">
+>>>>>>> ada2b85556708ca5b5f57c98167df37c359f77c0
             <div className="pt-1.5 pr-8">
               <UserCircleIcon className="size-8 text-orange" />
             </div>
@@ -437,7 +441,11 @@ export default function Page() {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <textarea name="testing area" id="test" defaultValue="Enter value here"></textarea>
+      <textarea
+        name="testing area"
+        id="test"
+        defaultValue="Enter value here"
+      ></textarea>
       <br></br>
       <br></br>
       <div className="flex justify-center space-x-4">
