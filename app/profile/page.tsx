@@ -87,8 +87,8 @@ export default function Page() {
       <div className="bg-light-orange p-6 rounded-lg shadow-lg flex justify-between items-center w-1/2 mx-auto">
         <div>
           <h2 className="font-bold text-lg">Admin</h2>
-          <h1 className="text-2xl font-semibold">name</h1>
-          <p className="text-sm">email</p>
+          <h1 className="text-2xl font-semibold">Dr. Reeves</h1>
+          <p className="text-sm">davree@gmail.com</p>
         </div>
         <div className="flex flex-col space-y-4">
           <a
