@@ -198,9 +198,6 @@ export default function Page() {
           textAlign: "center",
           marginRight: 150,
           marginTop: -10,
-          border: "1px solid teal",
-          borderLeft:"1px solid black",
-          borderBottom: "whie",
         }} // could also use "left" here for og
         onChange={handleChange}
         className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
@@ -431,49 +428,51 @@ export default function Page() {
         </div>
 
         {/*CHART*/}
-        <ResponsiveContainer
-          className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4"
-          width={"100%"}
-          height={600}
-        >
-          <LineChart data={selectedData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="#87bdc4"
-              strokeWidth="3px"
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4">
+          <ResponsiveContainer
+            width={"100%"}
+            height={500}
+          >
+            <LineChart data={selectedData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#87bdc4"
+                strokeWidth="3px"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+
+          {/*TEXT AREA BELOW GRAPH*/}
+          <textarea style={{
+              width: "500px",
+              height: "40px",
+              borderRadius: "15px",
+              border: "1px solid black",
+              textAlign: "center",  
+              margin: "0 auto",
+              display: "block",
+              padding: "10px",}}
+            >
+            INFO ABOUT ELEMENT  
+          </textarea>
+        </div>
+
       </div>
-      <textarea
+      
+      
+      {/*<textarea
         name="testing area"
         id="test"
         defaultValue="Enter value here"
-      ></textarea>
-      <br></br>
-      <br></br>
-      <div className="flex justify-center space-x-4">
-        <a
-          href="/api/auth/login"
-          className="bg-orange text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
-        >
-          Login
-        </a>
+      ></textarea> */}
 
-        <a
-          href="/api/auth/logout"
-          className="bg-orange text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
-        >
-          Logout
-        </a>
-      </div>
       <br></br>
       <br></br>
       <ProfileClient />
