@@ -54,13 +54,13 @@ const dataSets = {
 };
 
 //write ups for the text area
-const infoBoxes = {
-  ph: "PH INFO",
-  salinity: "SALINITY INFO",
-  temp: "TEMPERATURE INFO",
-  orp: "OXIDATION REDUCTION POTENTIAL INFO",
-  alk: "ALKALINE INFO",
-  calc: "CALCIUM INFO",
+const infoContent = {
+  ph: 'This is the pH info!',
+  calc: 'This is the calcium info!',
+  alk: 'This is the alkalinity info!',
+  orp: 'This is the ORP info!',
+  temp: 'This is the temperature info!',
+  salinity: 'This is the salinity info!',
 };
 
 const styles = {
@@ -109,9 +109,11 @@ export default function Page() {
 
   //stuff for selecting data according to dropdown in graph
   const [selectedData, setSelectedData] = React.useState(dataSets.ph);
+  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.ph);
 
   const handleChange = (e) => {
     setSelectedData(dataSets[e.target.value]);
+    setSelectedInfo(infoContent[e.target.value]);
   };
 
   return (
@@ -200,6 +202,7 @@ export default function Page() {
           marginTop: -10,
         }} // could also use "left" here for og
         onChange={handleChange}
+        //value={selectedInfo}
         className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
       >
         <option value="ph">PH</option>
@@ -446,19 +449,17 @@ export default function Page() {
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}
-          <textarea
+          <div
+            className="mt-4 p-4 bg-gray-100 rounded-lg shadow"
             style={{
-              width: "500px",
-              height: "40px",
-              borderRadius: "15px",
-              border: "1px solid black",
-              textAlign: "center",
-              margin: "0 auto",
-              display: "block",
-              padding: "10px",
-            }}
-            defaultValue="INFO ABOUT ELEMENT"
-          ></textarea>
+              fontSize: "16px",
+              fontWeight: "normal",
+              color: "#333",
+              }}
+          >
+            {selectedInfo}
+          </div>
+
         </div>
       </div>
 
