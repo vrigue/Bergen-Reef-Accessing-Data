@@ -31,8 +31,8 @@ An interactive web application that not only displays graphical representations 
 - [AG Grid](https://www.ag-grid.com/)
     Used to handle large datasets, customizable rows, and pagination
 
-- [React Datepicker](https://reactdatepicker.com/)
-    Advanced date selection features
+- [flatpickr](https://reactdatepicker.com/)
+    Advanced date selection features, including datetime filtering
     
 - [Auth0](https://auth0.com/)
     Authentication technology
