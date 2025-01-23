@@ -107,6 +107,9 @@ export default function Page() {
     fetchData();
   }, []);
 
+  const temp = data[0]?.data;
+  const pH = "Hello" + data[1]?.data;
+
   //stuff for selecting data according to dropdown in graph
   const [selectedData, setSelectedData] = React.useState(dataSets.ph);
   const [selectedInfo, setSelectedInfo] = React.useState(infoContent.ph);
@@ -230,7 +233,7 @@ export default function Page() {
             style={{
               width: "500px",
               height: "70px",
-              borderRadius: "15px",
+              borderRadius: "15px", 
               backgroundColor: "#ffe59b",
               padding: "10px",
               display: "flex",
@@ -252,7 +255,7 @@ export default function Page() {
               PH
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              Value 1
+              {pH}
             </div>
           </div>
 
