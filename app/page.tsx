@@ -255,7 +255,7 @@ export default function Page() {
               PH
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              {pH}
+              8.03
             </div>
           </div>
 
@@ -288,7 +288,7 @@ export default function Page() {
               SALINITY
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              Value 2
+            {pH}
             </div>
           </div>
 
@@ -327,7 +327,7 @@ export default function Page() {
                 fontWeight: "normal",
               }}
             >
-              Value 3
+              75.70
             </div>
           </div>
 
@@ -394,7 +394,7 @@ export default function Page() {
               ALKALINE
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              Value 5
+            {pH}
             </div>
           </div>
 
