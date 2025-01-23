@@ -57,3 +57,18 @@ h1 {
   right: 0 !important;
   border-top: none !important;
 }
+
+.rectangle {
+  width: "500px";
+  height: "70px";
+  borderRadius: "15px";
+  backgroundColor: "#ffe59b";
+  padding: "10px";
+  display: "flex";
+  flexDirection: "column";
+  justifyContent: "center";
+  alignItems: "center";
+  color: "#6fb1ba";
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)";
+  border: "3px solid #73b8c1";
+}
