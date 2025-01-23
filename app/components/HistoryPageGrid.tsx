@@ -20,6 +20,8 @@ ModuleRegistry.registerModules([
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
+import DTPicker from "./DTPicker";
+
 export default function HistoryPageGrid() {
   const [data, setData] = useState<any[]>([]);
   const [rowData, setRowData] = useState<any[]>([]);
@@ -31,13 +33,14 @@ export default function HistoryPageGrid() {
       field: "datetime",
       filter: "agDateColumnFilter",
       filterParams: {
-        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
-          if (!cellValue) return -1;
-          const cellDate = new Date(cellValue);
-          if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
-            return 0;
-          }
-          return cellDate < filterLocalDateAtMidnight ? -1 : 1;
+        defaultOption: "inRange",
+        comparator: function (filterLocalDate, cellValue) {
+          // Parse both dates using the ISO 8601 format
+          filterLocalDate = new Date(filterLocalDate);
+          cellValue = new Date(cellValue); 
+        
+          // Directly compare the dates
+          return filterLocalDate.getTime() - cellValue.getTime(); 
         },
       },
     },
@@ -45,15 +48,6 @@ export default function HistoryPageGrid() {
     { field: "type", filter: "agTextColumnFilter" },
     { field: "value", filter: "agNumberColumnFilter" },
   ]);
-
-  const defaultColDef = useMemo(() => {
-    return {
-      flex: 1,
-      minWidth: 150,
-      sortable: true,
-      filter: true,
-    };
-  }, []);
 
   const clearFilters = () => {
     if (gridApiRef.current) {
@@ -91,12 +85,24 @@ export default function HistoryPageGrid() {
         <AgGridReact
           rowData={rowData}
           columnDefs={colDefs}
-          defaultColDef={defaultColDef}
+          defaultColDef={{
+            flex: 1,
+            minWidth: 100,
+            resizable: true,
+            sortable: true,
+            filter: true,
+            filterParams: {
+              buttons: ['apply', 'clear', 'reset'],
+            },
+          }}
           domLayout="autoHeight"
           pagination={true}
           paginationPageSize={10}
           onGridReady={(params) => {
             gridApiRef.current = params.api;
+          }}
+          components={{
+            agDateInput: DTPicker
           }}
         />
       </div>
