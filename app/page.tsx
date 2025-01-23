@@ -108,7 +108,7 @@ export default function Page() {
   }, []);
 
   const temp = data[0]?.data;
-  const pH = "Hello" + data[1]?.data;
+  const pH = data[1]?.data;
 
   //stuff for selecting data according to dropdown in graph
   const [selectedData, setSelectedData] = React.useState(dataSets.ph);
