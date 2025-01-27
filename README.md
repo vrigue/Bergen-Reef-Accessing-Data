@@ -11,7 +11,9 @@ An interactive web application that not only displays graphical representations 
     ORM used to query data in the database, chosen for its more lightweight and SQL-centric approach
 
 - [Cron-Job](https://cron-job.org/) and [Raspberry Pi](https://www.raspberrypi.org/)
-    Used to pull data from Apex Fusion/the machines in the coral reef lab and deposit it in the database at regular intervals
+    Used to pull data from Apex Fusion/the machines in the Coral Reef Lab and deposit it in the database at regular intervals
+
+- [xml2js] (https://www.npmjs.com/package/xml2js)
 
 - [HTML/JS/CSS](https://developer.mozilla.org/en-US/docs/Web/HTML) with [Tailwind CSS](https://tailwindcss.com/) framework
     Visuals and styling within the UI
@@ -24,12 +26,16 @@ An interactive web application that not only displays graphical representations 
 
 - [Next.js](https://nextjs.org/)
     React framework used to build full stack web applications
+
+- [Vercel]
     
 - [Recharts](https://recharts.org/)
     Used for creation of graphical visuals
 
 - [AG Grid](https://www.ag-grid.com/)
     Used to handle large datasets, customizable rows, and pagination
+
+- [D3]
 
 - [flatpickr](https://reactdatepicker.com/)
     Advanced date selection features, including datetime filtering
