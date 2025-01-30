@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<datalog software="5.12_8H24" hardware="1.0">
+<hostname>MakerReef</hostname>
+<serial>AC6:15428</serial>
+<timezone>-5.00</timezone>
+<record>
+<date>10/08/2024 00:00:00</date>
+<probe>
+<name>Tmp</name> <type>Temp</type><value>75.8</value></probe>
+<probe>
+<name>pH</name> <type>pH</type><value>8.20</value></probe>
+<probe>
+<name>ORP</name> <type>ORP</type><value>426</value></probe>
+<probe>
+<name>LLS</name> <type>in</type><value>7.2</value></probe>
+<probe>
+<name>SUMPRETURNA</name> <type>Amps</type><value>0.4</value></probe>
+<probe>
+<name>SKIMMERA</name> <type>Amps</type><value>0.4</value></probe>
+<probe>
+<name>UVA</name> <type>Amps</type><value>0.1</value></probe>
+<probe>
+<name>HeaterA</name> <type>Amps</type><value>0.0</value></probe>
+<probe>
+<name>LEDLampA</name> <type>Amps</type><value>0.0</value></probe>
+<probe>
+<name>EMPTYA</name> <type>Amps</type><value>0.0</value></probe>
+<probe>
+<name>ATKpowerA</name> <type>Amps</type><value>0.0</value></probe>
+<probe>
+<name>WavepumpA</name> <type>Amps</type><value>0.0</value></probe>
+<probe>
+<name>SUMPRETURNW</name> <type>pwr</type><value>53</value></probe>
+<probe>
+<name>SKIMMERW</name> <type>pwr</type><value>35</value></probe>
+<probe>
+<name>UVW</name> <type>pwr</type><value>14</value></probe>
+<probe>
+<name>HeaterW</name> <type>pwr</type><value>0</value></probe>
+<probe>
+<name>LEDLampW</name> <type>pwr</type><value>1</value></probe>
+<probe>
+<name>EMPTYW</name> <type>pwr</type><value>0</value></probe>
+<probe>
+<name>ATKpowerW</name> <type>pwr</type><value>2</value></probe>
+<probe>
+<name>WavepumpW</name> <type>pwr</type><value>1</value></probe>
+<probe>
+<name>Volt_2</name> <type>volts</type><value>122</value></probe>
+<probe>
+<name>Tmpx4</name> <type>Temp</type><value>20.7</value></probe>
+<probe>
+<name>SALT</name> <type>Cond</type><value>35.2</value></probe>
+<probe>
+<name>Alkx5</name> <type>alk</type><value>9.05</value></probe>
+<probe>
+<name>Cax5</name> <type>ca</type><value>451</value></probe>
+<probe>
+<name>Mgx5</name> <type>mg</type><value>1172</value></probe>
+</record>
+</datalog>
