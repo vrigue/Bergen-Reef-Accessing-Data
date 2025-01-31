@@ -1,18 +1,18 @@
-// import 'dotenv/config';
-// import { drizzle } from 'drizzle-orm/mysql2';
-// import { dataTable } from 'src/db/schema';
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/mysql2';
+import { dataTable } from 'src/db/data-schema';
 
-// export default async function insertData(data : JSON) {
-//   const db = drizzle(process.env.DATABASE_URL!);
+const db = drizzle(process.env.DATABASE_URL!);
 
-//   const sample1: typeof dataTable.$inferInsert = {
-//     data: 75
-//   };
-
-//   const sample2: typeof dataTable.$inferInsert = {
-//     data: 86
-//   };
-
-//   await db.insert(dataTable).values(sample1);
-//   await db.insert(dataTable).values(sample2);
-// }
+export default async function insertData(data : Array<Record<string, any>>, date : string) {
+    for (let i = 0; i < data.length; i++) {
+        const entry : typeof dataTable.$inferInsert = {
+            datetime: new Date(date),
+            name: data[i].name,
+            type: data[i].type,
+            value: data[i].value
+        };
+        
+        await db.insert(dataTable).values(entry);
+    }
+}
