@@ -6,6 +6,7 @@ export async function POST(request : Request) {
     try {
         //
         const raw_xml = await request.text();
+        console.log(raw_xml);
 
         //
         var xml = raw_xml.replace(/^<\?xml[^>]*>\s*/, '');
