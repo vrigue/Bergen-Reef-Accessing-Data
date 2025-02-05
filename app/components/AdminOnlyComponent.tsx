@@ -8,7 +8,7 @@ export default function AdminOnly() {
   useEffect(() => {
     if (user) {
       const roles = user['https://coralreefwebapp/roles'] || [];
-      setIsAdmin(roles.includes('administrator'));
+      //setIsAdmin(roles.includes('administrator'));
     }
   }, [user]);
 
