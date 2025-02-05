@@ -4,30 +4,15 @@ import insertData from 'src/lib/insertData';
 
 export async function POST(request : Request) {
     try {
-        //
+        // Get the XML file within the request
         const raw_xml = await request.text();
-        console.log(raw_xml);
-
-        //
-        var xml = raw_xml.replace(/^<\?xml[^>]*>\s*/, '');
-        xml = xml.replace(/^<status[^>]*>/, '').replace(/<\/status>\s*$/m, '');
-        xml = xml.replace(/(<\/outlets>\s*\n)(\s*<name>)/, '$1<probe>$2');
-        xml = xml.replace(/<\/record>\s*/, '');
-        xml = xml.replace(/<\/datalog>\s*/, '');
-
-        //
-        const formatted_xml = `<status>\n${xml}\n</status>`;
-        console.log(formatted_xml);
         
-        //
+        // Use xml2js package to convert XML into JSON
         const parser = new xml2js.Parser({ explicitArray: false });
-        const parsed_xml = await parser.parseStringPromise(formatted_xml);
+        const parsed_xml = await parser.parseStringPromise(raw_xml);
 
-        //
+        // Pass JSON to database helper function
         await insertData(parsed_xml.status.probes.probe, parsed_xml.status.date);
-        await insertData(parsed_xml.status.probe, parsed_xml.status.date);
-
-        return NextResponse.json({ parsedData: parsed_xml });
     } 
     catch (error) {
         console.error("Error parsing XML:", error);
