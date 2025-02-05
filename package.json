@@ -13,6 +13,8 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.36.4",
     "flatpickr": "^4.6.13",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.1.0",
     "mysql2": "^3.11.4",
     "next": "^15.1.1",
     "plotly.js": "^2.35.3",
@@ -32,6 +34,7 @@
     "lint": "next lint"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "22.9.0",
     "@types/react": "18.3.12",
     "@types/react-dom": "^18.3.1",
