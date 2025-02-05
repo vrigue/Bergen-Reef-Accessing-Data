@@ -4,41 +4,41 @@ An interactive web application that not only displays graphical representations 
 
 ## Technologies used:
 
-- [MySQL Relational Database](https://www.mysql.com/)
-    The database we are using to store data pulled from Apex Fusion 
-
-- [Drizzle](https://orm.drizzle.team/)
-    ORM used to query data in the database, chosen for its more lightweight and SQL-centric approach
-
-- [Cron-Job](https://cron-job.org/) and [Raspberry Pi](https://www.raspberrypi.org/)
-    Used to pull data from Apex Fusion/the machines in the Coral Reef Lab and deposit it in the database at regular intervals
+- [ESP32](http://esp32.net/), [CircuitPython] (https://circuitpython.org/), [Cron-Job](https://cron-job.org/)
+    The tech stack used to pull data from Apex Fusion in the Coral Reef Lab and push it to the server at regular intervals
 
 - [xml2js] (https://www.npmjs.com/package/xml2js)
+    A package used to convert data from Apex Fusion from XML format to JSON format
+
+- [MySQL Relational Database](https://www.mysql.com/)
+    The database used to store data pulled from Apex Fusion 
+
+- [Drizzle](https://orm.drizzle.team/)
+    An ORM used to query data from the database, chosen for its more lightweight and SQL-centric approach
 
 - [HTML/JS/CSS](https://developer.mozilla.org/en-US/docs/Web/HTML) with [Tailwind CSS](https://tailwindcss.com/) framework
-    Visuals and styling within the UI
+    The languages and framework used for visuals and styling within the UI
 
 - [Headless UI](https://headlessui.dev/)
-    Works seamlessly with Tailwind CSS for building accessible menu components
+    A library used for building accessible menu components – works seamlessly with Tailwind CSS
 
 - [Heroicons](https://heroicons.com/)
-    SVG icons that work well with Tailwind
+    SVG icons that work well with Tailwind CSS
 
 - [Next.js](https://nextjs.org/)
-    React framework used to build full stack web applications
+    A React framework used to build full stack web applications
 
-- [Vercel]
+- [Vercel] (https://vercel.com/)
+    A cloud platform used to deploy web applications – integrates seamlessly with Next.js
     
-- [Recharts](https://recharts.org/)
-    Used for creation of graphical visuals
+- [Recharts](https://recharts.org/), [D3] (https://d3js.org/)
+    The libraries used for creation of graphical visuals
 
 - [AG Grid](https://www.ag-grid.com/)
-    Used to handle large datasets, customizable rows, and pagination
-
-- [D3]
+    A library for handling large datasets, customizable rows, and pagination
 
 - [flatpickr](https://reactdatepicker.com/)
-    Advanced date selection features, including datetime filtering
+    A React package used for date selection features, including datetime filtering
     
 - [Auth0](https://auth0.com/)
-    Authentication technology
+    An authorization and authentication service
