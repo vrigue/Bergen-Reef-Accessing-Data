@@ -4,11 +4,27 @@ import insertData from 'src/lib/insertData';
 
 export async function POST(request : Request) {
     try {
-        const xml = await request.text();
-        const parser = new xml2js.Parser({ explicitArray: false });
-        const parsed_xml = await parser.parseStringPromise(xml);
+        //
+        const raw_xml = await request.text();
 
-        // await insertData(parsed_xml.status.probes.probe, parsed_xml.status.date);
+        //
+        var xml = raw_xml.replace(/^<\?xml[^>]*>\s*/, '');
+        xml = xml.replace(/^<status[^>]*>/, '').replace(/<\/status>\s*$/m, '');
+        xml = xml.replace(/(<\/outlets>\s*\n)(\s*<name>)/, '$1<probe>$2');
+        xml = xml.replace(/<\/record>\s*/, '');
+        xml = xml.replace(/<\/datalog>\s*/, '');
+
+        //
+        const formatted_xml = `<status>\n${xml}\n</status>`;
+        console.log(formatted_xml);
+        
+        //
+        const parser = new xml2js.Parser({ explicitArray: false });
+        const parsed_xml = await parser.parseStringPromise(formatted_xml);
+
+        //
+        await insertData(parsed_xml.status.probes.probe, parsed_xml.status.date);
+        await insertData(parsed_xml.status.probe, parsed_xml.status.date);
 
         return NextResponse.json({ parsedData: parsed_xml });
     } 
