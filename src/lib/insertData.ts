@@ -13,13 +13,13 @@ export default async function insertData(data : Array<Record<string, any>>, date
             type = "in";
         }
         else if (data[i].name === "Volt_2") {
-            type = "volts";
+            type = "Volts";
         }
         else if (data[i].name.slice(data[i].name.length - 1) === 'A') {
             type = "Amps";
         }
         else if (data[i].name.slice(data[i].name.length - 1) === 'W') {
-            type = "pwr";
+            type = "Watts";
         }
         else {
             type = data[i].type;
