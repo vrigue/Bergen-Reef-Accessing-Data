@@ -10,7 +10,6 @@ import {
   Tab,
   TabGroup,
   TabList,
-  TabPanel,
   TabPanels,
   Menu,
   MenuButton,
@@ -25,7 +24,6 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/solid";
 
-import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 export default function Page() {
