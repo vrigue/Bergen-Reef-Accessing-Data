@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 import "../globals.css";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef, GridReadyEvent } from "ag-grid-community"; // use for later
@@ -15,8 +16,8 @@ import {
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
-import DTPicker from "./DTPicker";
-import DateTimeFilter from "./DateTimeFilter"; // 2nd option, trying to debug
+const DTPicker = dynamic(() => import("./DTPicker"), { ssr: false });
+const DateTimeFilter = dynamic(() => import("./DateTimeFilter"), { ssr: false }); // 2nd option, trying to debug
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
