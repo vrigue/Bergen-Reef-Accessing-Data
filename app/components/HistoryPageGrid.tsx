@@ -2,25 +2,31 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import "../globals.css";
 import { AgGridReact } from "ag-grid-react";
+import type { ColDef, GridReadyEvent } from "ag-grid-community"; // use for later
 import {
   ClientSideRowModelModule,
+  PaginationModule,
+  CustomFilterModule,
   DateFilterModule,
-  ModuleRegistry,
   NumberFilterModule,
   TextFilterModule,
+  ValidationModule,
+  ModuleRegistry
 } from "ag-grid-community";
-
-ModuleRegistry.registerModules([
-  ClientSideRowModelModule,
-  TextFilterModule,
-  NumberFilterModule,
-  DateFilterModule,
-]);
-
-import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import DTPicker from "./DTPicker";
+import DateTimeFilter from "./DateTimeFilter"; // 2nd option, trying to debug
+
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  PaginationModule,
+  CustomFilterModule,
+  DateFilterModule,
+  NumberFilterModule,
+  TextFilterModule,
+  ValidationModule
+]);
 
 export default function HistoryPageGrid() {
   const [data, setData] = useState<any[]>([]);
@@ -76,7 +82,7 @@ export default function HistoryPageGrid() {
   return (
     <div>
       <button onClick={clearFilters} style={{ marginBottom: "10px" }}>
-        Clear Filters
+        Clear All Filters
       </button>
       <div
         className="ag-theme-quartz center"
@@ -98,6 +104,7 @@ export default function HistoryPageGrid() {
           domLayout="autoHeight"
           pagination={true}
           paginationPageSize={10}
+          paginationPageSizeSelector={[10, 20, 50, 100]}
           onGridReady={(params) => {
             gridApiRef.current = params.api;
           }}
