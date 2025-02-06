@@ -10,8 +10,8 @@ import {
   DateFilterModule,
   NumberFilterModule,
   TextFilterModule,
+  ModuleRegistry,
   ValidationModule,
-  ModuleRegistry
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
