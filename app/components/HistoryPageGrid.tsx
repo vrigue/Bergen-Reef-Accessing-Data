@@ -40,6 +40,7 @@ export default function HistoryPageGrid() {
       minWidth: 225,
       filterParams: {
         defaultOption: "inRange",
+        inRangeInclusive: true,
         comparator: timestampFilter,
       },
     },

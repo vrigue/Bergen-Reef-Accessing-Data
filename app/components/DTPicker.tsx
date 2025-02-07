@@ -27,7 +27,7 @@ export class DTPicker implements IDateComp {
 
     this.picker = flatpickr(this.eGui, {
       onChange: this.onDateChanged.bind(this),
-      dateFormat: "Z",
+      dateFormat: "Z", // used for UTC time, but breaks filtering user experience
       wrap: true,
       enableTime: true,
       enableSeconds: true,
