@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import dynamic from "next/dynamic";
 import "../globals.css";
 import { AgGridReact } from "ag-grid-react";
 // import type { ColDef, GridReadyEvent } from "ag-grid-community"; // use for later
@@ -16,8 +15,7 @@ import {
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
-const DTPicker = dynamic(() => import("./DTPicker"), { ssr: false });
-// const DateTimeFilter = dynamic(() => import("./DateTimeFilter"), { ssr: false }); // 2nd option, trying to debug
+import { DTPicker } from "./DTPicker";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -39,16 +37,10 @@ export default function HistoryPageGrid() {
     {
       field: "datetime",
       filter: "agDateColumnFilter",
+      minWidth: 225,
       filterParams: {
         defaultOption: "inRange",
-        comparator: function (filterLocalDate, cellValue) {
-          // Parse both dates using the ISO 8601 format
-          filterLocalDate = new Date(filterLocalDate);
-          cellValue = new Date(cellValue); 
-        
-          // Directly compare the dates
-          return filterLocalDate.getTime() - cellValue.getTime(); 
-        },
+        comparator: timestampFilter
       },
     },
     { field: "name", filter: "agTextColumnFilter" },
@@ -116,4 +108,34 @@ export default function HistoryPageGrid() {
       </div>
     </div>
   );
+}
+
+
+/**
+ * Credit: https://javascript.plainenglish.io/how-to-create-a-datetime-filter-in-ag-grid-react-e2e1ba2fc80
+ * Timestamp filter function to be passed to comparator
+ * in column definition
+ * @param { * } filterLocalDate - Date to filter by
+ * @param { * } cellValue - Date from table cell
+ * @returns 0 | 1 | -1
+ */
+function timestampFilter(filterLocalDate, cellValue) {
+  filterLocalDate = new Date(filterLocalDate);
+  // Slice the Z from the end of the timestamp string:
+  cellValue = String(cellValue).toLowerCase().includes('z')
+    ? cellValue.slice(0, -1)
+    : cellValue;
+  let filterBy = filterLocalDate.getTime();
+  let filterMe = cellValue.getTime();
+  if (filterBy === filterMe) {
+    return 0;
+  }
+
+  if (filterMe < filterBy) {
+    return -1;
+  }
+
+  if (filterMe > filterBy) {
+    return 1;
+  }
 }

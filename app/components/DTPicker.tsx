@@ -1,88 +1,65 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import type { IDateComp, IDateParams } from 'ag-grid-community';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/dark.css';
 
-interface DTPickerProps {
-  onDateChanged: () => void;
-}
+export class DTPicker implements IDateComp {
+    params!: IDateParams;
+    eGui!: HTMLDivElement;
+    eInput!: HTMLInputElement;
+    picker: any;
+    date: any;
 
-const DTPicker = forwardRef((props: DTPickerProps, ref) => {
-  const [date, setDate] = useState(null);
-  const [picker, setPicker] = useState(null);
-  const refFlatPickr = useRef(null);
-  const refInput = useRef(null);
+    init(params: IDateParams) {
+        const template = `
+            <input type="text" data-input style="width: 100%;" />
+            <a class="input-button" title="clear" data-clear>
+                <i class="fa fa-times"></i>
+            </a>`;
 
-  const onDateChanged = (selectedDates) => {
-    console.log("Date changed:", selectedDates);
-    setDate(selectedDates[0]);
-    props.onDateChanged();
-  };
+        this.params = params;
+        this.eGui = document.createElement('div');
+        this.eGui.setAttribute('role', 'presentation');
+        this.eGui.classList.add('ag-input-wrapper', 'custom-date-filter');
+        this.eGui.innerHTML = template;
 
-  useEffect(() => {
-    setPicker(
-      flatpickr(refFlatPickr.current, {
-        onChange: onDateChanged,
-        dateFormat: 'Z',
-        wrap: true,
-        enableTime: true,
-        enableSeconds: true,
-      })
-    );
-  }, []);
+        this.eInput = this.eGui.querySelector('input')!;
 
-  useEffect(() => {
-    if (picker) {
-      picker.calendarContainer.classList.add('ag-custom-component-popup');
+        this.picker = flatpickr(this.eGui, {
+            onChange: this.onDateChanged.bind(this),
+            dateFormat: 'Z',
+            wrap: true,
+            enableTime: true,
+            enableSeconds: true,
+        });
+
+        this.picker.calendarContainer.classList.add('ag-custom-component-popup');
+        this.date = null;
     }
-  }, [picker]);
 
-  useEffect(() => {
-    if (picker) {
-      picker.setDate(date);
+    getGui() {
+        return this.eGui;
     }
-  }, [date, picker]);
 
-  useImperativeHandle(ref, () => ({
+    onDateChanged(selectedDates: any) {
+        this.date = selectedDates[0] || null;
+        this.params.onDateChanged();
+    }
+
     getDate() {
-      return date;
-    },
+        return this.date;
+    }
 
-    setDate(date) {
-      setDate(date);
-    },
+    setDate(date: any) {
+        this.picker.setDate(date);
+        this.date = date;
+    }
 
-    setInputPlaceholder(placeholder) {
-      if (refInput.current) {
-        refInput.current.setAttribute('placeholder', placeholder);
-      }
-    },
+    setInputPlaceholder(placeholder: string) {
+        this.eInput.setAttribute('placeholder', placeholder);
+    }
 
-    setInputAriaLabel(label) {
-      if (refInput.current) {
-        refInput.current.setAttribute('aria-label', label);
-      }
-    },
-  }));
-
-  return (
-    <div
-      className="ag-input-wrapper custom-date-filter"
-      role="presentation"
-      ref={refFlatPickr}
-    >
-      <input type="text" ref={refInput} data-input style={{ width: '100%' }} />
-      <a className="input-button" title="clear" data-clear>
-        <i className="fa fa-times"></i>
-      </a>
-    </div>
-  );
-});
-
-export default DTPicker;
+    setInputAriaLabel(label: string) {
+        this.eInput.setAttribute('aria-label', label);
+    }
+}
