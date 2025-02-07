@@ -1,65 +1,66 @@
-import type { IDateComp, IDateParams } from 'ag-grid-community';
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
-import 'flatpickr/dist/themes/dark.css';
+import type { IDateComp, IDateParams } from "ag-grid-community";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+import "flatpickr/dist/themes/dark.css";
 
 export class DTPicker implements IDateComp {
-    params!: IDateParams;
-    eGui!: HTMLDivElement;
-    eInput!: HTMLInputElement;
-    picker: any;
-    date: any;
+  params!: IDateParams;
+  eGui!: HTMLDivElement;
+  eInput!: HTMLInputElement;
+  picker: any;
+  date: any;
 
-    init(params: IDateParams) {
-        const template = `
+  init(params: IDateParams) {
+    const template = `
             <input type="text" data-input style="width: 100%;" />
             <a class="input-button" title="clear" data-clear>
                 <i class="fa fa-times"></i>
             </a>`;
 
-        this.params = params;
-        this.eGui = document.createElement('div');
-        this.eGui.setAttribute('role', 'presentation');
-        this.eGui.classList.add('ag-input-wrapper', 'custom-date-filter');
-        this.eGui.innerHTML = template;
+    this.params = params;
+    this.eGui = document.createElement("div");
+    this.eGui.setAttribute("role", "presentation");
+    this.eGui.classList.add("ag-input-wrapper", "custom-date-filter");
+    this.eGui.innerHTML = template;
 
-        this.eInput = this.eGui.querySelector('input')!;
+    this.eInput = this.eGui.querySelector("input")!;
 
-        this.picker = flatpickr(this.eGui, {
-            onChange: this.onDateChanged.bind(this),
-            dateFormat: 'Z',
-            wrap: true,
-            enableTime: true,
-            enableSeconds: true,
-        });
+    this.picker = flatpickr(this.eGui, {
+      onChange: this.onDateChanged.bind(this),
+      dateFormat: "Z",
+      wrap: true,
+      enableTime: true,
+      enableSeconds: true,
+      time_24hr: true,
+    });
 
-        this.picker.calendarContainer.classList.add('ag-custom-component-popup');
-        this.date = null;
-    }
+    this.picker.calendarContainer.classList.add("ag-custom-component-popup");
+    this.date = null;
+  }
 
-    getGui() {
-        return this.eGui;
-    }
+  getGui() {
+    return this.eGui;
+  }
 
-    onDateChanged(selectedDates: any) {
-        this.date = selectedDates[0] || null;
-        this.params.onDateChanged();
-    }
+  onDateChanged(selectedDates: any) {
+    this.date = selectedDates[0] || null;
+    this.params.onDateChanged();
+  }
 
-    getDate() {
-        return this.date;
-    }
+  getDate() {
+    return this.date;
+  }
 
-    setDate(date: any) {
-        this.picker.setDate(date);
-        this.date = date;
-    }
+  setDate(date: any) {
+    this.picker.setDate(date);
+    this.date = date;
+  }
 
-    setInputPlaceholder(placeholder: string) {
-        this.eInput.setAttribute('placeholder', placeholder);
-    }
+  setInputPlaceholder(placeholder: string) {
+    this.eInput.setAttribute("placeholder", placeholder);
+  }
 
-    setInputAriaLabel(label: string) {
-        this.eInput.setAttribute('aria-label', label);
-    }
+  setInputAriaLabel(label: string) {
+    this.eInput.setAttribute("aria-label", label);
+  }
 }

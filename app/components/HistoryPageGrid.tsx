@@ -24,7 +24,7 @@ ModuleRegistry.registerModules([
   DateFilterModule,
   NumberFilterModule,
   TextFilterModule,
-  ValidationModule
+  ValidationModule,
 ]);
 
 export default function HistoryPageGrid() {
@@ -40,7 +40,7 @@ export default function HistoryPageGrid() {
       minWidth: 225,
       filterParams: {
         defaultOption: "inRange",
-        comparator: timestampFilter
+        comparator: timestampFilter,
       },
     },
     { field: "name", filter: "agTextColumnFilter" },
@@ -91,7 +91,7 @@ export default function HistoryPageGrid() {
             sortable: true,
             filter: true,
             filterParams: {
-              buttons: ['apply', 'clear', 'reset'],
+              buttons: ["apply", "clear", "reset"],
             },
           }}
           domLayout="autoHeight"
@@ -102,14 +102,13 @@ export default function HistoryPageGrid() {
             gridApiRef.current = params.api;
           }}
           components={{
-            agDateInput: DTPicker
+            agDateInput: DTPicker,
           }}
         />
       </div>
     </div>
   );
 }
-
 
 /**
  * Credit: https://javascript.plainenglish.io/how-to-create-a-datetime-filter-in-ag-grid-react-e2e1ba2fc80
@@ -120,22 +119,18 @@ export default function HistoryPageGrid() {
  * @returns 0 | 1 | -1
  */
 function timestampFilter(filterLocalDate, cellValue) {
+  if (!cellValue) return -1;
+
   filterLocalDate = new Date(filterLocalDate);
-  // Slice the Z from the end of the timestamp string:
-  cellValue = String(cellValue).toLowerCase().includes('z')
-    ? cellValue.slice(0, -1)
-    : cellValue;
-  let filterBy = filterLocalDate.getTime();
-  let filterMe = cellValue.getTime();
-  if (filterBy === filterMe) {
-    return 0;
-  }
+  const filterBy = filterLocalDate.getTime();
 
-  if (filterMe < filterBy) {
-    return -1;
-  }
+  try {
+    const filterMe = new Date(cellValue).getTime();
 
-  if (filterMe > filterBy) {
-    return 1;
+    if (filterBy === filterMe) return 0;
+    return filterMe < filterBy ? -1 : 1;
+  } catch (error) {
+    console.error("Invalid datetime format:", cellValue);
+    return -1; // default to -1 for invalid dates
   }
 }
