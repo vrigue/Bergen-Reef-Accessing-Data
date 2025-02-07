@@ -7,10 +7,12 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 import ProfileClient from "../components/ProfileClient";
+import { isUserAdmin } from '../../actions/isUserAdmin';
+import { redirect } from "next/navigation";
 
 
 export default function Page() {
-
+  const isAdmin = isUserAdmin();
   const { user, error, isLoading } = useUser();
 
   if (isLoading) return <div>Loading...</div>;
@@ -122,7 +124,7 @@ export default function Page() {
       
       <br></br>  
 
-      {user && (
+      {user && isAdmin && (
         <div className="flex justify-center">
         <div className="rounded-md justify-content-center w-2/3 bg-gray-100 p-4" style={{height:400}}>
 
