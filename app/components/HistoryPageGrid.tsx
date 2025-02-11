@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import "../globals.css";
 import { AgGridReact } from "ag-grid-react";
-// import type { ColDef, GridReadyEvent } from "ag-grid-community"; // use for later
+
 import {
   ClientSideRowModelModule,
   PaginationModule,
@@ -16,6 +16,7 @@ import {
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import { DTPicker } from "./DTPicker";
+import { format, toZonedTime } from "date-fns-tz";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -63,7 +64,7 @@ export default function HistoryPageGrid() {
 
       const formattedData = result.map((item: any, index: number) => ({
         id: index,
-        datetime: item.datetime,
+        datetime: formatInTimeZone(item.datetime, "America/New_York", "yyyy-MM-dd HH:mm:ss"),
         name: item.name,
         type: item.type,
         value: item.value,
@@ -134,4 +135,9 @@ function timestampFilter(filterLocalDate, cellValue) {
     console.error("Invalid datetime format:", cellValue);
     return -1; // default to -1 for invalid dates
   }
+}
+
+function formatInTimeZone(datetime: any, timeZone: string, formatString: string) {
+  const zonedDate = toZonedTime(datetime, timeZone);
+  return format(zonedDate, formatString, { timeZone });
 }
