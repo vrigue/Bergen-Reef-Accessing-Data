@@ -4,12 +4,16 @@ import "../globals.css";
 import { AgGridReact } from "ag-grid-react";
 
 import {
+  CellClassParams,
+  CellStyleModule,
   ClientSideRowModelModule,
   PaginationModule,
   CustomFilterModule,
   DateFilterModule,
   NumberFilterModule,
   TextFilterModule,
+  EditableCallbackParams,
+  NumberEditorModule,
   ModuleRegistry,
   ValidationModule,
 } from "ag-grid-community";
@@ -19,12 +23,14 @@ import { DTPicker } from "./DTPicker";
 import { format, toZonedTime } from "date-fns-tz";
 
 ModuleRegistry.registerModules([
+  NumberEditorModule,
   ClientSideRowModelModule,
   PaginationModule,
   CustomFilterModule,
   DateFilterModule,
   NumberFilterModule,
   TextFilterModule,
+  CellStyleModule,
   ValidationModule,
 ]);
 
@@ -32,6 +38,24 @@ export default function HistoryPageGrid() {
   const [data, setData] = useState<any[]>([]);
   const [rowData, setRowData] = useState<any[]>([]);
   const gridApiRef = useRef<any>(null);
+  const [isEditing, setIsEditing] = useState(false); // State to track editing mode
+  const [editedRows, setEditedRows] = useState({}); // Store edited row data
+
+  function isCellEditable(params: EditableCallbackParams | CellClassParams) {
+    return true; // temporarily
+    // return params.data.year === 0;
+  }
+
+  const handleCellValueChanged = (params) => {
+    const rowId = params.data.id;
+    const newValue = params.newValue;
+
+    // Update the editedRows state
+    setEditedRows((prevEditedRows) => ({
+      ...prevEditedRows,
+      [rowId]: { ...params.data, value: newValue }, // Store the entire row data
+    }));
+  };
 
   const [colDefs] = useState([
     { field: "id", filter: "agNumberColumnFilter" },
@@ -47,7 +71,13 @@ export default function HistoryPageGrid() {
     },
     { field: "name", filter: "agTextColumnFilter" },
     { field: "type", filter: "agTextColumnFilter" },
-    { field: "value", filter: "agNumberColumnFilter" },
+    {
+      field: "value",
+      filter: "agNumberColumnFilter",
+      editable: (params) => isEditing && isCellEditable(params), // Conditional editing
+      cellEditor: "agNumberCellEditor", // Use a number cell editor
+      onCellValueChanged: handleCellValueChanged, // Handle cell value changes
+    },
   ]);
 
   const clearFilters = () => {
@@ -63,8 +93,12 @@ export default function HistoryPageGrid() {
       setData(result);
 
       const formattedData = result.map((item: any, index: number) => ({
-        id: index,
-        datetime: formatInTimeZone(item.datetime, "America/New_York", "yyyy-MM-dd HH:mm:ss"),
+        id: item.id,
+        datetime: formatInTimeZone(
+          item.datetime,
+          "America/New_York",
+          "yyyy-MM-dd HH:mm:ss"
+        ),
         name: item.name,
         type: item.type,
         value: item.value,
@@ -76,9 +110,27 @@ export default function HistoryPageGrid() {
 
   return (
     <div>
-      <button onClick={clearFilters} style={{ marginBottom: "10px" }}>
-        Clear All Filters
-      </button>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+        <button
+          onClick={clearFilters}
+          style={{
+            borderRadius: "20px",
+            padding: "10px 20px",
+            marginRight: "20px",
+          }}
+        >
+          Clear All Filters
+        </button>
+        <button
+          onClick={() => setIsEditing((prev) => !prev)}
+          style={{
+            borderRadius: "20px",
+            padding: "10px 20px",
+          }}
+        >
+          {isEditing ? "Is Editing" : "Enter Edit Mode"}
+        </button>
+      </div>
       <div
         className="ag-theme-quartz center"
         style={{ height: 500, width: "100%" }}
@@ -137,7 +189,11 @@ function timestampFilter(filterLocalDate, cellValue) {
   }
 }
 
-function formatInTimeZone(datetime: any, timeZone: string, formatString: string) {
+function formatInTimeZone(
+  datetime: any,
+  timeZone: string,
+  formatString: string
+) {
   const zonedDate = toZonedTime(datetime, timeZone);
   return format(zonedDate, formatString, { timeZone });
 }
