@@ -16,6 +16,7 @@ import {
   NumberEditorModule,
   ModuleRegistry,
   ValidationModule,
+  TextEditorModule,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -24,6 +25,7 @@ import { format, toZonedTime } from "date-fns-tz";
 
 ModuleRegistry.registerModules([
   NumberEditorModule,
+  TextEditorModule,
   ClientSideRowModelModule,
   PaginationModule,
   CustomFilterModule,
@@ -38,51 +40,35 @@ export default function HistoryPageGrid() {
   const [data, setData] = useState<any[]>([]);
   const [rowData, setRowData] = useState<any[]>([]);
   const gridApiRef = useRef<any>(null);
-  const [isEditing, setIsEditing] = useState(false); // State to track editing mode
-  const [editedRows, setEditedRows] = useState({}); // Store edited row data
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedRows, setEditedRows] = useState<Record<number, any>>({});
 
   function isCellEditable(params: EditableCallbackParams | CellClassParams) {
-    return true; // temporarily
-    // return params.data.year === 0;
+    return isEditing;
   }
 
   const handleCellValueChanged = (params) => {
     const rowId = params.data.id;
-    const newValue = params.newValue;
-
-    // Update the editedRows state
-    setEditedRows((prevEditedRows) => ({
-      ...prevEditedRows,
-      [rowId]: { ...params.data, value: newValue }, // Store the entire row data
+    setEditedRows((prev) => ({
+      ...prev,
+      [rowId]: { ...params.data, [params.column.getColId()]: params.newValue },
     }));
   };
 
-  const [colDefs] = useState([
-    { field: "id", filter: "agNumberColumnFilter" },
-    {
-      field: "datetime",
-      filter: "agDateColumnFilter",
-      minWidth: 225,
-      filterParams: {
-        defaultOption: "inRange",
-        inRangeInclusive: true,
-        comparator: timestampFilter,
-      },
-    },
-    { field: "name", filter: "agTextColumnFilter" },
-    { field: "type", filter: "agTextColumnFilter" },
-    {
-      field: "value",
-      filter: "agNumberColumnFilter",
-      editable: (params) => isEditing && isCellEditable(params), // Conditional editing
-      cellEditor: "agNumberCellEditor", // Use a number cell editor
-      onCellValueChanged: handleCellValueChanged, // Handle cell value changes
-    },
-  ]);
-
-  const clearFilters = () => {
-    if (gridApiRef.current) {
-      gridApiRef.current.setFilterModel(null);
+  const saveChanges = async () => {
+    if (Object.keys(editedRows).length === 0) return;
+    try {
+      const response = await fetch("/api/updateData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates: Object.values(editedRows) }),
+      });
+      if (!response.ok) throw new Error("Failed to update database");
+      alert("Changes saved successfully!");
+      setEditedRows({});
+    } catch (error) {
+      console.error("Error saving changes:", error);
+      alert("Error saving changes.");
     }
   };
 
@@ -91,45 +77,66 @@ export default function HistoryPageGrid() {
       const response = await fetch("/api/data");
       const result = await response.json();
       setData(result);
-
-      const formattedData = result.map((item: any, index: number) => ({
-        id: item.id,
-        datetime: formatInTimeZone(
-          item.datetime,
-          "America/New_York",
-          "yyyy-MM-dd HH:mm:ss"
-        ),
-        name: item.name,
-        type: item.type,
-        value: item.value,
-      }));
-      setRowData(formattedData);
+      setRowData(
+        result.map((item) => ({
+          ...item,
+          datetime: formatInTimeZone(
+            item.datetime,
+            "America/New_York",
+            "yyyy-MM-dd HH:mm:ss"
+          ),
+        }))
+      );
     }
     fetchData();
   }, []);
 
   return (
     <div>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          marginBottom: "10px",
+          justifyContent: "space-between",
+        }}
+      >
         <button
-          onClick={clearFilters}
+          onClick={() => gridApiRef.current?.setFilterModel(null)}
           style={{
             borderRadius: "20px",
-            padding: "10px 20px",
-            marginRight: "20px",
+            padding: "10px 10px",
+            backgroundColor: "#BFBFBF",
+            color: "white",
           }}
         >
           Clear All Filters
         </button>
-        <button
-          onClick={() => setIsEditing((prev) => !prev)}
-          style={{
-            borderRadius: "20px",
-            padding: "10px 20px",
-          }}
-        >
-          {isEditing ? "Is Editing" : "Enter Edit Mode"}
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => setIsEditing((prev) => !prev)}
+            style={{
+              borderRadius: "20px",
+              padding: "10px 10px",
+              backgroundColor: "#E60000",
+              color: "white",
+            }}
+          >
+            {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
+          </button>
+          <button // honestly this button might be gotten rid of - to complex to code for the MVP
+            onClick={saveChanges}
+            style={{
+              borderRadius: "20px",
+              padding: "8px 10px",
+              backgroundColor: "#4CAF50",
+              color: "white",
+            }}
+            disabled={Object.keys(editedRows).length === 0}
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
       <div
         className="ag-theme-quartz center"
@@ -137,7 +144,30 @@ export default function HistoryPageGrid() {
       >
         <AgGridReact
           rowData={rowData}
-          columnDefs={colDefs}
+          columnDefs={useMemo(
+            () => [
+              { field: "id", filter: "agNumberColumnFilter" },
+              {
+                field: "datetime",
+                filter: "agDateColumnFilter",
+                minWidth: 225,
+                filterParams: {
+                  defaultOption: "inRange",
+                  inRangeInclusive: true,
+                  comparator: timestampFilter,
+                },
+              },
+              { field: "name", filter: "agTextColumnFilter" },
+              { field: "type", filter: "agTextColumnFilter" },
+              {
+                field: "value",
+                filter: "agNumberColumnFilter",
+                editable: isCellEditable,
+                onCellValueChanged: handleCellValueChanged,
+              },
+            ],
+            [isEditing]
+          )}
           defaultColDef={{
             flex: 1,
             minWidth: 100,

@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/mysql2';
 import { sql } from 'drizzle-orm';
-import { dataTable } from 'src/db/data-schema';
+import { dataTable } from 'src/db/schema'; // eventually change back to data-schema
 import { eq } from 'drizzle-orm/expressions';
 
 const db = drizzle(process.env.DATABASE_URL!);
