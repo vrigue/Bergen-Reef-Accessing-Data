@@ -1,5 +1,6 @@
 "use server";
 
+import React from "react";
 import { createAccessToken } from "./createAccessToken";
 import { getSession } from "@auth0/nextjs-auth0";
 
@@ -11,7 +12,7 @@ type Role = {
 
 // Get the roles for the current user in Auth0 Management API
 export async function getUsersRoles(): Promise<Role[]> {
-  const session = await getSession();
+  const session = await getSession()
   const user = session?.user;
 
   if (!user) {
