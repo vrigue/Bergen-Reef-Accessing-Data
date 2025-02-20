@@ -24,6 +24,7 @@ export default function Page() {
       }
     }
     checkAdmin();
+    console.log(isAdmin);
   }, [user]);
 
   if (isLoading) return <div>Loading...</div>;
