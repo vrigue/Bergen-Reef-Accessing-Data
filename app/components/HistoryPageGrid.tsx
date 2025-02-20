@@ -59,35 +59,38 @@ export default function HistoryPageGrid() {
     if (Object.keys(editedRows).length === 0) return;
     try {
       const response = await fetch("/api/updateData", {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ updates: Object.values(editedRows) }),
       });
       if (!response.ok) throw new Error("Failed to update database");
       alert("Changes saved successfully!");
       setEditedRows({});
+      // fetchData(); // updating this is a potential fix for possible issues with the data not updating after saving changes when passing json data between pages
+      // ^ however for now re-rending a lot of data is not necessary imo
     } catch (error) {
-      console.error("Error saving changes:", error);
+      console.error("Error saving changes: ", error);
       alert("Error saving changes.");
     }
   };
 
+  async function fetchData() {
+    const response = await fetch("/api/data");
+    const result = await response.json();
+    setData(result);
+    setRowData(
+      result.map((item) => ({
+        ...item,
+        datetime: formatInTimeZone(
+          item.datetime,
+          "America/New_York",
+          "yyyy-MM-dd HH:mm:ss"
+        ),
+      }))
+    );
+  }
+
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch("/api/data");
-      const result = await response.json();
-      setData(result);
-      setRowData(
-        result.map((item) => ({
-          ...item,
-          datetime: formatInTimeZone(
-            item.datetime,
-            "America/New_York",
-            "yyyy-MM-dd HH:mm:ss"
-          ),
-        }))
-      );
-    }
     fetchData();
   }, []);
 
@@ -106,7 +109,7 @@ export default function HistoryPageGrid() {
           style={{
             borderRadius: "20px",
             padding: "10px 10px",
-            backgroundColor: "#BFBFBF",
+            backgroundColor: "#7c7c7c",
             color: "white",
           }}
         >
