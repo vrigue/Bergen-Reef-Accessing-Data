@@ -12,8 +12,19 @@ import { redirect } from "next/navigation";
 
 
 export default function Page() {
-  const isAdmin = isUserAdmin();
   const { user, error, isLoading } = useUser();
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      if (user) {
+        const adminStatus = await isUserAdmin();
+        setIsAdmin(adminStatus);
+      }
+    }
+    checkAdmin();
+  }, [user]);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -124,7 +135,7 @@ export default function Page() {
       
       <br></br>  
 
-      {user && isAdmin && (
+      {isAdmin && (
         <div className="flex justify-center">
         <div className="rounded-md justify-content-center w-2/3 bg-gray-100 p-4" style={{height:400}}>
 
