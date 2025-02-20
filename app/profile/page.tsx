@@ -7,11 +7,20 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 import ProfileClient from "../components/ProfileClient";
-
+import { isUserAdmin } from "actions/isUserAdmin";
 
 export default function Page() {
 
   const { user, error, isLoading } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false); // State for admin status
+
+  useEffect(() => {
+    if (user) {
+      isUserAdmin()
+        .then((adminStatus) => setIsAdmin(adminStatus))
+        .catch((error) => console.error("Error checking admin status:", error));
+    }
+  }, [user]); 
 
   if (isLoading) return <div>Loading...</div>;
 
