@@ -1,7 +1,7 @@
 import type { IDateComp, IDateParams } from "ag-grid-community";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
-import "flatpickr/dist/themes/dark.css";
+import "flatpickr/dist/themes/material_blue.css";
 
 export class DTPicker implements IDateComp {
   params!: IDateParams;
@@ -12,10 +12,10 @@ export class DTPicker implements IDateComp {
 
   init(params: IDateParams) {
     const template = `
-            <input type="text" data-input style="width: 100%;" />
-            <a class="input-button" title="clear" data-clear>
-                <i class="fa fa-times"></i>
-            </a>`;
+        <input type="text" data-input style="width: 100%; border: 1px solid black; font-size: 16px;" />
+        <a class="input-button" title="clear" data-clear>
+          <i class="fa fa-times"></i>
+        </a>`;
 
     this.params = params;
     this.eGui = document.createElement("div");
@@ -57,7 +57,7 @@ export class DTPicker implements IDateComp {
   }
 
   setInputPlaceholder(placeholder: string) {
-    this.eInput.setAttribute("placeholder", placeholder);
+    this.eInput.setAttribute("placeholder", "Enter date here...");
   }
 
   setInputAriaLabel(label: string) {
