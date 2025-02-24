@@ -4,7 +4,7 @@ import clsx from "clsx";
 import "../globals.css";
 import { isUserAdmin } from '../../actions/isUserAdmin';
 
-import DateConstraintElement from "../components/DateConstraintElement";
+import DateBoundElement from "../components/DateBoundElement";
 
 import HistoryPageGrid from "../components/HistoryPageGrid";
 import {
@@ -164,13 +164,13 @@ export default function Page() {
                 <span className="text-sm font-semibold text-gray-700">
                   Start Date:
                 </span>
-                <DateConstraintElement />
+                <DateBoundElement value={startDate} onChange={setStartDate} />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-gray-700">
                   End Date:
                 </span>
-                <DateConstraintElement />
+                <DateBoundElement value={startDate} onChange={setStartDate} />
               </div>
             </div>
             {/* Type Selection Menu */}
