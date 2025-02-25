@@ -4,7 +4,7 @@ An interactive web application that not only displays graphical representations 
 
 ## Technologies used:
 
-- [ESP32](http://esp32.net/), [CircuitPython] (https://circuitpython.org/), [Cron-Job](https://cron-job.org/)
+- [ESP32](http://esp32.net/), [CircuitPython](https://circuitpython.org/), [Cron-Job](https://cron-job.org/)
     The tech stack used to pull data from Apex Fusion in the Coral Reef Lab and push it to the server at regular intervals
 
 - [xml2js] (https://www.npmjs.com/package/xml2js)
@@ -28,10 +28,10 @@ An interactive web application that not only displays graphical representations 
 - [Next.js](https://nextjs.org/)
     A React framework used to build full stack web applications
 
-- [Vercel] (https://vercel.com/)
+- [Vercel](https://vercel.com/)
     A cloud platform used to deploy web applications – integrates seamlessly with Next.js
     
-- [Recharts](https://recharts.org/), [D3] (https://d3js.org/)
+- [Recharts](https://recharts.org/), [D3](https://d3js.org/)
     The libraries used for creation of graphical visuals
 
 - [AG Grid](https://www.ag-grid.com/)
