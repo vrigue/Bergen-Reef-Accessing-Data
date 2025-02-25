@@ -2,7 +2,6 @@
 import React, { useEffect, useState, Fragment } from "react";
 import clsx from "clsx";
 import "../globals.css";
-import "react-datepicker/dist/react-datepicker.css";
 
 import {
   Tab,
