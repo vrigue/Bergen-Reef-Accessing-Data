@@ -1,15 +1,14 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/mysql2";
-import { sql } from "drizzle-orm";
+import { sql, and, between, eq, inArray } from "drizzle-orm";
 import { dataTable } from "src/db/data-schema";
-import { and, between, eq } from "drizzle-orm/expressions";
 
 const db = drizzle(process.env.DATABASE_URL!);
 
-export default async function updateValue(
+export default async function searchDataByDateType(
   datetimeStart: Date,
   datetimeEnd: Date,
-  type: string
+  types: string[]
 ) {
   try {
     const result = await db
@@ -18,15 +17,18 @@ export default async function updateValue(
       .where(
         and(
           between(dataTable.datetime, datetimeStart, datetimeEnd),
-          eq(dataTable.type, type)
+          inArray(dataTable.type, types)
         )
-      );
+      )
+      .orderBy(dataTable.datetime); // Order by datetime
 
     console.log(
-      `Successfully filtered for data of type ${type} between ${datetimeStart} and ${datetimeEnd}.`
+      `Successfully filtered for data of types ${types} between ${datetimeStart} and ${datetimeEnd}.`
     );
+
+    return result;
   } catch (error) {
     console.error("Error searching for data: ", error);
-    throw new Error("Failed to filter type in the database.");
+    throw new Error("Failed to filter types in the database.");
   }
 }
