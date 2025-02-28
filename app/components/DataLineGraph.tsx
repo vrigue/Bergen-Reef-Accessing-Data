@@ -21,11 +21,12 @@ export default function DataLineGraph() {
   const [data, setData] = useState<DataPoint[]>([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([""]); // Initialize with one empty string
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([""]);
   const [zoom, setZoom] = useState(50);
   const [step, setStep] = useState(50);
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   const availableTypes = [
     "Salinity",
@@ -34,6 +35,17 @@ export default function DataLineGraph() {
     "Alkalinity",
     "Calcium",
   ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 1220);
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (shouldFetch) {
@@ -160,7 +172,7 @@ export default function DataLineGraph() {
               </MenuItems>
             </Menu>
           ))}
-          {selectedTypes.length < 1 && ( // Limit to 5 plots
+          {selectedTypes.length < 1 && ( // keep to 1 plot for now
             <button
               onClick={addPlot}
               className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -172,9 +184,9 @@ export default function DataLineGraph() {
         <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-5">
           Enter Date Constraints
         </h1>
-        <div className="flex space-x-4 justify-center pt-4">
+        <div className={`flex items-center ${isSmallScreen ? "flex-col" : "space-x-4"} justify-center pt-4`}>
           <DateBoundElement value={startDate} onChange={setStartDate} />
-          <span className="self-center font-bold">to</span>
+          <span className={`${isSmallScreen ? "self-center pt-2" : "self-center"} font-bold`}>to</span>
           <DateBoundElement value={endDate} onChange={setEndDate} />
         </div>
         <div className="flex justify-center pt-4">
