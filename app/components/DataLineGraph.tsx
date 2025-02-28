@@ -21,7 +21,7 @@ export default function DataLineGraph() {
   const [data, setData] = useState<DataPoint[]>([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([""]); // Initialize with one empty string
   const [zoom, setZoom] = useState(50);
   const [step, setStep] = useState(50);
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -144,7 +144,7 @@ export default function DataLineGraph() {
                 {type || "Select Type"}
                 <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
               </MenuButton>
-              <MenuItems className="absolute z-50 right-0 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
+              <MenuItems className="absolute z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
                 {availableTypes
                   .filter((t) => !selectedTypes.includes(t))
                   .map((t) => (
@@ -160,7 +160,7 @@ export default function DataLineGraph() {
               </MenuItems>
             </Menu>
           ))}
-          {selectedTypes.length < 5 && ( // change to 5 later to add more plots
+          {selectedTypes.length < 1 && ( // Limit to 5 plots
             <button
               onClick={addPlot}
               className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
