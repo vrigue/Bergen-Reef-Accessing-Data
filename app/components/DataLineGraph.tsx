@@ -86,7 +86,7 @@ export default function DataLineGraph() {
     svg.selectAll("*").remove();
 
     const margin = { top: 30, right: 30, bottom: 70, left: 60 };
-    const width = 800 - margin.left - margin.right;
+    const width = 900 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
 
     const g = svg
