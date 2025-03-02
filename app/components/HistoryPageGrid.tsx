@@ -95,7 +95,7 @@ export default function HistoryPageGrid() {
   }, []);
 
   const handleGraphClick = () => {
-    //for the future
+    window.location.href = "/data";
   };
 
   return (
@@ -137,11 +137,28 @@ export default function HistoryPageGrid() {
             </button>
             <button
               onClick={fetchData}
-              className="flex justify-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+              style={{
+                padding: "8px 16px",
+                fontSize: "16px",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              Refresh
+            </button>
+            <button
+              onClick={handleGraphClick}
+              className="bg-orange-500 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-700"
               style={{
               padding: "8px 16px",
               fontSize: "16px",
-              backgroundColor: "#3498db",
+              backgroundColor: "#FFA500",
               color: "white",
               border: "none",
               borderRadius: "5px",
@@ -149,30 +166,12 @@ export default function HistoryPageGrid() {
               alignItems: "center",
               justifyContent: "center",
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#EA580C")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FFA500")}
             >
-              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
-              Refresh
+              <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              Graphs
             </button>
-            <a href="/data">
-                <button
-                onClick={handleGraphClick}
-                className="flex justify-center bg-orange-500 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-600"
-                style={{
-                  padding: "8px 16px",
-                  fontSize: "16px",
-                  backgroundColor: "#f39c12",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                >
-                <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
-                Graphs
-                </button>
-            </a>
           </div>
         </div>
       </div>
