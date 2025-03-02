@@ -22,6 +22,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import { DTPicker } from "./DTPicker";
 import { format, toZonedTime } from "date-fns-tz";
+import { ArrowPathIcon, ChartBarIcon } from "@heroicons/react/24/solid";
 
 ModuleRegistry.registerModules([
   NumberEditorModule,
@@ -66,8 +67,7 @@ export default function HistoryPageGrid() {
       if (!response.ok) throw new Error("Failed to update database");
       alert("Changes saved successfully!");
       setEditedRows({});
-      // fetchData(); // updating this is a potential fix for possible issues with the data not updating after saving changes when passing json data between pages
-      // ^ however for now re-rending a lot of data is not necessary imo
+      fetchData();
     } catch (error) {
       console.error("Error saving changes: ", error);
       alert("Error saving changes.");
@@ -94,104 +94,140 @@ export default function HistoryPageGrid() {
     fetchData();
   }, []);
 
+  const handleGraphClick = () => {
+    //for the future
+  };
+
   return (
-    <div>
+    <div className="flex gap-8 mt-6">
+      {/* Left Panel */}
       <div
+        className="flex flex-col bg-gray-200 p-6 rounded-lg shadow-md"
         style={{
-          display: "flex",
-          gap: "10px",
-          marginBottom: "10px",
-          justifyContent: "space-between",
+          width: "30%",
+          position: "fixed",
+          top: "20%",
+          height: "60vh",
+          overflowY: "auto",
         }}
       >
-        <button
-          onClick={() => gridApiRef.current?.setFilterModel(null)}
-          style={{
-            borderRadius: "20px",
-            padding: "10px 10px",
-            backgroundColor: "#7c7c7c",
-            color: "white",
-          }}
-        >
-          Clear All Filters
-        </button>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            onClick={() => setIsEditing((prev) => !prev)}
-            style={{
-              borderRadius: "20px",
-              padding: "10px 10px",
-              backgroundColor: "#E60000",
+        <div className="flex flex-col h-full justify-start">
+          <h2 className="flex justify-center text-xl font-bold text-gray-800 mb-4">
+            Actions
+          </h2>
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={() => gridApiRef.current?.setFilterModel(null)}
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-400"
+            >
+              Clear Filters
+            </button>
+            <button
+              onClick={() => setIsEditing((prev) => !prev)}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+            >
+              {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
+            </button>
+            <button
+              onClick={saveChanges}
+              className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
+              disabled={Object.keys(editedRows).length === 0}
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={fetchData}
+              className="flex justify-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+              style={{
+              padding: "8px 16px",
+              fontSize: "16px",
+              backgroundColor: "#3498db",
               color: "white",
-            }}
-          >
-            {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
-          </button>
-          <button // honestly this button might be gotten rid of - to complex to code for the MVP
-            onClick={saveChanges}
-            style={{
-              borderRadius: "20px",
-              padding: "8px 10px",
-              backgroundColor: "#4CAF50",
-              color: "white",
-            }}
-            disabled={Object.keys(editedRows).length === 0}
-          >
-            Save Changes
-          </button>
+              border: "none",
+              borderRadius: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              }}
+            >
+              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              Refresh
+            </button>
+            <a href="/data">
+                <button
+                onClick={handleGraphClick}
+                className="flex justify-center bg-orange-500 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-600"
+                style={{
+                  padding: "8px 16px",
+                  fontSize: "16px",
+                  backgroundColor: "#f39c12",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                >
+                <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+                Graphs
+                </button>
+            </a>
+          </div>
         </div>
       </div>
-      <div
-        className="ag-theme-quartz center"
-        style={{ height: 500, width: "100%" }}
-      >
-        <AgGridReact
-          rowData={rowData}
-          columnDefs={useMemo(
-            () => [
-              { field: "id", filter: "agNumberColumnFilter" },
-              {
-                field: "datetime",
-                filter: "agDateColumnFilter",
-                minWidth: 225,
-                filterParams: {
-                  defaultOption: "inRange",
-                  inRangeInclusive: true,
-                  comparator: timestampFilter,
+
+      {/* Right Panel */}
+      <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "33%" }}>
+        <div className="ag-theme-quartz" style={{ height: "400px" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={useMemo(
+              () => [
+                { field: "id", filter: "agNumberColumnFilter" },
+                {
+                  field: "datetime",
+                  filter: "agDateColumnFilter",
+                  minWidth: 225,
+                  filterParams: {
+                    defaultOption: "inRange",
+                    inRangeInclusive: true,
+                    comparator: timestampFilter,
+                  },
                 },
+                { field: "name", filter: "agTextColumnFilter" },
+                { field: "type", filter: "agTextColumnFilter" },
+                {
+                  field: "value",
+                  filter: "agNumberColumnFilter",
+                  editable: isCellEditable,
+                  onCellValueChanged: handleCellValueChanged,
+                },
+              ],
+              [isEditing]
+            )}
+            defaultColDef={{
+              flex: 1,
+              minWidth: 100,
+              resizable: true,
+              sortable: true,
+              filter: true,
+              filterParams: {
+                buttons: ["apply", "clear", "reset"],
               },
-              { field: "name", filter: "agTextColumnFilter" },
-              { field: "type", filter: "agTextColumnFilter" },
-              {
-                field: "value",
-                filter: "agNumberColumnFilter",
-                editable: isCellEditable,
-                onCellValueChanged: handleCellValueChanged,
-              },
-            ],
-            [isEditing]
-          )}
-          defaultColDef={{
-            flex: 1,
-            minWidth: 100,
-            resizable: true,
-            sortable: true,
-            filter: true,
-            filterParams: {
-              buttons: ["apply", "clear", "reset"],
-            },
-          }}
-          domLayout="autoHeight"
-          pagination={true}
-          paginationPageSize={10}
-          paginationPageSizeSelector={[10, 20, 50, 100]}
-          onGridReady={(params) => {
-            gridApiRef.current = params.api;
-          }}
-          components={{
-            agDateInput: DTPicker,
-          }}
-        />
+            }}
+            domLayout="autoHeight"
+            pagination={true}
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            onGridReady={(params) => {
+              gridApiRef.current = params.api;
+            }}
+            components={{
+              agDateInput: DTPicker,
+            }}
+          />
+        </div>
       </div>
     </div>
   );
