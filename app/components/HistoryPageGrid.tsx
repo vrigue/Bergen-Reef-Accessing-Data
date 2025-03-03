@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import "../globals.css";
 import { AgGridReact } from "ag-grid-react";
+import { isUserAdmin } from '../../actions/isUserAdmin';
+import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 
 import {
   CellClassParams,
@@ -38,6 +40,21 @@ ModuleRegistry.registerModules([
 ]);
 
 export default function HistoryPageGrid() {
+
+  const { user, error, isLoading } = useUser();
+    const [isAdmin, setIsAdmin] = useState(false);
+  
+    useEffect(() => {
+      async function checkAdmin() {
+        if (user) {
+          const adminStatus = await isUserAdmin();
+          setIsAdmin(adminStatus);
+        }
+      }
+      checkAdmin();
+      console.log(isAdmin);
+    }, [user]);
+
   const [data, setData] = useState<any[]>([]);
   const [rowData, setRowData] = useState<any[]>([]);
   const gridApiRef = useRef<any>(null);
@@ -122,19 +139,26 @@ export default function HistoryPageGrid() {
             >
               Clear Filters
             </button>
-            <button
-              onClick={() => setIsEditing((prev) => !prev)}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
-            >
-              {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
-            </button>
-            <button
-              onClick={saveChanges}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
-              disabled={Object.keys(editedRows).length === 0}
-            >
-              Save Changes
-            </button>
+
+            {isAdmin && (
+            <div className="w-full flex flex-col gap-2">
+              <button
+                onClick={() => setIsEditing((prev) => !prev)}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+              >
+                {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
+              </button>
+              <button
+                onClick={saveChanges}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
+                disabled={Object.keys(editedRows).length === 0}
+              >
+                Save Changes
+              </button> 
+            </div>
+            )}
+
+
             <button
               onClick={fetchData}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
