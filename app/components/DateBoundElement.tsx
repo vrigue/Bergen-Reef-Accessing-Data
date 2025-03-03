@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/themes/material_blue.css";
-// const [startDate, setStartDate] = useState<Date | null>(new Date());
-// const [endDate, setEndDate] = useState<Date | null>(new Date());
+
 const DateBoundElement = ({ value, onChange }: { value: Date | null; onChange: (date: Date | null) => void }) => {
   const ref = React.useRef<HTMLInputElement>(null);
 
@@ -16,6 +15,12 @@ const DateBoundElement = ({ value, onChange }: { value: Date | null; onChange: (
       onChange: (selectedDates) => {
         onChange(selectedDates.length ? selectedDates[0] : null);
       },
+      disable: [
+        {
+          from: new Date(new Date().setDate(new Date().getDate() + 1)),
+          to: new Date(9999, 12, 31)
+        }
+      ]
       });
 
       const updateWidth = () => {
