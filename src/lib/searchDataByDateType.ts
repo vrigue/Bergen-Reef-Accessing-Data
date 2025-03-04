@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/mysql2";
-import { sql, and, between, eq, inArray } from "drizzle-orm";
+import { and, between, inArray } from "drizzle-orm";
 import { dataTable } from "src/db/data-schema";
 
 const db = drizzle(process.env.DATABASE_URL!);
@@ -17,7 +17,8 @@ export default async function searchDataByDateType(
       .where(
         and(
           between(dataTable.datetime, datetimeStart, datetimeEnd),
-          inArray(dataTable.type, types)
+          // dataTable.name has the more accurate types to filter by (multiple different names can have the same type of data)
+          inArray(dataTable.name, types)
         )
       )
       .orderBy(dataTable.datetime); // Order by datetime
