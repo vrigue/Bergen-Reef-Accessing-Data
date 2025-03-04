@@ -19,7 +19,6 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 import DataLineGraph from "app/components/DataLineGraph";
 
 export default function Page() {
-  const [startDate, setStartDate] = useState(new Date());
 
   return (
     <div>
@@ -27,7 +26,7 @@ export default function Page() {
         <a href="/">
           <div className="text-3xl">
             {" "}
-            <img src="/images/coral-logo.png"></img>
+            <img src="/images/coral-logo.png" alt="Logo" />
           </div>
         </a>
         <div className="flex items-right justify-between">
