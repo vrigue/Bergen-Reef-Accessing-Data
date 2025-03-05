@@ -14,10 +14,9 @@ export async function POST(request : Request) {
         // Pass JSON to database helper function
         await insertData(parsed_xml.status.probes.probe, parsed_xml.status.date);
 
-        return NextResponse.json({ parsed_data: parsed_xml });
+        return NextResponse.json({ status: 200 });
     } 
     catch (error) {
-        console.error("Error parsing XML:", error);
-        return NextResponse.json({ error: "Invalid XML Format" }, { status: 400 });
+        return NextResponse.json({ status: 400 });
     }
 }
