@@ -128,7 +128,7 @@ export default function DataLineGraph() {
 
     const y = d3
       .scaleLinear()
-      .domain(d3.extent(data, (d) => d.value) as [number, number])
+      .domain(d3.extent(data, (d) => +d.value) as [number, number])
       .nice()
       .range([height, 0]);
 
@@ -141,7 +141,7 @@ export default function DataLineGraph() {
       .tickFormat(d3.timeFormat("%Y-%m-%d"));
 
     // Adjust y-axis range based on zoom level
-    const yDomain = d3.extent(data, (d) => d.value) as [number, number];
+    const yDomain = d3.extent(data, (d) => +d.value) as [number, number];
     const yRange = yDomain[1] - yDomain[0];
     const zoomFactor = zoom / 100;
     const adjustedYDomain = [
