@@ -113,7 +113,7 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 30, bottom: 120, left: 90 };
+    const margin = { top: 30, right: 60, bottom: 120, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -141,6 +141,21 @@ export default function DataLineGraph() {
       yDomain[1] - (yRange * (1 - zoomFactor)) / 2,
     ];
     y.domain(adjustedYDomain).nice();
+
+    const yRight = d3
+      .scaleLinear()
+      .domain(d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[1]]), (d) => +d.value) as [number, number])
+      .nice()
+      .range([height, 0]);
+
+    // Adjust yRight-axis range based on zoom level
+    const yRightDomain = d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[1]]), (d) => +d.value) as [number, number];
+    const yRightRange = yRightDomain[1] - yRightDomain[0];
+    const adjustedYRightDomain = [
+      yRightDomain[0] + (yRightRange * (1 - zoomFactor)) / 2,
+      yRightDomain[1] - (yRightRange * (1 - zoomFactor)) / 2,
+    ];
+    yRight.domain(adjustedYRightDomain).nice();
 
     const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -193,6 +208,40 @@ export default function DataLineGraph() {
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
       .text(selectedTypes[0]);
+
+    // Add right y-axis
+    const yRightAxis = g.append("g")
+      .attr("transform", `translate(${width},0)`)
+      .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
+      .append("text")
+      .attr("fill", "black")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 70)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text(units[selectedTypes[1]]);
+
+    // Add y-axis label for the second selected type
+    const yRightLabel = g.append("text")
+      .attr("fill", "black")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", width + margin.right - 5)
+      .attr("text-anchor", "middle")
+      .text(selectedTypes[1]);
+
+    // Add color box next to y-axis labels
+    const addColorBox = (g, x, y, color) => {
+      g.append("rect")
+        .attr("x", x)
+        .attr("y", y)
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("fill", color);
+    };
+
+    addColorBox(g, -margin.left + 10, -70, d3.scaleOrdinal(d3.schemeCategory10)(selectedTypes[0])); // Left y-axis color box
+    addColorBox(g, width + margin.right - 30, -70, d3.scaleOrdinal(d3.schemeCategory10)(selectedTypes[1])); // Right y-axis color box
 
     const line = d3
       .line<DataPoint>()
@@ -262,6 +311,38 @@ export default function DataLineGraph() {
         .attr("stroke-width", 1.5)
         .attr("d", gapLine);
     });
+
+    // Update line drawing to use yRight for the second series
+    g.append("path")
+      .datum(data.filter(d => d.name === typeMapping[selectedTypes[1]]))
+      .attr("fill", "none")
+      .attr("stroke", color("1"))
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line<DataPoint>()
+        .defined((d) => !isNaN(d.value) && d.value !== null)
+        .x((d) => x(new Date(d.datetime)))
+        .y((d) => yRight(d.value)));
+
+    // Add circles for each data point and tooltip interaction for the second series
+    g.selectAll("circle.second-series")
+      .data(data.filter(d => d.name === typeMapping[selectedTypes[1]]))
+      .enter()
+      .append("circle")
+      .attr("class", "second-series")
+      .attr("cx", (d) => x(new Date(d.datetime)))
+      .attr("cy", (d) => yRight(d.value))
+      .attr("r", 4)
+      .attr("fill", color("1"))
+      .on("mouseover", (event, d) => {
+        tooltip.style("visibility", "visible")
+          .html(`ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`);
+      })
+      .on("mousemove", (event) => {
+        tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
+      })
+      .on("mouseout", () => {
+        tooltip.style("visibility", "hidden");
+      });
   };
 
   const handleTypeSelect = (index: number, type: string) => {
@@ -317,7 +398,7 @@ export default function DataLineGraph() {
               </MenuItems>
             </Menu>
           ))}
-          {selectedTypes.length < 1 && ( // keep to 1 plot for now
+          {selectedTypes.length < 2 && ( // keep to 2 plots for now
             <button
               onClick={addPlot}
               className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
