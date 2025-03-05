@@ -137,8 +137,8 @@ export default function DataLineGraph() {
 
     // Adjust x-axis ticks based on the number of days in the range
     const xAxis = d3.axisBottom(x)
-      .ticks(dayCount)
-      .tickFormat(d3.timeFormat("%Y-%m-%d"));
+      .ticks(Math.min(dayCount, 10))
+      .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
 
     // Adjust y-axis range based on zoom level
     const yDomain = d3.extent(data, (d) => +d.value) as [number, number];
@@ -152,9 +152,18 @@ export default function DataLineGraph() {
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(xAxis);
+      .call(xAxis)
+      .append("text")
+      .attr("fill", "black")
+      .attr("x", width / 2)
+      .attr("y", 40)
+      .attr("text-anchor", "middle")
+      .text("Time");
+
+    const tickCount = Math.min(5, Math.ceil(yRange)); // Dynamically set ticks based on range
+
     g.append("g")
-      .call(d3.axisLeft(y))
+      .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f"))) // Fixed number of ticks with format
       .append("text")
       .attr("fill", "black")
       .attr("transform", "rotate(-90)")
