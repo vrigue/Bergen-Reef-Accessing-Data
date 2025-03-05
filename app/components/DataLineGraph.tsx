@@ -113,7 +113,7 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 30, bottom: 70, left: 60 };
+    const margin = { top: 30, right: 30, bottom: 120, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -132,14 +132,6 @@ export default function DataLineGraph() {
       .nice()
       .range([height, 0]);
 
-    // Calculate the number of days in the selected range
-    const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-
-    // Adjust x-axis ticks based on the number of days in the range
-    const xAxis = d3.axisBottom(x)
-      .ticks(Math.min(dayCount, 10))
-      .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
-
     // Adjust y-axis range based on zoom level
     const yDomain = d3.extent(data, (d) => +d.value) as [number, number];
     const yRange = yDomain[1] - yDomain[0];
@@ -150,27 +142,57 @@ export default function DataLineGraph() {
     ];
     y.domain(adjustedYDomain).nice();
 
+    const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Calculate tick values with a staggered approach
+    const tickValues = [];
+    for (let i = 0; i < dayCount; i++) {
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      if (i % 2 === 0) { // Stagger: only add every other day
+        tickValues.push(date);
+      }
+    }
+
+    // Adjust x-axis ticks based on the number of days in the range
+    const xAxis = d3.axisBottom(x)
+      .ticks(Math.min(dayCount, 10))
+      .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
+
     g.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
-      .append("text")
+      .selectAll("text")
+      .attr("transform", "rotate(-45)")
+      .style("text-anchor", "end");
+
+    // Add x-axis label
+    g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
-      .attr("y", 40)
+      .attr("y", height + 110) // Position it below the axis
       .attr("text-anchor", "middle")
       .text("Time");
 
     const tickCount = Math.min(5, Math.ceil(yRange)); // Dynamically set ticks based on range
 
     g.append("g")
-      .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f"))) // Fixed number of ticks with format
+      .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
       .append("text")
       .attr("fill", "black")
       .attr("transform", "rotate(-90)")
-      .attr("y", -50)
+      .attr("y", -70)
       .attr("dy", "0.71em")
       .attr("text-anchor", "end")
       .text(units[selectedTypes[0]]);
+
+    // Add y-axis label for the selected type
+    g.append("text")
+      .attr("fill", "black")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", -margin.left + 20)
+      .attr("text-anchor", "middle")
+      .text(selectedTypes[0]);
 
     const line = d3
       .line<DataPoint>()
@@ -214,7 +236,7 @@ export default function DataLineGraph() {
         .attr("fill", color(index.toString()))
         .on("mouseover", (event, d) => {
           tooltip.style("visibility", "visible")
-            .html(`ID: ${d.id}<br>Date: ${d.datetime}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`);
+            .html(`ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`);
         })
         .on("mousemove", (event) => {
           tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
