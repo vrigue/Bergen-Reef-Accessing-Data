@@ -25,6 +25,15 @@ const units = {
   Calcium: "ppm",
 };
 
+const typeMapping: { [key: string]: string } = {
+  Temperature: "Tmp",
+  Salinity: "Salt",
+  ORP: "ORP",
+  Alkalinity: "Alkx4",
+  Calcium: "Cax4",
+  pH: "pH"
+};
+
 export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -175,7 +184,10 @@ export default function DataLineGraph() {
 
     // Add circles for each data point and tooltip interaction
     selectedTypes.forEach((type, index) => {
-      const typeData = data.filter((d) => d.type === type);
+      const mappedType = typeMapping[type] || type;
+      const typeData = data.filter((d) => d.name === mappedType);
+      console.log("typeData:");
+      console.log(typeData);
       g.append("path")
         .datum(typeData)
         .attr("fill", "none")
