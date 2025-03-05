@@ -110,6 +110,8 @@ export default function DataLineGraph() {
   }, [data, zoom, step]);
 
   const drawChart = () => {
+    if (selectedTypes.length < 1) return;
+
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -126,36 +128,20 @@ export default function DataLineGraph() {
       .domain([startDate, endDate])
       .range([0, width]);
 
+    // Calculate y-axis for the first selected type
+    const yDomain = d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[0]]), (d) => +d.value) as [number, number];
     const y = d3
       .scaleLinear()
-      .domain(d3.extent(data, (d) => +d.value) as [number, number])
+      .domain(yDomain)
       .nice()
       .range([height, 0]);
 
-    // Adjust y-axis range based on zoom level
-    const yDomain = d3.extent(data, (d) => +d.value) as [number, number];
-    const yRange = yDomain[1] - yDomain[0];
-    const zoomFactor = zoom / 100;
-    const adjustedYDomain = [
-      yDomain[0] + (yRange * (1 - zoomFactor)) / 2,
-      yDomain[1] - (yRange * (1 - zoomFactor)) / 2,
-    ];
-    y.domain(adjustedYDomain).nice();
-
-    const yRight = d3
+    // Calculate yRight-axis for the second selected type if it exists
+    const yRight = selectedTypes[1] ? d3
       .scaleLinear()
       .domain(d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[1]]), (d) => +d.value) as [number, number])
       .nice()
-      .range([height, 0]);
-
-    // Adjust yRight-axis range based on zoom level
-    const yRightDomain = d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[1]]), (d) => +d.value) as [number, number];
-    const yRightRange = yRightDomain[1] - yRightDomain[0];
-    const adjustedYRightDomain = [
-      yRightDomain[0] + (yRightRange * (1 - zoomFactor)) / 2,
-      yRightDomain[1] - (yRightRange * (1 - zoomFactor)) / 2,
-    ];
-    yRight.domain(adjustedYRightDomain).nice();
+      .range([height, 0]) : null;
 
     const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -188,7 +174,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .text("Time");
 
-    const tickCount = Math.min(5, Math.ceil(yRange)); // Dynamically set ticks based on range
+    const tickCount = Math.min(5, Math.ceil(yDomain[1] - yDomain[0])); // Dynamically set ticks based on range
 
     g.append("g")
       .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
@@ -209,33 +195,35 @@ export default function DataLineGraph() {
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
     // Add right y-axis
-    const yRightAxis = g.append("g")
-      .attr("transform", `translate(${width},0)`)
-      .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
+    if (yRight) {
+      const yRightAxis = g.append("g")
+        .attr("transform", `translate(${width},0)`)
+        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
 
-    // Add y-axis label for the second selected type
-    const yRightLabel = g.append("text")
-      .attr("fill", "black")
-      .attr("transform", "rotate(-90)")
-      .attr("x", -height / 2)
-      .attr("y", width + margin.right - 5)
-      .attr("text-anchor", "middle")
-      .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
+      // Add y-axis label for the second selected type
+      const yRightLabel = g.append("text")
+        .attr("fill", "black")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", width + margin.right - 5)
+        .attr("text-anchor", "middle")
+        .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
 
-    // Add color box next to y-axis labels
-    const addColorBox = (g, x, y, color) => {
-      g.append("rect")
-        .attr("x", x)
-        .attr("y", y)
-        .attr("width", 10)
-        .attr("height", 10)
-        .attr("fill", color);
-    };
+      // Add color box next to y-axis labels
+      const addColorBox = (g, x, y, color) => {
+        g.append("rect")
+          .attr("x", x)
+          .attr("y", y)
+          .attr("width", 10)
+          .attr("height", 10)
+          .attr("fill", color);
+      };
 
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    addColorBox(g, -margin.left + 10, -70, color(0)); // Left y-axis color box
-    addColorBox(g, width + margin.right - 30, -70, color(1)); // Right y-axis color box
+      addColorBox(g, -margin.left + 10, -70, color(0)); // Left y-axis color box
+      addColorBox(g, width + margin.right - 30, -70, color(1)); // Right y-axis color box
+    }
 
     const line = d3
       .line<DataPoint>()
@@ -261,12 +249,12 @@ export default function DataLineGraph() {
       const lineFunction = index === 0 ? line : d3.line<DataPoint>()
         .defined((d) => !isNaN(d.value) && d.value !== null)
         .x((d) => x(new Date(d.datetime)))
-        .y((d) => yRight(d.value));
+        .y((d) => yRight ? yRight(d.value) : y(d.value));
 
       g.append("path")
         .datum(typeData)
         .attr("fill", "none")
-        .attr("stroke", color(index.toString()))
+        .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
         .attr("d", lineFunction);
 
@@ -276,9 +264,9 @@ export default function DataLineGraph() {
         .append("circle")
         .attr("class", `series-${index}`)
         .attr("cx", (d) => x(new Date(d.datetime)))
-        .attr("cy", (d) => index === 0 ? y(d.value) : yRight(d.value))
+        .attr("cy", (d) => index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value))
         .attr("r", 4)
-        .attr("fill", color(index.toString()))
+        .attr("fill", d3.schemeCategory10[index])
         .on("mouseover", (event, d) => {
           tooltip.style("visibility", "visible")
             .html(`ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`);
@@ -351,6 +339,14 @@ export default function DataLineGraph() {
               className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             >
               Add Another Plot
+            </button>
+          )}
+          {selectedTypes.length > 1 && (
+            <button
+              onClick={() => setSelectedTypes(selectedTypes.slice(0, -1))}
+              className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Remove Last Plot
             </button>
           )}
         </div>
