@@ -197,8 +197,7 @@ export default function DataLineGraph() {
       .attr("transform", "rotate(-90)")
       .attr("y", -70)
       .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text(units[selectedTypes[0]]);
+      .attr("text-anchor", "end");
 
     // Add y-axis label for the selected type
     g.append("text")
@@ -207,19 +206,12 @@ export default function DataLineGraph() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .text(selectedTypes[0]);
+      .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
     // Add right y-axis
     const yRightAxis = g.append("g")
       .attr("transform", `translate(${width},0)`)
       .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
-      .append("text")
-      .attr("fill", "black")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 70)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text(units[selectedTypes[1]]);
 
     // Add y-axis label for the second selected type
     const yRightLabel = g.append("text")
@@ -228,7 +220,7 @@ export default function DataLineGraph() {
       .attr("x", -height / 2)
       .attr("y", width + margin.right - 5)
       .attr("text-anchor", "middle")
-      .text(selectedTypes[1]);
+      .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
 
     // Add color box next to y-axis labels
     const addColorBox = (g, x, y, color) => {
@@ -240,16 +232,16 @@ export default function DataLineGraph() {
         .attr("fill", color);
     };
 
-    addColorBox(g, -margin.left + 10, -70, d3.scaleOrdinal(d3.schemeCategory10)(selectedTypes[0])); // Left y-axis color box
-    addColorBox(g, width + margin.right - 30, -70, d3.scaleOrdinal(d3.schemeCategory10)(selectedTypes[1])); // Right y-axis color box
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    addColorBox(g, -margin.left + 10, -70, color(0)); // Left y-axis color box
+    addColorBox(g, width + margin.right - 30, -70, color(1)); // Right y-axis color box
 
     const line = d3
       .line<DataPoint>()
       .defined((d) => !isNaN(d.value) && d.value !== null)
       .x((d) => x(new Date(d.datetime)))
       .y((d) => y(d.value));
-
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     // Add tooltip div
     const tooltip = d3.select("body").append("div")
@@ -266,21 +258,25 @@ export default function DataLineGraph() {
     selectedTypes.forEach((type, index) => {
       const mappedType = typeMapping[type] || type;
       const typeData = data.filter((d) => d.name === mappedType);
-      console.log("typeData:");
-      console.log(typeData);
+      const lineFunction = index === 0 ? line : d3.line<DataPoint>()
+        .defined((d) => !isNaN(d.value) && d.value !== null)
+        .x((d) => x(new Date(d.datetime)))
+        .y((d) => yRight(d.value));
+
       g.append("path")
         .datum(typeData)
         .attr("fill", "none")
         .attr("stroke", color(index.toString()))
         .attr("stroke-width", 1.5)
-        .attr("d", line);
+        .attr("d", lineFunction);
 
-      g.selectAll("circle")
+      g.selectAll(`circle.series-${index}`)
         .data(typeData)
         .enter()
         .append("circle")
+        .attr("class", `series-${index}`)
         .attr("cx", (d) => x(new Date(d.datetime)))
-        .attr("cy", (d) => y(d.value))
+        .attr("cy", (d) => index === 0 ? y(d.value) : yRight(d.value))
         .attr("r", 4)
         .attr("fill", color(index.toString()))
         .on("mouseover", (event, d) => {
@@ -293,56 +289,7 @@ export default function DataLineGraph() {
         .on("mouseout", () => {
           tooltip.style("visibility", "hidden");
         });
-
-      const gapLine = d3.line<DataPoint>()
-        .defined((d, i, data) => {
-          if (i === 0) return false;
-          const prevDate = new Date(data[i - 1].datetime);
-          const currDate = new Date(d.datetime);
-          return (currDate.getTime() - prevDate.getTime()) > (1000 * 60 * 60 * 2); // 2-hour threshold
-        })
-        .x((d) => x(new Date(d.datetime)))
-        .y((d) => y(d.value));
-
-      g.append("path")
-        .datum(typeData)
-        .attr("fill", "none")
-        .attr("stroke", "gray")
-        .attr("stroke-width", 1.5)
-        .attr("d", gapLine);
     });
-
-    // Update line drawing to use yRight for the second series
-    g.append("path")
-      .datum(data.filter(d => d.name === typeMapping[selectedTypes[1]]))
-      .attr("fill", "none")
-      .attr("stroke", color("1"))
-      .attr("stroke-width", 1.5)
-      .attr("d", d3.line<DataPoint>()
-        .defined((d) => !isNaN(d.value) && d.value !== null)
-        .x((d) => x(new Date(d.datetime)))
-        .y((d) => yRight(d.value)));
-
-    // Add circles for each data point and tooltip interaction for the second series
-    g.selectAll("circle.second-series")
-      .data(data.filter(d => d.name === typeMapping[selectedTypes[1]]))
-      .enter()
-      .append("circle")
-      .attr("class", "second-series")
-      .attr("cx", (d) => x(new Date(d.datetime)))
-      .attr("cy", (d) => yRight(d.value))
-      .attr("r", 4)
-      .attr("fill", color("1"))
-      .on("mouseover", (event, d) => {
-        tooltip.style("visibility", "visible")
-          .html(`ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`);
-      })
-      .on("mousemove", (event) => {
-        tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
-      })
-      .on("mouseout", () => {
-        tooltip.style("visibility", "hidden");
-      });
   };
 
   const handleTypeSelect = (index: number, type: string) => {
@@ -433,7 +380,7 @@ export default function DataLineGraph() {
             Graph
           </button>
         </div>
-        <div className="flex flex-col items-center justify-center mt-auto">
+        <div className="flex flex-col items-center justify-center mt-auto" style={{ visibility: 'hidden' }}>
           <ZoomSlider value={zoom} onChange={setZoom} />
           <StepSlider value={step} onChange={setStep} />
         </div>
