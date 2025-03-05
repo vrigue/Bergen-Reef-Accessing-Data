@@ -114,7 +114,7 @@ export default function DataLineGraph() {
 
     const x = d3
       .scaleTime()
-      .domain(d3.extent(data, (d) => new Date(d.datetime)) as [Date, Date])
+      .domain([startDate, endDate])
       .range([0, width]);
 
     const y = d3
@@ -123,9 +123,27 @@ export default function DataLineGraph() {
       .nice()
       .range([height, 0]);
 
+    // Calculate the number of days in the selected range
+    const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Adjust x-axis ticks based on the number of days in the range
+    const xAxis = d3.axisBottom(x)
+      .ticks(dayCount)
+      .tickFormat(d3.timeFormat("%Y-%m-%d"));
+
+    // Adjust y-axis range based on zoom level
+    const yDomain = d3.extent(data, (d) => d.value) as [number, number];
+    const yRange = yDomain[1] - yDomain[0];
+    const zoomFactor = zoom / 100;
+    const adjustedYDomain = [
+      yDomain[0] + (yRange * (1 - zoomFactor)) / 2,
+      yDomain[1] - (yRange * (1 - zoomFactor)) / 2,
+    ];
+    y.domain(adjustedYDomain).nice();
+
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
+      .call(xAxis);
     g.append("g")
       .call(d3.axisLeft(y))
       .append("text")
@@ -183,6 +201,23 @@ export default function DataLineGraph() {
         .on("mouseout", () => {
           tooltip.style("visibility", "hidden");
         });
+
+      const gapLine = d3.line<DataPoint>()
+        .defined((d, i, data) => {
+          if (i === 0) return false;
+          const prevDate = new Date(data[i - 1].datetime);
+          const currDate = new Date(d.datetime);
+          return (currDate.getTime() - prevDate.getTime()) > (1000 * 60 * 60 * 2); // 2-hour threshold
+        })
+        .x((d) => x(new Date(d.datetime)))
+        .y((d) => y(d.value));
+
+      g.append("path")
+        .datum(typeData)
+        .attr("fill", "none")
+        .attr("stroke", "gray")
+        .attr("stroke-width", 1.5)
+        .attr("d", gapLine);
     });
   };
 
@@ -197,6 +232,10 @@ export default function DataLineGraph() {
       setSelectedTypes([...selectedTypes, ""]);
     }
   };
+
+  useEffect(() => {
+    setZoom(100); // Set default zoom to 100%
+  }, []);
 
   return (
     <div className="grid grid-cols-3 gap-7 pt-5">
