@@ -36,6 +36,44 @@ connection.connect((err) => {
 
 */
 //static datasets for the interactive graph
+
+//write ups for the text area
+const infoContent = {
+  ph: 'This is the pH info!',
+  calc: 'This is the calcium info!',
+  alk: 'This is the alkalinity info!',
+  orp: 'This is the ORP info!',
+  temp: 'This is the temperature info!',
+  salinity: 'This is the salinity info!',
+};
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "row" as "row", // Explicitly cast the type
+    gap: "20px",
+    padding: "0 20px",
+  },
+  leftHalf: {
+    flex: 1,
+    justifyContent: "center",
+    padding: "20px",
+    backgroundColor: "#f9f9f9",
+  },
+  rightHalf: {
+    flex: 2, // Takes up the other 50%
+    display: "flex",
+    justifyContent: "center", // Centers the graph horizontally
+    alignItems: "center", // Centers the graph vertically
+  },
+  select: {
+    marginTop: "20px",
+    padding: "10px",
+    fontSize: "16px",
+  },
+};
+
+
 const dataSets = {
   ph: [
     {value: 8.02 },
@@ -107,42 +145,6 @@ const dataSets = {
     {value: 313.00 },
     {value: 313.00 },
   ],
-};
-
-//write ups for the text area
-const infoContent = {
-  ph: 'This is the pH info!',
-  calc: 'This is the calcium info!',
-  alk: 'This is the alkalinity info!',
-  orp: 'This is the ORP info!',
-  temp: 'This is the temperature info!',
-  salinity: 'This is the salinity info!',
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "row" as "row", // Explicitly cast the type
-    gap: "20px",
-    padding: "0 20px",
-  },
-  leftHalf: {
-    flex: 1,
-    justifyContent: "center",
-    padding: "20px",
-    backgroundColor: "#f9f9f9",
-  },
-  rightHalf: {
-    flex: 2, // Takes up the other 50%
-    display: "flex",
-    justifyContent: "center", // Centers the graph horizontally
-    alignItems: "center", // Centers the graph vertically
-  },
-  select: {
-    marginTop: "20px",
-    padding: "10px",
-    fontSize: "16px",
-  },
 };
 
 export default function Page() {
