@@ -43,6 +43,11 @@ const dataSets = {
     {value: 8.02 },
     {value: 8.01 },
     {value: 8.01 },
+    {value: 8.00 },
+    {value: 7.99 },
+    {value: 8.01 },
+    {value: 8.00 },
+    {value: 8.00 },
   ],
   salinity: [
     {value: 35.00 },
@@ -50,6 +55,11 @@ const dataSets = {
     {value: 35.20 },
     {value: 34.90 },
     {value: 35.20 },
+    {value: 36.40 },
+    {value: 36.30 },
+    {value: 36.40 },
+    {value: 36.40 },
+    {value: 36.40 },
   ],
   temp: [
     {value: 74.80 },
@@ -57,6 +67,11 @@ const dataSets = {
     {value: 74.60 },
     {value: 74.80 },
     {value: 75.40 },
+    {value: 75.30 },
+    {value: 75.40 },
+    {value: 75.30 },
+    {value: 75.40 },
+    {value: 74.80 },
   ],
   orp: [
     {value: 332.00 },
@@ -64,6 +79,9 @@ const dataSets = {
     {value: 330.00 },
     {value: 329.00 },
     {value: 327.00 },
+    {value: 325.00 },
+    {value: 323.00 },
+    {value: 320.00 },
   ],
   alk: [
     {value: 10.28 },
@@ -71,8 +89,18 @@ const dataSets = {
     {value: 10.28 },
     {value: 10.28 },
     {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
   ],
   calc: [
+    {value: 313.00 },
+    {value: 313.00 },
+    {value: 313.00 },
+    {value: 313.00 },
+    {value: 313.00 },
     {value: 313.00 },
     {value: 313.00 },
     {value: 313.00 },
@@ -285,7 +313,7 @@ export default function Page() {
               PH
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              8.01
+              8.00
             </div>
           </div>
 
@@ -318,7 +346,7 @@ export default function Page() {
               SALINITY
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-            35.00
+            36.40
             </div>
           </div>
 
@@ -357,7 +385,7 @@ export default function Page() {
                 fontWeight: "normal",
               }}
             >
-              75.70
+              74.80
             </div>
           </div>
 
@@ -391,7 +419,7 @@ export default function Page() {
               OXIDATION REDUCTION POTENTIAL
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              332.00
+              320.00
             </div>
           </div>
 
