@@ -7,6 +7,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 import ProfileClient from "./components/ProfileClient";
+//import HomepageGraph from "./components/HomePageGraph";
 
 import {
   LineChart,
@@ -37,34 +38,46 @@ connection.connect((err) => {
 //static datasets for the interactive graph
 const dataSets = {
   ph: [
-    { name: "December 1", value: 100 },
-    { name: "December 2", value: 50 },
-    { name: "December 3", value: 20 },
+    {value: 8.02 },
+    {value: 8.03 },
+    {value: 8.02 },
+    {value: 8.01 },
+    {value: 8.01 },
   ],
   salinity: [
-    { name: "December 1", value: 75 },
-    { name: "December 2", value: 100 },
-    { name: "December 3", value: 50 },
+    {value: 35.00 },
+    {value: 34.90 },
+    {value: 35.20 },
+    {value: 34.90 },
+    {value: 35.20 },
   ],
   temp: [
-    { name: "December 1", value: 80 },
-    { name: "December 2", value: 120 },
-    { name: "December 3", value: 200 },
+    {value: 74.80 },
+    {value: 75.10 },
+    {value: 74.60 },
+    {value: 74.80 },
+    {value: 75.40 },
   ],
   orp: [
-    { name: "December 1", value: 95 },
-    { name: "December 2", value: 20 },
-    { name: "December 3", value: 95 },
+    {value: 332.00 },
+    {value: 331.00 },
+    {value: 330.00 },
+    {value: 329.00 },
+    {value: 327.00 },
   ],
   alk: [
-    { name: "December 1", value: 100 },
-    { name: "December 2", value: 200 },
-    { name: "December 3", value: 150 },
+    {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
+    {value: 10.28 },
   ],
   calc: [
-    { name: "December 1", value: 80 },
-    { name: "December 2", value: 50 },
-    { name: "December 3", value: 100 },
+    {value: 313.00 },
+    {value: 313.00 },
+    {value: 313.00 },
+    {value: 313.00 },
+    {value: 313.00 },
   ],
 };
 
@@ -107,6 +120,7 @@ const styles = {
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState(["pH"]);
 
   useEffect(() => {
     async function fetchData() {
@@ -130,6 +144,7 @@ export default function Page() {
   const [selectedInfo, setSelectedInfo] = React.useState(infoContent.ph);
 
   const handleChange = (e) => {
+    setSelectedType(e.target.value);
     setSelectedData(dataSets[e.target.value]);
     setSelectedInfo(infoContent[e.target.value]);
   };
@@ -220,7 +235,7 @@ export default function Page() {
           marginTop: -10,
         }} // could also use "left" here for og
         onChange={handleChange}
-        //value={selectedInfo}
+        value={selectedType}
         className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
       >
         <option value="ph">PH</option>
@@ -270,7 +285,7 @@ export default function Page() {
               PH
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              8.03
+              8.01
             </div>
           </div>
 
@@ -303,7 +318,7 @@ export default function Page() {
               SALINITY
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-            {pH}
+            35.00
             </div>
           </div>
 
@@ -376,7 +391,7 @@ export default function Page() {
               OXIDATION REDUCTION POTENTIAL
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              Value 4
+              332.00
             </div>
           </div>
 
@@ -409,7 +424,7 @@ export default function Page() {
               ALKALINE
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-            {pH}
+            10.28
             </div>
           </div>
 
@@ -442,7 +457,7 @@ export default function Page() {
               CALCIUM
             </div>
             <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              Value 6
+              313.00
             </div>
           </div>
         </div>
@@ -450,10 +465,11 @@ export default function Page() {
         {/*CHART*/}
         <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4">
           <ResponsiveContainer width={"100%"} height={500}>
+            {/*<HomepageGraph selectedType ={[selectedType]} /> */}
             <LineChart data={selectedData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
-              <YAxis />
+              <YAxis domain={['dataMin - 5', 'dataMax + 5']}/>
               <Tooltip />
               <Legend />
               <Line
