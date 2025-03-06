@@ -17,6 +17,7 @@ import {
   EditableCallbackParams,
   NumberEditorModule,
   ModuleRegistry,
+  RowSelectionModule,
   ValidationModule,
   TextEditorModule,
 } from "ag-grid-community";
@@ -34,6 +35,7 @@ ModuleRegistry.registerModules([
   CustomFilterModule,
   DateFilterModule,
   NumberFilterModule,
+  RowSelectionModule,
   TextFilterModule,
   CellStyleModule,
   ValidationModule,
@@ -60,6 +62,7 @@ export default function HistoryPageGrid() {
   const gridApiRef = useRef<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedRows, setEditedRows] = useState<Record<number, any>>({});
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
   function isCellEditable(params: EditableCallbackParams | CellClassParams) {
     return isEditing;
@@ -67,12 +70,116 @@ export default function HistoryPageGrid() {
 
   const handleCellValueChanged = (params) => {
     const rowId = params.data.id;
+
     setEditedRows((prev) => ({
       ...prev,
       [rowId]: { ...params.data, [params.column.getColId()]: params.newValue },
     }));
   };
 
+  const onSelectionChanged = () => {
+    const selectedRows = gridApiRef.current?.getSelectedRows();
+    setSelectedRows(selectedRows || []);
+  };
+
+  const handleDeleteRow = async (params) => {
+    const rowId = params.data.id;
+
+    if (!confirm("Are you sure you want to delete this entry?")) return;
+  
+    try {
+      const response = await fetch(`/api/deleteData`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rowId }),
+      });
+  
+      if (!response.ok) throw new Error("Failed to delete row");
+  
+      setRowData((prev) => prev.filter((row) => row.id !== rowId));
+
+      alert("The selected entry has been deleted.");
+    } 
+    catch (error) {
+      console.error("Error deleting row: ", error);
+      alert("There was an error in deleting the selected entry.");
+    }
+  };
+
+  const handleDeleteSelectedRows = async () => {
+    const selectedRows = gridApiRef.current?.getSelectedRows();
+    if (!selectedRows || selectedRows.length === 0) return;
+  
+    if (!confirm("Are you sure you want to delete the selected entries?")) return;
+  
+    const idsToDelete = selectedRows.map((row) => row.id);
+  
+    try {
+      const response = await fetch(`/api/deleteData`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: idsToDelete }),
+      });
+  
+      if (!response.ok) throw new Error("Failed to delete rows");
+  
+      setRowData((prev) => prev.filter((row) => !idsToDelete.includes(row.id)));
+
+      alert("The selected entries have been deleted.");
+    } catch (error) {
+      console.error("Error deleting rows: ", error);
+      alert("There was an error in deleting the selected entries.");
+    }
+  };  
+
+const handleCreateRow = async () => {
+  const newRow = {
+    id: 0, // Temporary ID, will be replaced by DB
+    datetime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+    name: "",
+    type: "",
+    value: 0,
+    isNewRow: true, // Add isNewRow attribute
+  };
+
+  setRowData((prev) => {
+    return [newRow, ...prev.map((row) => ({ ...row }))];
+  });
+};
+
+  
+const handleSaveNewRow = async (params) => {
+  const rowId = params.data.id;
+  const rowToSave = rowData.find((row) => row.isNewRow === true);
+  if (!rowToSave) return;
+
+  // Remove isNewRow attribute
+  rowToSave.isNewRow = false;
+
+  try {
+    const response = await fetch("/api/createData", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(rowToSave),
+    });
+
+    if (!response.ok) throw new Error("Failed to save row");
+
+    const result = await response.json();
+
+    setRowData((prev) =>
+      prev.map((row) => (row.id === 0 ? { ...row, id: result.id } : row))
+    );
+
+    alert("The new entry has been created.");
+  } 
+  catch (error) {
+    console.error("Error saving row: ", error);
+    alert("There was an error in creating the new entry.");
+  }
+};
+  
+  
   const saveChanges = async () => {
     if (Object.keys(editedRows).length === 0) return;
     try {
@@ -82,12 +189,14 @@ export default function HistoryPageGrid() {
         body: JSON.stringify({ updates: Object.values(editedRows) }),
       });
       if (!response.ok) throw new Error("Failed to update database");
-      alert("Changes saved successfully!");
+
+      alert("All changes have been saved.");
       setEditedRows({});
       fetchData();
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error saving changes: ", error);
-      alert("Error saving changes.");
+      alert("There was an error in saving the changes.");
     }
   };
 
@@ -121,11 +230,12 @@ export default function HistoryPageGrid() {
       <div
         className="flex flex-col bg-gray-200 p-6 rounded-lg shadow-md"
         style={{
-          width: "30%",
+          width: "31%",
           position: "fixed",
-          top: "20%",
-          height: "60vh",
+          top: "13%",
+          height: "73.5vh",
           overflowY: "auto",
+          margin: "23px",
         }}
       >
         <div className="flex flex-col h-full justify-start">
@@ -140,28 +250,9 @@ export default function HistoryPageGrid() {
               Clear Filters
             </button>
 
-            {isAdmin && (
-            <div className="w-full flex flex-col gap-2">
-              <button
-                onClick={() => setIsEditing((prev) => !prev)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
-              >
-                {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
-              </button>
-              <button
-                onClick={saveChanges}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
-                disabled={Object.keys(editedRows).length === 0}
-              >
-                Save Changes
-              </button> 
-            </div>
-            )}
-
-
             <button
               onClick={fetchData}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+              className="bg-medium-teal text-white px-4 py-2 rounded-lg shadow hover:bg-dark-teal"
               style={{
                 padding: "8px 16px",
                 fontSize: "16px",
@@ -178,11 +269,10 @@ export default function HistoryPageGrid() {
             </button>
             <button
               onClick={handleGraphClick}
-              className="bg-orange-500 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-700"
+              className="bg-orange text-white px-4 py-2 rounded-lg shadow hover:bg-dark-orange"
               style={{
               padding: "8px 16px",
               fontSize: "16px",
-              backgroundColor: "#FFA500",
               color: "white",
               border: "none",
               borderRadius: "5px",
@@ -190,43 +280,128 @@ export default function HistoryPageGrid() {
               alignItems: "center",
               justifyContent: "center",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#EA580C")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FFA500")}
+              // onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#EA580C")}
+              // onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FFA500")}
             >
               <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
               Graphs
             </button>
+            {isAdmin && (
+            <div className="w-full flex flex-col gap-2">
+              <button
+                onClick={() => setIsEditing((prev) => !prev)}
+                className="bg-neutral-600 text-white px-4 py-2 rounded-lg shadow hover:bg-neutral-700"
+              >
+                {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
+              </button>
+
+              {isEditing && (
+                  <button
+                  onClick={handleCreateRow}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+                >
+                  Create
+                </button> 
+              )}
+              {isEditing && (
+                  <button
+                  onClick={handleDeleteSelectedRows}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+                  disabled={selectedRows.length === 0}
+                >
+                  Delete Selected
+                </button> 
+              )}
+              {isEditing && (
+                  <button
+                  onClick={saveChanges}
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
+                  disabled={Object.keys(editedRows).length === 0}
+                >
+                  Save Changes
+                </button> 
+              )}
+            </div>
+            )}
           </div>
         </div>
       </div>
+      
 
       {/* Right Panel */}
       <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "33%" }}>
         <div className="ag-theme-quartz" style={{ height: "400px" }}>
           <AgGridReact
             rowData={rowData}
+            rowSelection={"multiple" as any}
+            onSelectionChanged={onSelectionChanged}
             columnDefs={useMemo(
-              () => [
-                { field: "id", filter: "agNumberColumnFilter" },
-                {
-                  field: "datetime",
-                  filter: "agDateColumnFilter",
-                  minWidth: 225,
-                  filterParams: {
-                    defaultOption: "inRange",
-                    inRangeInclusive: true,
-                    comparator: timestampFilter,
+              () => {
+                const gridColumns = [
+                  { field: "id", filter: "agNumberColumnFilter" },
+                  {
+                    field: "datetime",
+                    filter: "agDateColumnFilter",
+                    minWidth: 225,
+                    filterParams: {
+                      defaultOption: "inRange",
+                      inRangeInclusive: true,
+                      comparator: timestampFilter,
+                    },
                   },
-                },
-                { field: "name", filter: "agTextColumnFilter" },
-                { field: "type", filter: "agTextColumnFilter" },
-                {
-                  field: "value",
-                  filter: "agNumberColumnFilter",
-                  editable: isCellEditable,
-                  onCellValueChanged: handleCellValueChanged,
-                },
-              ],
+                  {
+                    field: "name",
+                    filter: "agTextColumnFilter",
+                    editable: (params) => params.data?.isNewRow && isEditing,
+                  },
+                  {
+                    field: "type",
+                    filter: "agTextColumnFilter",
+                    editable: (params) => params.data?.isNewRow && isEditing,
+                  },
+                  {
+                    field: "value",
+                    filter: "agNumberColumnFilter",
+                    editable: (params) => params.data?.isNewRow || isCellEditable,
+                    onCellValueChanged: handleCellValueChanged,
+                    valueParser: (data) => {
+                      const newValue = parseFloat(data.newValue);
+                      return newValue;
+                    }
+                  }
+                ];
+
+                if (isEditing) {
+                  gridColumns.push({
+                    headerName: "Actions",
+                    field: "delete",
+                    cellRenderer: (params) => {
+                      if (params.data.isNewRow) {
+                        return (
+                          <button
+                            onClick={() => handleSaveNewRow(params)}
+                            className="bg-green-500 text-white text-xs px-1 py-0.5 w-14 h-6 rounded shadow hover:bg-green-600"
+                          >
+                            Save
+                          </button>
+                        );
+                      }
+
+                      return (
+                        <button
+                          onClick={() => handleDeleteRow(params)}
+                          className="bg-red-500 text-white text-xs px-1 py-0.5 w-14 h-6 rounded shadow hover:bg-red-600"
+                        >
+                          Delete
+                        </button>
+                      );
+                    },
+                    width: 80,
+                  } as any);
+                }
+
+                return gridColumns;
+              },
               [isEditing]
             )}
             defaultColDef={{

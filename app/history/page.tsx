@@ -78,7 +78,6 @@ export default function Page() {
       </div>
 
       {/* Content */}
-      <h1 className="text-3xl font-bold underline">CoralLab380 History</h1>
       <HistoryPageGrid />
     </div>
   );
