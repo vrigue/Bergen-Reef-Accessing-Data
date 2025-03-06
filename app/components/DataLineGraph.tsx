@@ -31,7 +31,7 @@ const typeMapping: { [key: string]: string } = {
   ORP: "ORP",
   Alkalinity: "Alkx4",
   Calcium: "Cax4",
-  pH: "pH"
+  pH: "pH",
 };
 
 export default function DataLineGraph() {
@@ -53,6 +53,8 @@ export default function DataLineGraph() {
     "Calcium",
     "pH",
   ];
+  
+  const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   useEffect(() => {
     const handleResize = () => {
@@ -123,39 +125,46 @@ export default function DataLineGraph() {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3
-      .scaleTime()
-      .domain([startDate, endDate])
-      .range([0, width]);
+    const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
 
     // Calculate y-axis for the first selected type
-    const yDomain = d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[0]]), (d) => +d.value) as [number, number];
-    const y = d3
-      .scaleLinear()
-      .domain(yDomain)
-      .nice()
-      .range([height, 0]);
+    const yDomain = d3.extent(
+      data.filter((d) => d.name === typeMapping[selectedTypes[0]]),
+      (d) => +d.value
+    ) as [number, number];
+    const y = d3.scaleLinear().domain(yDomain).nice().range([height, 0]);
 
     // Calculate yRight-axis for the second selected type if it exists
-    const yRight = selectedTypes[1] ? d3
-      .scaleLinear()
-      .domain(d3.extent(data.filter(d => d.name === typeMapping[selectedTypes[1]]), (d) => +d.value) as [number, number])
-      .nice()
-      .range([height, 0]) : null;
+    const yRight = selectedTypes[1]
+      ? d3
+          .scaleLinear()
+          .domain(
+            d3.extent(
+              data.filter((d) => d.name === typeMapping[selectedTypes[1]]),
+              (d) => +d.value
+            ) as [number, number]
+          )
+          .nice()
+          .range([height, 0])
+      : null;
 
-    const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const dayCount = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     // Calculate tick values with a staggered approach
     const tickValues = [];
     for (let i = 0; i < dayCount; i++) {
       const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
-      if (i % 2 === 0) { // Stagger: only add every other day
+      if (i % 2 === 0) {
+        // Stagger: only add every other day
         tickValues.push(date);
       }
     }
 
     // Adjust x-axis ticks based on the number of days in the range
-    const xAxis = d3.axisBottom(x)
+    const xAxis = d3
+      .axisBottom(x)
       .ticks(Math.min(dayCount, 10))
       .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
 
@@ -187,7 +196,7 @@ export default function DataLineGraph() {
 
     // Add y-axis label for the selected type
     g.append("text")
-      .attr("fill", "black")
+      .attr("fill", d3.schemeCategory10[0])
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
@@ -196,13 +205,15 @@ export default function DataLineGraph() {
 
     // Add right y-axis
     if (yRight) {
-      const yRightAxis = g.append("g")
+      const yRightAxis = g
+        .append("g")
         .attr("transform", `translate(${width},0)`)
-        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
+        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")));
 
       // Add y-axis label for the second selected type
-      const yRightLabel = g.append("text")
-        .attr("fill", "black")
+      const yRightLabel = g
+        .append("text")
+        .attr("fill", d3.schemeCategory10[1])
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
         .attr("y", width + margin.right - 5)
@@ -221,8 +232,8 @@ export default function DataLineGraph() {
 
       const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-      addColorBox(g, -margin.left + 10, -70, color(0)); // Left y-axis color box
-      addColorBox(g, width + margin.right - 30, -70, color(1)); // Right y-axis color box
+      addColorBox(g, -margin.left + 10, -50, d3.schemeCategory10[0]); // Left y-axis color box
+      addColorBox(g, width + margin.right - 30, -50, d3.schemeCategory10[1]); // Right y-axis color box
     }
 
     const line = d3
@@ -232,7 +243,9 @@ export default function DataLineGraph() {
       .y((d) => y(d.value));
 
     // Add tooltip div
-    const tooltip = d3.select("body").append("div")
+    const tooltip = d3
+      .select("body")
+      .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
       .style("visibility", "hidden")
@@ -246,10 +259,14 @@ export default function DataLineGraph() {
     selectedTypes.forEach((type, index) => {
       const mappedType = typeMapping[type] || type;
       const typeData = data.filter((d) => d.name === mappedType);
-      const lineFunction = index === 0 ? line : d3.line<DataPoint>()
-        .defined((d) => !isNaN(d.value) && d.value !== null)
-        .x((d) => x(new Date(d.datetime)))
-        .y((d) => yRight ? yRight(d.value) : y(d.value));
+      const lineFunction =
+        index === 0
+          ? line
+          : d3
+              .line<DataPoint>()
+              .defined((d) => !isNaN(d.value) && d.value !== null)
+              .x((d) => x(new Date(d.datetime)))
+              .y((d) => (yRight ? yRight(d.value) : y(d.value)));
 
       g.append("path")
         .datum(typeData)
@@ -264,12 +281,19 @@ export default function DataLineGraph() {
         .append("circle")
         .attr("class", `series-${index}`)
         .attr("cx", (d) => x(new Date(d.datetime)))
-        .attr("cy", (d) => index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value))
+        .attr("cy", (d) =>
+          index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value)
+        )
         .attr("r", 4)
         .attr("fill", d3.schemeCategory10[index])
         .on("mouseover", (event, d) => {
-          tooltip.style("visibility", "visible")
-            .html(`ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`);
+          tooltip
+            .style("visibility", "visible")
+            .html(
+              `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
+                new Date(d.datetime)
+              )}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`
+            );
         })
         .on("mousemove", (event) => {
           tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
@@ -314,7 +338,9 @@ export default function DataLineGraph() {
               className="relative inline-block text-left"
             >
               <MenuButton className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
-                {type || "Select Type"}
+                <span style={{ color: colorScale(index) }}>
+                  {type || "Select Type"}
+                </span>
                 <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
               </MenuButton>
               <MenuItems className="absolute z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
@@ -376,7 +402,10 @@ export default function DataLineGraph() {
             Graph
           </button>
         </div>
-        <div className="flex flex-col items-center justify-center mt-auto" style={{ visibility: 'hidden' }}>
+        <div
+          className="flex flex-col items-center justify-center mt-auto"
+          style={{ visibility: "hidden" }}
+        >
           <ZoomSlider value={zoom} onChange={setZoom} />
           <StepSlider value={step} onChange={setStep} />
         </div>
