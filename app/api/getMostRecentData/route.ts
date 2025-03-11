@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import getMostRecentData from "src/lib/getMostRecentData"; // Import function
 
 export async function GET(request: Request) {
+  console.log("api being called");
   try {
+
     const { searchParams } = new URL(request.url);
-    const types = searchParams.get("types")?.split(",");
+    const type = searchParams.get("type");
 
     const typeMapping: { [key: string]: string } = {
       Temperature: "Tmp",
@@ -15,18 +17,13 @@ export async function GET(request: Request) {
       pH: "pH"
     };
 
-    const mappedTypes: string[] = [];
-    for (const type of types) {
-      mappedTypes.push(typeMapping[type] || type);
-    }
-
-    if (!types || types.length === 0) {
+    if (!type || type.length === 0) {
       return NextResponse.json({ error: "Missing types" }, { status: 400 });
     }
 
-    console.log("Fetching most recent values for types:", types);
+    console.log("Fetching most recent values for types:", type);
 
-    const result = await getMostRecentData(mappedTypes); // Call function
+    const result = await getMostRecentData(type); // Call function
 
     console.log("Most recent values:", result);
 

@@ -19,6 +19,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import HomepageGraph from "./components/HomepageGraph";
 
 /*
 const mysql = require('mysql');
@@ -495,8 +496,8 @@ export default function Page() {
         {/*CHART*/}
         <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4">
           <ResponsiveContainer width={"100%"} height={500}>
-            {/*<HomepageGraph selectedType ={[selectedType]} /> */}
-            <LineChart data={selectedData}>
+            <HomepageGraph/>
+            {/*<LineChart data={selectedData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
               <YAxis domain={['dataMin - 5', 'dataMax + 5']}/>
@@ -509,7 +510,7 @@ export default function Page() {
                 strokeWidth="3px"
                 activeDot={{ r: 8 }}
               />
-            </LineChart>
+            </LineChart> */}
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import searchDataByDateType from "src/lib/searchDataByDateType";
 
 export async function GET(request: Request) {
+  console.log("THIS IS HISTORY REQUEST")
+  console.log(request);
   try {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
