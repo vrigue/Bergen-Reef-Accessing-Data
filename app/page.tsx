@@ -256,27 +256,6 @@ export default function Page() {
       <br></br>
       <br></br>
 
-      <select
-        style={{
-          float: "right",
-          width: "750px",
-          height: "30px",
-          textAlign: "center",
-          marginRight: 80,
-          marginTop: -10,
-        }} // could also use "left" here for og
-        onChange={handleChange}
-        value={selectedType}
-        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-      >
-        <option value="ph">PH</option>
-        <option value="salinity">Salinity</option>
-        <option value="temp">Temperature</option>
-        <option value="orp">Oxidation Reduction Potential (ORP)</option>
-        <option value="alk">Alkalinity</option>
-        <option value="calc">Calcium</option>
-      </select>
-
       <br></br>
 
       {/*CONTAINER HOLDING ELEMENTS AND GRAPH IN HALVES OF THE SCREEN*/}

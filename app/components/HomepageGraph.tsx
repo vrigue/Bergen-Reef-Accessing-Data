@@ -37,8 +37,8 @@ export default function HomepageGraph() {
           }));
 
         console.log("Filtered data:", filteredData);
-
-        setChartData(filteredData);
+        const reversedData = filteredData.reverse();
+        setChartData(reversedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
