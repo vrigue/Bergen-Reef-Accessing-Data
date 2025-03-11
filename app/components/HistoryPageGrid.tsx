@@ -148,12 +148,10 @@ const handleCreateRow = async () => {
 };
 
   
-const handleSaveNewRow = async () => {
+const handleSaveNewRow = async (params) => {
+  const rowId = params.data.id;
   const rowToSave = rowData.find((row) => row.isNewRow === true);
-
-  if (!rowToSave) {
-    return;
-  }
+  if (!rowToSave) return;
 
   // Remove isNewRow attribute
   rowToSave.isNewRow = false;
@@ -165,18 +163,15 @@ const handleSaveNewRow = async () => {
       body: JSON.stringify(rowToSave),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to save row");
-    }
+    if (!response.ok) throw new Error("Failed to save row");
 
     const result = await response.json();
 
     setRowData((prev) =>
-      prev.map((row) => (row.id === rowToSave.id ? { ...row, id: result.id } : row))
+      prev.map((row) => (row.id === 0 ? { ...row, id: result.id } : row))
     );
 
     alert("The new entry has been created.");
-    fetchData();
   } 
   catch (error) {
     console.error("Error saving row: ", error);
@@ -291,8 +286,7 @@ const handleSaveNewRow = async () => {
               <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
               Graphs
             </button>
-            {/* isAdmin && */}
-            {(
+            {isAdmin && (
             <div className="w-full flex flex-col gap-2">
               <button
                 onClick={() => setIsEditing((prev) => !prev)}
@@ -344,7 +338,6 @@ const handleSaveNewRow = async () => {
             columnDefs={useMemo(
               () => {
                 const gridColumns = [
-                  { field: "id", filter: "agNumberColumnFilter" },
                   {
                     field: "datetime",
                     filter: "agDateColumnFilter",
@@ -385,7 +378,7 @@ const handleSaveNewRow = async () => {
                       if (params.data.isNewRow) {
                         return (
                           <button
-                            onClick={() => handleSaveNewRow()}
+                            onClick={() => handleSaveNewRow(params)}
                             className="bg-green-500 text-white text-xs px-1 py-0.5 w-14 h-6 rounded shadow hover:bg-green-600"
                           >
                             Save
