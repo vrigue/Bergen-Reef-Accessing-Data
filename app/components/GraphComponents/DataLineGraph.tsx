@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
-import "../globals.css";
+import "../../globals.css";
 import DateBoundElement from "../DateBoundElement";
 import ZoomSlider from "../ZoomSlider";
 import StepSlider from "../StepSlider";
