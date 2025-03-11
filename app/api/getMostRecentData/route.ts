@@ -21,11 +21,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing types" }, { status: 400 });
     }
 
-    console.log("Fetching most recent values for types:", type);
+    //console.log("Fetching most recent values for types:", type);
 
     const result = await getMostRecentData(type); // Call function
 
-    console.log("Most recent values:", result);
+    //console.log("Most recent values:", result);
 
     return NextResponse.json(result);
   } catch (error) {

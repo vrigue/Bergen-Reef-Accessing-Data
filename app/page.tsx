@@ -196,7 +196,7 @@ export default function Page() {
           {/* Rectangle 1 */}
           <div
             style={{
-              width: "500px",
+              width: "200px",
               height: "70px",
               borderRadius: "15px", 
               backgroundColor: "#ffe59b",
@@ -229,7 +229,7 @@ export default function Page() {
           {/* Rectangle 2 */}
           <div
             style={{
-              width: "500px",
+              width: "200px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -262,7 +262,7 @@ export default function Page() {
           {/* Rectangle 3 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -301,7 +301,7 @@ export default function Page() {
           {/* Rectangle 4 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -335,7 +335,7 @@ export default function Page() {
           {/* Rectangle 5 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -368,7 +368,7 @@ export default function Page() {
           {/* Rectangle 6 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",

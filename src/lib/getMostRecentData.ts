@@ -14,7 +14,7 @@ export default async function getMostRecentData(type: string) {
       .orderBy(desc(dataTable.datetime)) // Order by most recent first
       .limit(10); // Get only the most recent per type
 
-    console.log(`Fetched most recent values for types: ${type}.`);
+    //console.log(`Fetched most recent values for types: ${type}.`);
 
     return result;
   } catch (error) {
