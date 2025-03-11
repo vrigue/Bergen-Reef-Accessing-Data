@@ -11,6 +11,7 @@ export default function HomepageGraph() {
     setSelectedTypes(e.target.value);
   };
   
+  //getting chart data for the graph from the api
   useEffect(() => {
     async function fetchData() {
       if (selectedType.length === 0) return; // Prevent empty API calls
@@ -48,8 +49,9 @@ export default function HomepageGraph() {
   }, [selectedType]); // Runs when selectedType changes
 
   return (
+
     <div>
-      <select
+      <select //dropdown selecting element for graph
           style={{
             float: "right",
             width: "750px",
@@ -69,9 +71,11 @@ export default function HomepageGraph() {
           <option value="Alkx4">Alkalinity</option>
           <option value="Cax4">Calcium</option>
       </select>
+
       <br></br>
       <br></br>
-      <LineChart width={800} height={450} data={chartData}>
+      
+      <LineChart width={800} height={450} data={chartData}> 
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 16)}/>
         <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
