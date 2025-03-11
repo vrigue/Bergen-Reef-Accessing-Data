@@ -19,6 +19,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import HomepageGraph from "./components/HomepageGraph";
 
 /*
 const mysql = require('mysql');
@@ -74,79 +75,6 @@ const styles = {
 };
 
 
-const dataSets = {
-  ph: [
-    {value: 8.02 },
-    {value: 8.03 },
-    {value: 8.02 },
-    {value: 8.01 },
-    {value: 8.01 },
-    {value: 8.00 },
-    {value: 7.99 },
-    {value: 8.01 },
-    {value: 8.00 },
-    {value: 8.00 },
-  ],
-  salinity: [
-    {value: 35.00 },
-    {value: 34.90 },
-    {value: 35.20 },
-    {value: 34.90 },
-    {value: 35.20 },
-    {value: 36.40 },
-    {value: 36.30 },
-    {value: 36.40 },
-    {value: 36.40 },
-    {value: 36.40 },
-  ],
-  temp: [
-    {value: 74.80 },
-    {value: 75.10 },
-    {value: 74.60 },
-    {value: 74.80 },
-    {value: 75.40 },
-    {value: 75.30 },
-    {value: 75.40 },
-    {value: 75.30 },
-    {value: 75.40 },
-    {value: 74.80 },
-  ],
-  orp: [
-    {value: 332.00 },
-    {value: 331.00 },
-    {value: 330.00 },
-    {value: 329.00 },
-    {value: 327.00 },
-    {value: 325.00 },
-    {value: 323.00 },
-    {value: 320.00 },
-  ],
-  alk: [
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-    {value: 10.28 },
-  ],
-  calc: [
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-    {value: 313.00 },
-  ],
-};
-
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -170,12 +98,10 @@ export default function Page() {
   const pH = data[1]?.data;
 
   //stuff for selecting data according to dropdown in graph
-  const [selectedData, setSelectedData] = React.useState(dataSets.ph);
   const [selectedInfo, setSelectedInfo] = React.useState(infoContent.ph);
 
   const handleChange = (e) => {
     setSelectedType(e.target.value);
-    setSelectedData(dataSets[e.target.value]);
     setSelectedInfo(infoContent[e.target.value]);
   };
 
@@ -255,27 +181,6 @@ export default function Page() {
       <br></br>
       <br></br>
 
-      <select
-        style={{
-          float: "right",
-          width: "750px",
-          height: "30px",
-          textAlign: "center",
-          marginRight: 80,
-          marginTop: -10,
-        }} // could also use "left" here for og
-        onChange={handleChange}
-        value={selectedType}
-        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-      >
-        <option value="ph">PH</option>
-        <option value="salinity">Salinity</option>
-        <option value="temp">Temperature</option>
-        <option value="orp">Oxidation Reduction Potential (ORP)</option>
-        <option value="alk">Alkalinity</option>
-        <option value="calc">Calcium</option>
-      </select>
-
       <br></br>
 
       {/*CONTAINER HOLDING ELEMENTS AND GRAPH IN HALVES OF THE SCREEN*/}
@@ -291,7 +196,7 @@ export default function Page() {
           {/* Rectangle 1 */}
           <div
             style={{
-              width: "500px",
+              width: "200px",
               height: "70px",
               borderRadius: "15px", 
               backgroundColor: "#ffe59b",
@@ -324,7 +229,7 @@ export default function Page() {
           {/* Rectangle 2 */}
           <div
             style={{
-              width: "500px",
+              width: "200px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -357,7 +262,7 @@ export default function Page() {
           {/* Rectangle 3 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -396,7 +301,7 @@ export default function Page() {
           {/* Rectangle 4 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -430,7 +335,7 @@ export default function Page() {
           {/* Rectangle 5 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -463,7 +368,7 @@ export default function Page() {
           {/* Rectangle 6 */}
           <div
             style={{
-              width: "500px",
+              width: "300px",
               height: "70px",
               borderRadius: "15px",
               backgroundColor: "#ffe59b",
@@ -495,21 +400,7 @@ export default function Page() {
         {/*CHART*/}
         <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4">
           <ResponsiveContainer width={"100%"} height={500}>
-            {/*<HomepageGraph selectedType ={[selectedType]} /> */}
-            <LineChart data={selectedData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
-              <YAxis domain={['dataMin - 5', 'dataMax + 5']}/>
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#87bdc4"
-                strokeWidth="3px"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
+            <HomepageGraph/>
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}
@@ -526,13 +417,6 @@ export default function Page() {
 
         </div>
       </div>
-
-      {/*<textarea
-        name="testing area"
-        id="test"
-        defaultValue="Enter value here"
-      ></textarea> */}
-
       <br></br>
       <br></br>
       <ProfileClient />
