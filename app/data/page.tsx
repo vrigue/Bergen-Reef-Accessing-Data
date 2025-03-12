@@ -25,6 +25,7 @@ export default function Page() {
     <div>
       <NavigationBar defaultIndex={1} />
       <DataLineGraph />
+      <br></br>
     </div>
   );
 }
