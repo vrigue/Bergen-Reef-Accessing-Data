@@ -11,7 +11,6 @@ const infoContent = {
   ORP: 'This is the ORP info!',
   Tmp: 'This is the temperature info!',
   Salt: 'This is the salinity info!',
-  Magnesium: 'This is the magnesium info!',
 };
 
 
@@ -98,6 +97,18 @@ export default function HomePageGraph() {
         </LineChart>
       </div>
       
+      <br></br>
+      <br></br>
+      <div
+        className="mt-4 p-9 bg-white drop-shadow-orange rounded-lg"
+        style={{
+          fontSize: "16px",
+          fontWeight: "normal",
+          color: "#333",
+          }}
+      >
+        {selectedInfo}
+      </div>
     </div>
   );
 }

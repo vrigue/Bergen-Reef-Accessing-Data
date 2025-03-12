@@ -2,6 +2,8 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import clsx from 'clsx';
 import { Fragment } from 'react';
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface NavigationBarProps {
   defaultIndex: number;
@@ -10,7 +12,7 @@ interface NavigationBarProps {
 const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
   const isDefaultIndexNegative = defaultIndex === -1;
   return (
-    <div className="flex items-center justify-between bg-white p-4 drop-shadow-orange rounded-lg">
+    <div className="flex items-center justify-between bg-white p-4 drop-shadow-orange rounded-lg" style={{ position: 'relative', zIndex: 10 }}>
       <a href="/">
         <div className="text-3xl">
           <img src="/images/coral-reef-logo.png" style={{ width: '5%', height: 'auto' }} alt="Coral Reef Logo" />
@@ -31,9 +33,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                     <button
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
-                        false
+                        isDefaultIndexNegative
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : selected
                           ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-orange outline outline-2 outline-dark-orange text-dark-gray font-semibold hover:bg-medium-orange"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Home
@@ -41,31 +45,48 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   )}
                 </Tab>
               </a>
-              <a href="/data">
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={clsx(
-                        'tab-item px-6 py-2 rounded-full transition',
-                        selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
-                      )}
-                    >
-                      Data
-                    </button>
+              <Menu as="div" className="relative inline-block text-left">
+                <MenuButton
+                  className={clsx(
+                    'tab-item px-6 py-2 rounded-full transition flex items-center justify-between',
+                    isDefaultIndexNegative
+                      ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                      : defaultIndex === 1
+                      ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                      : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                   )}
-                </Tab>
-              </a>
+                >
+                  <span>Data</span>
+                  <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
+                </MenuButton>
+                <MenuItems className="absolute z-50 right-0 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5 z-50" style={{ zIndex: 20 }}>
+                  <MenuItem>
+                    <a href="/data/linegraph">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Line Graph
+                      </button>
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a href="/data/twodimgraph">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Two Dimension Plot
+                      </button>
+                    </a>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
               <a href="/history">
                 <Tab as={Fragment}>
                   {({ selected }) => (
                     <button
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
-                        selected
+                        isDefaultIndexNegative
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : selected
                           ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       History
@@ -84,8 +105,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                     <button
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
-                        selected
-                          ? "bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-bold"
+                        isDefaultIndexNegative
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : selected
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
                           : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
@@ -94,30 +117,47 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   )}
                 </Tab>
               </a>
-              <a href="/data">
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={clsx(
-                        'tab-item px-6 py-2 rounded-full transition',
-                        selected
-                          ? "bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-bold"
-                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
-                      )}
-                    >
-                      Data
-                    </button>
+              <Menu as="div" className="relative inline-block text-left">
+                <MenuButton
+                  className={clsx(
+                    'tab-item px-6 py-2 rounded-full transition flex items-center justify-between',
+                    isDefaultIndexNegative
+                      ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                      : defaultIndex === 1
+                      ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                      : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                   )}
-                </Tab>
-              </a>
+                >
+                  <span>Data</span>
+                  <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
+                </MenuButton>
+                <MenuItems className="absolute z-50 right-0 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5 z-50" style={{ zIndex: 20 }}>
+                  <MenuItem>
+                    <a href="/data/linegraph">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Line Graph
+                      </button>
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a href="/data/twodimgraph">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Two Dimension Plot
+                      </button>
+                    </a>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
               <a href="/history">
                 <Tab as={Fragment}>
                   {({ selected }) => (
                     <button
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
-                        selected
-                          ? "bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-bold"
+                        isDefaultIndexNegative || defaultIndex === 1
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : selected
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
                           : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
