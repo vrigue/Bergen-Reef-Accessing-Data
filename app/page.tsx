@@ -22,6 +22,7 @@ import {
 import ProfileClient from "./components/ProfileClient";
 import HomePageGraph from "./components/HomePageGraph";
 import HomePageElements from "./components/HomePageElements";
+import NavigationBar from "./components/NavigationBar";
 /*
 const mysql = require('mysql');
 const connection = mysql.createConnection({
@@ -108,73 +109,7 @@ export default function Page() {
 
   return (
     <div>
-      <div className="flex items-center justify-between bg-white p-4 drop-shadow-orange rounded-lg">
-        <a href="/">
-          <div className="text-3xl">
-            {" "}
-            <img src="/images/coral-reef-logo.png" style={{width: "5%", height: "auto"}}></img>
-          </div>
-        </a>
-        <div className="flex items-right justify-between">
-          <a href="/profile">
-            <div className="pt-1.5 pr-8">
-              <UserCircleIcon className="size-8 text-orange" />
-            </div>
-          </a>
-          <TabGroup defaultIndex={0}>
-            <TabList className="flex space-x-4">
-              <a href="/">
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
-                        selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-orange outline outline-2 outline-dark-orange text-dark-gray font-semibold hover:bg-medium-orange"
-                      )}
-                    >
-                      Home
-                    </button>
-                  )}
-                </Tab>
-              </a>
-              <a href="/data">
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
-                        selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
-                      )}
-                    >
-                      Data
-                    </button>
-                  )}
-                </Tab>
-              </a>
-              <a href="/history">
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
-                        selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
-                      )}
-                    >
-                      History
-                    </button>
-                  )}
-                </Tab>
-              </a>
-            </TabList>
-          </TabGroup>
-        </div>
-      </div>
+      <NavigationBar defaultIndex={0} />
 
       <br></br>
 
