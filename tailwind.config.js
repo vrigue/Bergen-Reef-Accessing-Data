@@ -6,21 +6,27 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    
     fontFamily: {
       'sans': ['"Montserrat"', 'ui-sans-serif', 'system-ui']
     },
     extend: {
       colors: {
-        'teal': '#68bfc6',
-        'medium-teal': '#009da8',
-        'dark-teal': '#3b6769',
-        'light-orange': '#fcd98c',
-        'medium-orange': '#ffca57',
-        'orange': '#ffb734',
-        'dark-orange': '#ffa600',
-        'light-gray': '#e8e8e8',
-        'medium-gray': '#e0e0e0'
+        'teal': '#68BFC6',
+        'medium-teal': '#009DA8',
+        'dark-teal': '#3B6769',
+        'light-orange': '#FCD98C',
+        'medium-orange': '#FFCA57',
+        'orange': '#FEB934',
+        'dark-orange': '#FFA900',
+        'light-gray': '#F1F0F0',
+        'medium-gray': '#B1B1B4',
+        'gray': '#757575',
+        'dark-gray': '#5E5E5E'
       },
+      dropShadow: {
+        'orange': '0 5px 5px #ffb734',
+      }
     },
   plugins: [],
   }

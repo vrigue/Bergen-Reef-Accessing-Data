@@ -6,8 +6,7 @@ import "./globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
-import ProfileClient from "./components/ProfileClient";
-//import HomepageGraph from "./components/HomePageGraph";
+import { headers } from "next/headers";
 
 import {
   LineChart,
@@ -19,9 +18,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import HomepageGraph from "./components/HomepageGraph";
-import { headers } from "next/headers";
 
+import ProfileClient from "./components/ProfileClient";
+import HomePageGraph from "./components/HomePageGraph";
+import HomePageElements from "./components/HomePageElements";
 /*
 const mysql = require('mysql');
 const connection = mysql.createConnection({
@@ -53,13 +53,13 @@ const styles = {
   container: {
     display: "flex",
     flexDirection: "row" as "row", // Explicitly cast the type
-    gap: "20px",
+    gap: "10px",
     padding: "0 20px",
   },
   leftHalf: {
     flex: 1,
     justifyContent: "center",
-    padding: "20px",
+    padding: "10px",
     backgroundColor: "#f9f9f9",
   },
   rightHalf: {
@@ -108,7 +108,7 @@ export default function Page() {
 
   return (
     <div>
-      <div className="flex items-center justify-between bg-white p-4 shadow-lg rounded-lg">
+      <div className="flex items-center justify-between bg-white p-4 drop-shadow-orange rounded-lg">
         <a href="/">
           <div className="text-3xl">
             {" "}
@@ -130,8 +130,8 @@ export default function Page() {
                       className={clsx(
                         "tab-item px-6 py-2 rounded-full transition",
                         selected
-                          ? "bg-orange text-white font-bold"
-                          : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-orange outline outline-2 outline-dark-orange text-dark-gray font-semibold hover:bg-medium-orange"
                       )}
                     >
                       Home
@@ -146,8 +146,8 @@ export default function Page() {
                       className={clsx(
                         "tab-item px-6 py-2 rounded-full transition",
                         selected
-                          ? "bg-orange text-white font-bold"
-                          : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Data
@@ -162,8 +162,8 @@ export default function Page() {
                       className={clsx(
                         "tab-item px-6 py-2 rounded-full transition",
                         selected
-                          ? "bg-orange text-white font-bold"
-                          : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       History
@@ -181,226 +181,17 @@ export default function Page() {
       {/*CONTAINER HOLDING ELEMENTS AND GRAPH IN HALVES OF THE SCREEN*/}
       <div style={styles.container}>
         {/*ELEMENTS*/}
-        <div
-          className="bg-white rounded-lg shadow-lg p-8"
-          style={{
-            flexDirection: "column",
-            gap: "20px",
-          }}
-        >
-          {/* Rectangle 1 */}
-          <div
-            style={{
-              width: "200px",
-              height: "70px",
-              borderRadius: "15px", 
-              backgroundColor: "#ffe59b",
-              padding: "10px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#6fb1ba",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              border: "3px solid #73b8c1",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              PH
-            </div>
-            <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              8.00
-            </div>
-          </div>
-
-          <br></br>
-
-          {/* Rectangle 2 */}
-          <div
-            style={{
-              width: "200px",
-              height: "70px",
-              borderRadius: "15px",
-              backgroundColor: "#ffe59b",
-              padding: "10px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#6fb1ba",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              border: "3px solid #73b8c1",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              SALINITY
-            </div>
-            <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-            36.40
-            </div>
-          </div>
-
-          <br></br>
-
-          {/* Rectangle 3 */}
-          <div
-            style={{
-              width: "300px",
-              height: "70px",
-              borderRadius: "15px",
-              backgroundColor: "#ffe59b",
-              padding: "10px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#6fb1ba",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              border: "3px solid #73b8c1",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              TEMPERATURE
-            </div>
-            <div
-              style={{
-                backgroundColor: "light-orange",
-                fontSize: "16px",
-                fontWeight: "normal",
-              }}
-            >
-              74.80
-            </div>
-          </div>
-
-          <br></br>
-
-          {/* Rectangle 4 */}
-          <div
-            style={{
-              width: "300px",
-              height: "70px",
-              borderRadius: "15px",
-              backgroundColor: "#ffe59b",
-              padding: "10px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#6fb1ba",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              border: "3px solid #73b8c1",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-                marginTop: "5px",
-              }}
-            >
-              OXIDATION REDUCTION POTENTIAL
-            </div>
-            <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              320.00
-            </div>
-          </div>
-
-          <br></br>
-
-          {/* Rectangle 5 */}
-          <div
-            style={{
-              width: "300px",
-              height: "70px",
-              borderRadius: "15px",
-              backgroundColor: "#ffe59b",
-              padding: "10px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#6fb1ba",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              border: "3px solid #73b8c1",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              ALKALINE
-            </div>
-            <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-            10.28
-            </div>
-          </div>
-
-          <br></br>
-
-          {/* Rectangle 6 */}
-          <div
-            style={{
-              width: "300px",
-              height: "70px",
-              borderRadius: "15px",
-              backgroundColor: "#ffe59b",
-              padding: "10px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#6fb1ba",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              border: "3px solid #73b8c1",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-              }}
-            >
-              CALCIUM
-            </div>
-            <div style={{ fontSize: "16px", fontWeight: "normal" }}>
-              313.00
-            </div>
-          </div>
-        </div>
+        <HomePageElements/>
 
         {/*CHART*/}
-        <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 ml-4">
-          <ResponsiveContainer width={"100%"} height={500}>
-            <HomepageGraph/>
+        <div className="w-2/3 rounded-lg p-6 mt-8 ml-4">
+          <ResponsiveContainer width={"100%"} height={"auto"}>
+            <HomePageGraph/>
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}
           <div
-            className="mt-4 p-4 bg-gray-100 rounded-lg shadow"
+            className="mt-4 p-9 bg-white drop-shadow-orange rounded-lg"
             style={{
               fontSize: "16px",
               fontWeight: "normal",
@@ -412,9 +203,7 @@ export default function Page() {
 
         </div>
       </div>
-      <br></br>
-      <br></br>
-      <ProfileClient />
+      <ProfileClient/>
     </div>
   );
 }

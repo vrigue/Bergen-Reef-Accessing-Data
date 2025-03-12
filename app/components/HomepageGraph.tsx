@@ -3,7 +3,7 @@ import { string } from "prop-types";
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-export default function HomepageGraph() {
+export default function HomePageGraph() {
   const [chartData, setChartData] = useState([]);
   const [selectedType, setSelectedTypes] = useState<string | undefined>("pH");
 
@@ -52,36 +52,36 @@ export default function HomepageGraph() {
 
     <div>
       <select //dropdown selecting element for graph
-          style={{
-            float: "right",
-            width: "750px",
-            height: "30px",
-            textAlign: "center",
-            marginRight: 80,
-            marginTop: -10,
-          }} // could also use "left" here for og
-          onChange={handleChange}
-          value={selectedType}
-          className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white  ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-        >
-          <option value="pH">PH</option>
-          <option value="Salt">Salinity</option>
-          <option value="Tmp">Temperature</option>
-          <option value="ORP">Oxidation Reduction Potential (ORP)</option>
-          <option value="Alkx4">Alkalinity</option>
-          <option value="Cax4">Calcium</option>
+            style={{
+              float: "right",
+              width: "840px",
+              height: "30px",
+              textAlign: "center",
+              marginRight: 45,
+              marginTop: -50
+            }} // could also use "left" here for og
+            onChange={handleChange}
+            value={selectedType}
+            className="absolute right-0 z-10 mt-2 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+          >
+            <option value="pH">PH</option>
+            <option value="Salt">Salinity</option>
+            <option value="Tmp">Temperature</option>
+            <option value="ORP">Oxidation Reduction Potential (ORP)</option>
+            <option value="Alkx4">Alkalinity</option>
+            <option value="Cax4">Calcium</option>
       </select>
-
-      <br></br>
-      <br></br>
       
-      <LineChart width={800} height={450} data={chartData}> 
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 16)}/>
-        <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
-        <Tooltip/>
-        <Line type="monotone" dataKey="value" stroke="#8884d8" />
-      </LineChart>
+      <div className="bg-white rounded-lg p-5">
+        <LineChart width={800} height={450} data={chartData}> 
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 16)}/>
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
+          <Tooltip/>
+          <Line type="monotone" dataKey="value" stroke="#feb934" />
+        </LineChart>
+      </div>
+      
     </div>
   );
 }
