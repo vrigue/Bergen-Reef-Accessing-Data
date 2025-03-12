@@ -326,7 +326,7 @@ const handleSaveNewRow = async (params) => {
       
 
       {/* Right Panel */}
-      <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "33%"}}>
+      <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "35%"}}>
         <div className="ag-theme-quartz" style={{ height: "400px" }}>
           <AgGridReact
             rowData={rowData}
