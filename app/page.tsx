@@ -125,16 +125,7 @@ export default function Page() {
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}
-          <div
-            className="mt-4 p-9 bg-white drop-shadow-orange rounded-lg"
-            style={{
-              fontSize: "16px",
-              fontWeight: "normal",
-              color: "#333",
-              }}
-          >
-            {selectedInfo}
-          </div>
+          
 
         </div>
       </div>
