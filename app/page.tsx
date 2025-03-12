@@ -20,7 +20,7 @@ import {
 } from "recharts";
 
 import ProfileClient from "./components/ProfileClient";
-import HomePageGraph from "./components/HomePageGraph";
+import HomePageGraph from "./components/HomepageGraph";
 import HomePageElements from "./components/HomePageElements";
 /*
 const mysql = require('mysql');
