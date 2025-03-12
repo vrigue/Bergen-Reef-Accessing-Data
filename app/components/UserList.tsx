@@ -48,7 +48,7 @@ const UserList = () => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
       <h2 className="text-xl font-bold mb-4">Users</h2>
       <ul>
         {users.map((user) => (
