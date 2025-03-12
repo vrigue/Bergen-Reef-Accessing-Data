@@ -319,11 +319,11 @@ export default function DataLineGraph() {
 
   return (
     <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3">
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
         <svg ref={svgRef} width="100%" height="100%"></svg>
       </div>
 
-      <div className="col-span-1 bg-medium-gray mr-8 pt-3 pb-3 flex flex-col space-y-3 overflow-hidden">
+      <div className="col-span-1 bg-medium-gray mr-8 pt-3 pb-3 flex flex-col space-y-3 overflow-hidden rounded-lg">
         <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-5">
           Line Plot
         </h1>
