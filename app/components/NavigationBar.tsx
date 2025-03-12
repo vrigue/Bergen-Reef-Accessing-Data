@@ -85,8 +85,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
+                          ? "bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-bold"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Home
@@ -101,8 +101,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
+                          ? "bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-bold"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Data
@@ -117,8 +117,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
+                          ? "bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-bold"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       History

@@ -12,6 +12,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        'light-teal': '#A2D9D9',
         'teal': '#68BFC6',
         'medium-teal': '#009DA8',
         'dark-teal': '#3B6769',

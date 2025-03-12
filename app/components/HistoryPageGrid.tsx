@@ -228,37 +228,36 @@ const handleSaveNewRow = async (params) => {
     <div className="flex gap-8 mt-6">
       {/* Left Panel */}
       <div
-        className="flex flex-col bg-gray-200 p-6 rounded-lg shadow-md"
+        className="flex flex-col bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md"
         style={{
           width: "31%",
           position: "fixed",
-          top: "13%",
-          height: "73.5vh",
+          top: "12.8%",
+          height: "76%",
           overflowY: "auto",
           margin: "23px",
         }}
       >
         <div className="flex flex-col h-full justify-start">
-          <h2 className="flex justify-center text-xl font-bold text-gray-800 mb-4">
-            Actions
-          </h2>
-          <div className="flex flex-col gap-4">
+          <div className="bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
+            <h2 className="flex justify-center text-xl text-white font-semibold">Actions</h2>
+          </div>
+          <div className="flex flex-col gap-4 p-6">
             <button
               onClick={() => gridApiRef.current?.setFilterModel(null)}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-400"
+              className="bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-medium px-4 py-2 rounded-xl hover:bg-medium-gray"
             >
               Clear Filters
             </button>
 
             <button
               onClick={fetchData}
-              className="bg-medium-teal text-white px-4 py-2 rounded-lg shadow hover:bg-dark-teal"
+              className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-teal"
               style={{
                 padding: "8px 16px",
                 fontSize: "16px",
                 color: "white",
                 border: "none",
-                borderRadius: "5px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -269,13 +268,12 @@ const handleSaveNewRow = async (params) => {
             </button>
             <button
               onClick={handleGraphClick}
-              className="bg-orange text-white px-4 py-2 rounded-lg shadow hover:bg-dark-orange"
+              className="bg-orange text-white outline outline-1 outline-dark-orange drop-shadow-xl font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-orange"
               style={{
               padding: "8px 16px",
               fontSize: "16px",
               color: "white",
               border: "none",
-              borderRadius: "5px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -286,40 +284,39 @@ const handleSaveNewRow = async (params) => {
               <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
               Graphs
             </button>
-            {isAdmin && (
+            {/* isAdmin && */}
+            { (
             <div className="w-full flex flex-col gap-2">
               <button
                 onClick={() => setIsEditing((prev) => !prev)}
-                className="bg-neutral-600 text-white px-4 py-2 rounded-lg shadow hover:bg-neutral-700"
+                className="bg-neutral-600 text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-neutral-700"
               >
                 {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
               </button>
 
               {isEditing && (
+                <div className="w-full flex flex-col gap-3 bg-light-teal p-4 rounded-lg">
+                  <div className="w-1/3 bg-teal text-white font-semibold text-center p-1 rounded-xl">Edit Controls</div>
                   <button
                   onClick={handleCreateRow}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-                >
-                  Create
-                </button> 
-              )}
-              {isEditing && (
+                  className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-orange font-semibold px-4 py-2 rounded-xl shadow hover:bg-light-orange"
+                  >Create
+                  </button> 
+
                   <button
                   onClick={handleDeleteSelectedRows}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+                  className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-red-200"
                   disabled={selectedRows.length === 0}
-                >
-                  Delete Selected
-                </button> 
-              )}
-              {isEditing && (
+                  >Delete Selected
+                  </button> 
+
                   <button
                   onClick={saveChanges}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
+                  className="bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-200"
                   disabled={Object.keys(editedRows).length === 0}
-                >
-                  Save Changes
-                </button> 
+                  >Save Changes
+                  </button> 
+                </div>
               )}
             </div>
             )}
@@ -329,7 +326,7 @@ const handleSaveNewRow = async (params) => {
       
 
       {/* Right Panel */}
-      <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "33%" }}>
+      <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "33%"}}>
         <div className="ag-theme-quartz" style={{ height: "400px" }}>
           <AgGridReact
             rowData={rowData}
@@ -379,7 +376,7 @@ const handleSaveNewRow = async (params) => {
                         return (
                           <button
                             onClick={() => handleSaveNewRow(params)}
-                            className="bg-green-500 text-white text-xs px-1 py-0.5 w-14 h-6 rounded shadow hover:bg-green-600"
+                            className="bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 text-xs px-1 py-0.5 w-14 h-6 rounded-lg shadow hover:bg-green-200"
                           >
                             Save
                           </button>
@@ -389,7 +386,7 @@ const handleSaveNewRow = async (params) => {
                       return (
                         <button
                           onClick={() => handleDeleteRow(params)}
-                          className="bg-red-500 text-white text-xs px-1 py-0.5 w-14 h-6 rounded shadow hover:bg-red-600"
+                          className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold text-xs px-1 py-0.5 w-14 h-6 rounded-lg shadow hover:bg-red-200"
                         >
                           Delete
                         </button>
@@ -426,6 +423,7 @@ const handleSaveNewRow = async (params) => {
           />
         </div>
       </div>
+      <br></br>
     </div>
   );
 }
