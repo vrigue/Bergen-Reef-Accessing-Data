@@ -1,5 +1,5 @@
 "use client";
-import { string } from "prop-types";
+import { string } from "prop-types"; // not used
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import "../globals.css";
