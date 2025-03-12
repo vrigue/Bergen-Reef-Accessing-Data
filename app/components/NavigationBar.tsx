@@ -10,7 +10,7 @@ interface NavigationBarProps {
 const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
   const isDefaultIndexNegative = defaultIndex === -1;
   return (
-    <div className="flex items-center justify-between bg-white p-4 shadow-lg rounded-lg">
+    <div className="flex items-center justify-between bg-white p-4 drop-shadow-orange rounded-lg">
       <a href="/">
         <div className="text-3xl">
           <img src="/images/coral-reef-logo.png" style={{ width: '5%', height: 'auto' }} alt="Coral Reef Logo" />
@@ -32,8 +32,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         false
-                          ? 'bg-orange text-white font-bold'
-                          : 'bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange'
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-orange outline outline-2 outline-dark-orange text-dark-gray font-semibold hover:bg-medium-orange"
                       )}
                     >
                       Home
@@ -48,8 +48,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? 'bg-orange text-white font-bold'
-                          : 'bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange'
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Data
@@ -64,8 +64,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? 'bg-orange text-white font-bold'
-                          : 'bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange'
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       History
@@ -85,8 +85,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? 'bg-orange text-white font-bold'
-                          : 'bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange'
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Home
@@ -101,8 +101,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? 'bg-orange text-white font-bold'
-                          : 'bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange'
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       Data
@@ -117,8 +117,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       className={clsx(
                         'tab-item px-6 py-2 rounded-full transition',
                         selected
-                          ? 'bg-orange text-white font-bold'
-                          : 'bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange'
+                          ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
+                          : "bg-light-gray outline outline-2 outline-medium-gray text-gray font-semibold hover:bg-orange"
                       )}
                     >
                       History
