@@ -2,13 +2,28 @@
 import { string } from "prop-types";
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import "../globals.css";
+
+const infoContent = {
+  pH: 'This is the pH info!',
+  Cax4: 'This is the calcium info!',
+  Alkx4: 'This is the alkalinity info!',
+  ORP: 'This is the ORP info!',
+  Tmp: 'This is the temperature info!',
+  Salt: 'This is the salinity info!',
+};
+
 
 export default function HomePageGraph() {
   const [chartData, setChartData] = useState([]);
   const [selectedType, setSelectedTypes] = useState<string | undefined>("pH");
+  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.pH);
+
+  //setSelectedTypes("pH");
 
   const handleChange = (e) => {
     setSelectedTypes(e.target.value);
+    setSelectedInfo(infoContent[e.target.value])
   };
   
   //getting chart data for the graph from the api
