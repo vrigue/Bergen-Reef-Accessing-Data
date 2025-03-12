@@ -403,17 +403,17 @@ export default function Page() {
             <HomepageGraph/>
           </ResponsiveContainer>
 
-          {/*TEXT AREA BELOW GRAPH*/}
-          <div
-            className="mt-4 p-4 bg-gray-100 rounded-lg shadow"
-            style={{
-              fontSize: "16px",
-              fontWeight: "normal",
-              color: "#333",
-              }}
-          >
-            {selectedInfo}
-          </div>
+        {/*TEXT AREA BELOW GRAPH
+        <div
+          className="mt-4 p-4 bg-gray-100 rounded-lg shadow"
+          style={{
+            fontSize: "16px",
+            fontWeight: "normal",
+            color: "#333",
+            }}
+        >
+          {selectedInfo}
+        </div> */}
 
         </div>
       </div>
