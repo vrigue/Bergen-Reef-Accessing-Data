@@ -2,11 +2,25 @@
 import React from "react";
 import "../globals.css";
 import HistoryPageGrid from "../components/HistoryPageGrid";
-import { TabGroup, TabList, Tab, TabPanels } from "@headlessui/react";
+import {
+  TabGroup,
+  TabList,
+  Tab,
+  TabPanels,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 
 export default function Page() {
+  const links = [
+    { href: '/data', label: 'Line Graph' },
+    { href: '/', label: 'Home' },
+  ]
+  
   return (
     <div>
       <div className="flex items-center justify-between bg-teal p-4 shadow-lg rounded-lg">
@@ -39,22 +53,48 @@ export default function Page() {
                   )}
                 </Tab>
               </a>
-              <a href="/data">
-                <Tab as={React.Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
-                        selected
-                          ? "bg-orange text-white font-bold"
-                          : "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
-                      )}
-                    >
-                      Data
-                    </button>
-                  )}
-                </Tab>
-              </a>
+              <Tab as="div">
+                <Menu>
+                  <MenuButton>
+                    {() => (
+                      <button
+                        className={clsx(
+                          "tab-item px-6 py-2 rounded-full transition",
+                          "bg-light-orange text-dark-teal font-semibold hover:bg-medium-orange"
+                        )}
+                      >
+                        Data
+                      </button>
+                    )}
+                  </MenuButton>
+                  <MenuItems anchor="bottom">
+                    <MenuItem>
+                      <a
+                        className="block data-[focus]:bg-blue-100"
+                        href="/settings"
+                      >
+                        Settings
+                      </a>
+                    </MenuItem>
+                    <MenuItem>
+                      <a
+                        className="block data-[focus]:bg-blue-100"
+                        href="/support"
+                      >
+                        Support
+                      </a>
+                    </MenuItem>
+                    <MenuItem>
+                      <a
+                        className="block data-[focus]:bg-blue-100"
+                        href="/license"
+                      >
+                        License
+                      </a>
+                    </MenuItem>
+                  </MenuItems>
+                </Menu>
+              </Tab>
               <a href="/history">
                 <Tab as={React.Fragment}>
                   {({ selected }) => (

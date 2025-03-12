@@ -20,6 +20,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import HomepageGraph from "./components/HomepageGraph";
+import { headers } from "next/headers";
 
 /*
 const mysql = require('mysql');
@@ -107,11 +108,11 @@ export default function Page() {
 
   return (
     <div>
-      <div className="flex items-center justify-between bg-teal p-4 shadow-lg rounded-lg">
+      <div className="flex items-center justify-between bg-white p-4 shadow-lg rounded-lg">
         <a href="/">
           <div className="text-3xl">
             {" "}
-            <img src="/images/coral-logo.png"></img>
+            <img src="/images/coral-reef-logo.png" style={{width: "5%", height: "auto"}}></img>
           </div>
         </a>
         <div className="flex items-right justify-between">
@@ -174,12 +175,6 @@ export default function Page() {
           </TabGroup>
         </div>
       </div>
-
-      <br></br>
-      <h1 className="text-3xl font-bold">CoralLab380</h1>
-
-      <br></br>
-      <br></br>
 
       <br></br>
 

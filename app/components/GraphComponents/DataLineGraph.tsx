@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
-import "../globals.css";
-import DateBoundElement from "./DateBoundElement";
-import ZoomSlider from "../components/ZoomSlider";
-import StepSlider from "../components/StepSlider";
+import "../../globals.css";
+import DateBoundElement from "../DateBoundElement";
+import ZoomSlider from "../ZoomSlider";
+import StepSlider from "../StepSlider";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
@@ -231,9 +231,6 @@ export default function DataLineGraph() {
       };
 
       const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-      addColorBox(g, -margin.left + 10, -50, d3.schemeCategory10[0]); // Left y-axis color box
-      addColorBox(g, width + margin.right - 30, -50, d3.schemeCategory10[1]); // Right y-axis color box
     }
 
     const line = d3

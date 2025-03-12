@@ -338,7 +338,6 @@ const handleSaveNewRow = async (params) => {
             columnDefs={useMemo(
               () => {
                 const gridColumns = [
-                  { field: "id", filter: "agNumberColumnFilter" },
                   {
                     field: "datetime",
                     filter: "agDateColumnFilter",
