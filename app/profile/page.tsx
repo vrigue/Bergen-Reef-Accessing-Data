@@ -10,6 +10,8 @@ import ProfileClient from "../components/ProfileClient";
 import NavigationBar from "../components/NavigationBar";
 import { isUserAdmin } from '../../actions/isUserAdmin';
 import { redirect } from "next/navigation";
+import { ResponsiveContainer } from "recharts";
+import UserList from "app/components/UserList";
 
 
 export default function Page() {
@@ -73,8 +75,10 @@ export default function Page() {
       {isAdmin && (
         <div className="flex justify-center">
         <div className="rounded-md justify-content-center w-2/3 bg-gray-100 p-4" style={{height:400}}>
-
-            <div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
+          <ResponsiveContainer>
+            <UserList/>
+          </ResponsiveContainer>
+            {/*<div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
               <h3 className="font-bold text-lg mb-4">Manage Users</h3>
               <div className="flex items-center mb-4">
                 <span className="h-4 w-4 bg-black rounded-full inline-block mr-4"></span>
@@ -119,7 +123,7 @@ export default function Page() {
                 </a>
               </div>
 
-            </div>
+            </div> */}
         </div>
       </div>
       )}
