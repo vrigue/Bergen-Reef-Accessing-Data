@@ -16,7 +16,7 @@ import {
 } from "@headlessui/react";
 
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import DataLineGraph from "app/components/GraphComponents/DataLineGraph";
+import DataLineGraph from "app/components/graphComponents/DataLineGraph";
 
 export default function Page() {
 
