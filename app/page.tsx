@@ -42,12 +42,12 @@ connection.connect((err) => {
 
 //write ups for the text area
 const infoContent = {
-  ph: 'This is the pH info!',
-  calc: 'This is the calcium info!',
-  alk: 'This is the alkalinity info!',
-  orp: 'This is the ORP info!',
-  temp: 'This is the temperature info!',
-  salinity: 'This is the salinity info!',
+  ph: "This is the pH info!",
+  calc: "This is the calcium info!",
+  alk: "This is the alkalinity info!",
+  orp: "This is the ORP info!",
+  temp: "This is the temperature info!",
+  salinity: "This is the salinity info!",
 };
 
 const styles = {
@@ -75,7 +75,6 @@ const styles = {
     fontSize: "16px",
   },
 };
-
 
 export default function Page() {
   const [data, setData] = useState<any[]>([]);
@@ -116,20 +115,20 @@ export default function Page() {
       {/*CONTAINER HOLDING ELEMENTS AND GRAPH IN HALVES OF THE SCREEN*/}
       <div style={styles.container}>
         {/*ELEMENTS*/}
-        <HomePageElements/>
+        <div style={{ position: "relative", zIndex: 1 } }>
+          <HomePageElements />
+        </div>
 
         {/*CHART*/}
-        <div className="w-2/3 rounded-lg p-6 mt-8 ml-4">
+        <div className="w-2/3 rounded-lg p-6 mt-8 ml-4" style={{ position: "relative", zIndex: 1 }}>
           <ResponsiveContainer width={"100%"} height={"auto"}>
-            <HomePageGraph/>
+            <HomePageGraph />
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}
-          
-
         </div>
       </div>
-      <ProfileClient/>
+      <ProfileClient />
     </div>
   );
 }
