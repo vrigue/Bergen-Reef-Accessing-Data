@@ -49,7 +49,7 @@ export async function GET(request: Request) {
 
     const result = await searchDataByDateType(startDateObj, endDateObj, mappedTypes);
     
-    // console.log("Search result:", result);
+    console.log("Search result:", result);
 
     return NextResponse.json(result);
   } catch (error) {
