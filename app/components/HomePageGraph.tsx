@@ -11,6 +11,7 @@ const infoContent = {
   ORP: 'This is the ORP info!',
   Tmp: 'This is the temperature info!',
   Salt: 'This is the salinity info!',
+  Magnesium: 'This is the magnesium info!',
 };
 
 
