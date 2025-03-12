@@ -54,9 +54,9 @@ const UserList = () => {
         {users.map((user) => (
           <li key={user.user_id} className="mb-2">
             {user.email}
-            <button
+            <button 
               onClick={() => handleAssignAdmin(user.user_id)}
-              className="ml-2 bg-blue-500 text-white px-2 py-1 rounded"
+              className="ml-10 bg-blue-500 text-white px-2 py-1 rounded"
               disabled={loading}
             >
               {loading ? 'Assigning...' : 'Make Admin'}
