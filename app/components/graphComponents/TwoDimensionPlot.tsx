@@ -190,24 +190,24 @@ export default function DataLineGraph() {
         <svg ref={svgRef} width="100%" height="100%"></svg>
       </div>
 
-      <div className="col-span-1 bg-medium-gray mr-8 pt-3 pb-3 flex flex-col space-y-3 overflow-hidden rounded-lg">
-        <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-5">
+      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+        <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Two Dimensional Plot
         </h1>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col">
           {selectedTypes.map((type, index) => (
             <Menu
               as="div"
               key={index}
-              className="relative inline-block text-left"
+              className="relative inline-block text-left m-3"
             >
-              <MenuButton className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
+              <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
                 <span style={{ color: colorScale(index) }}>
                   {type || "Select Type"}
                 </span>
-                <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
+                <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
               </MenuButton>
-              <MenuItems className="absolute z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
+              <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
                 {availableTypes
                   .filter((t) => !selectedTypes.includes(t))
                   .map((t) => (
@@ -226,7 +226,7 @@ export default function DataLineGraph() {
           {selectedTypes.length < 2 && ( // keep to 2 plots for now
             <button
               onClick={addPlot}
-              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-medium px-4 py-2 m-3 rounded-xl hover:bg-dark-orange"
             >
               Add Another Plot
             </button>
@@ -234,38 +234,40 @@ export default function DataLineGraph() {
           {selectedTypes.length > 1 && (
             <button
               onClick={() => setSelectedTypes(selectedTypes.slice(0, -1))}
-              className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 m-3 rounded-xl hover:bg-dark-teal"
             >
               Remove Last Plot
             </button>
           )}
         </div>
-        <h1 className="flex items-center justify-center text-xl text-gray-800 font-bold pt-5">
+
+        <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl">
           Enter Date Constraints
-        </h1>
-        <div
-          className={`flex items-center ${
-            isSmallScreen ? "flex-col" : "space-x-4"
-          } justify-center pt-4`}
-        >
-          <DateBoundElement value={startDate} onChange={setStartDate} />
-          <span
-            className={`${
-              isSmallScreen ? "self-center pt-2" : "self-center"
-            } font-bold`}
+          </div>
+          <div
+            className={`flex items-center ${
+              isSmallScreen ? "flex-col" : "space-x-4"
+            } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
-            to
-          </span>
-          <DateBoundElement value={endDate} onChange={setEndDate} />
-        </div>
-        <div className="flex justify-center pt-4">
+            <DateBoundElement value={startDate} onChange={setStartDate} />
+
+            <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
+              <span className="text-white font-semibold text-center">to</span>
+            </div>
+            
+            <DateBoundElement value={endDate} onChange={setEndDate} />
+          </div>
+
+          <div className="flex justify-center pt-4">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
             onClick={() => setShouldFetch(true)}
-          >
-            Graph
+            >Graph
           </button>
         </div>
+        </div>
+        
         <div
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
