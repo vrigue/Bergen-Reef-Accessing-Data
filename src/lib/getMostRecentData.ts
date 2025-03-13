@@ -12,7 +12,7 @@ export default async function getMostRecentData(type: string) {
       .from(dataTable)
       .where(eq(dataTable.name, type))// Filter by types
       .orderBy(desc(dataTable.datetime)) // Order by most recent first
-      .limit(10); // Get only the most recent per type
+      .limit(240); // Get only the most recent per type
 
     //console.log(`Fetched most recent values for types: ${type}.`);
 

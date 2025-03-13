@@ -16,8 +16,8 @@ const infoContent = {
 
 export default function HomePageGraph() {
   const [chartData, setChartData] = useState([]);
-  const [selectedType, setSelectedTypes] = useState<string | undefined>("pH");
-  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.pH);
+  const [selectedType, setSelectedTypes] = useState<string | undefined>("Salt");
+  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.Salt);
 
   //setSelectedTypes("pH");
 
@@ -93,11 +93,10 @@ export default function HomePageGraph() {
           <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 16)}/>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
           <Tooltip/>
-          <Line type="monotone" dataKey="value" stroke="#feb934" />
+          <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
         </LineChart>
       </div>
       
-      <br></br>
       <br></br>
       <div
         className="mt-4 p-9 bg-white drop-shadow-orange rounded-lg"
