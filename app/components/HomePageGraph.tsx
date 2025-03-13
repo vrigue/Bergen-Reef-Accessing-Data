@@ -65,19 +65,18 @@ export default function HomePageGraph() {
 
   return (
 
-    <div>
+    <div className="flex flex-col">
       <select //dropdown selecting element for graph
             style={{
               float: "right",
               width: "840px",
               height: "30px",
               textAlign: "center",
-              marginRight: 45,
-              marginTop: -50
+              marginTop: -47
             }} // could also use "left" here for og
             onChange={handleChange}
             value={selectedType}
-            className="absolute right-0 z-10 mt-2 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+            className="mb-6 z-10 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
           >
             <option value="pH">PH</option>
             <option value="Salt">Salinity</option>
@@ -97,9 +96,8 @@ export default function HomePageGraph() {
         </LineChart>
       </div>
       
-      <br></br>
       <div
-        className="mt-4 p-9 bg-white drop-shadow-orange rounded-lg"
+        className="mt-6 p-10 bg-white drop-shadow-orange rounded-lg"
         style={{
           fontSize: "16px",
           fontWeight: "normal",
