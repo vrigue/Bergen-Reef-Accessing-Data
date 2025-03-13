@@ -209,7 +209,7 @@ const handleSaveNewRow = async (params) => {
         ...item,
         datetime: formatInTimeZone(
           item.datetime,
-          "America/New_York",
+          "UTC",
           "yyyy-MM-dd HH:mm:ss"
         ),
       }))
@@ -285,7 +285,7 @@ const handleSaveNewRow = async (params) => {
               Graphs
             </button>
             {/* isAdmin && */}
-            {isAdmin && (
+            { (
             <div className="w-full flex flex-col gap-2">
               <button
                 onClick={() => setIsEditing((prev) => !prev)}
