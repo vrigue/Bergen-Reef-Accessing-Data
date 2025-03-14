@@ -148,11 +148,33 @@ export default function DataLineGraph() {
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      .selectAll("path, line")
+      .style("stroke-width", "2px")
+      .selectAll("text")
+      .style("font-size", "12px");
 
-    g.append("g").call(d3.axisLeft(y));
+    g.append("g")
+      .call(d3.axisLeft(y))
+      .selectAll("path, line")
+      .style("stroke-width", "2px")
+      .selectAll("text")
+      .style("font-size", "12px");
 
-    // Plot points
+    // Add tooltip div
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background", "rgba(255, 255, 255, 0.8)")
+      .style("border", "1px solid #ccc")
+      .style("padding", "10px")
+      .style("border-radius", "4px")
+      .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
+
+    // Plot points with tooltip interaction
     g.selectAll("circle")
       .data(data)
       .enter()
@@ -160,13 +182,30 @@ export default function DataLineGraph() {
       .attr("cx", (d) => x(d.value))
       .attr("cy", (d) => y(d.value))
       .attr("r", 4)
-      .attr("fill", "steelblue");
+      .attr("fill", "steelblue")
+      .on("mouseover", (event, d) => {
+        tooltip
+          .style("visibility", "visible")
+          .html(
+            `Time: ${d.datetime}<br>DataType1: ${selectedTypes[0]} (${d.value})<br>DataType2: ${selectedTypes[1]} (${d.value})`
+          );
+      })
+      .on("mousemove", (event) => {
+        tooltip
+          .style("top", `${event.pageY - 10}px`)
+          .style("left", `${event.pageX + 10}px`);
+      })
+      .on("mouseout", () => {
+        tooltip.style("visibility", "hidden");
+      });
 
     g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
       .attr("y", height + margin.bottom - 10) // Position it below the axis
       .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
     g.append("text")
@@ -175,6 +214,8 @@ export default function DataLineGraph() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
       .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
   };
 

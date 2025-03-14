@@ -172,8 +172,7 @@ export default function DataLineGraph() {
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
       .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end");
+      .style("font-size", "12px");
 
     // Add x-axis label
     g.append("text")
@@ -181,26 +180,26 @@ export default function DataLineGraph() {
       .attr("x", width / 2)
       .attr("y", height + 110) // Position it below the axis
       .attr("text-anchor", "middle")
+      .style("font-size", "16px") // Increase label font size
+      .style("font-weight", "bold") // Make label bold
       .text("Time");
 
     const tickCount = Math.min(5, Math.ceil(yDomain[1] - yDomain[0])); // Dynamically set ticks based on range
 
     g.append("g")
       .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
-      .append("text")
-      .attr("fill", "black")
-      .attr("transform", "rotate(-90)")
-      .attr("y", -70)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end");
+      .selectAll("text")
+      .style("font-size", "12px");
 
-    // Add y-axis label for the selected type
+    // Update font size and weight for labels
     g.append("text")
       .attr("fill", d3.schemeCategory10[0])
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
     // Add right y-axis
@@ -208,9 +207,10 @@ export default function DataLineGraph() {
       const yRightAxis = g
         .append("g")
         .attr("transform", `translate(${width},0)`)
-        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")));
+        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
+        .selectAll("text")
+        .style("font-size", "12px");
 
-      // Add y-axis label for the second selected type
       const yRightLabel = g
         .append("text")
         .attr("fill", d3.schemeCategory10[1])
@@ -218,6 +218,8 @@ export default function DataLineGraph() {
         .attr("x", -height / 2)
         .attr("y", width + margin.right - 5)
         .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
         .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
 
       // Add color box next to y-axis labels
