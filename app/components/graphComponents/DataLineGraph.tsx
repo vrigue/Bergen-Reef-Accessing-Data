@@ -53,7 +53,7 @@ export default function DataLineGraph() {
     "Calcium",
     "pH",
   ];
-  
+
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   useEffect(() => {
@@ -293,7 +293,9 @@ export default function DataLineGraph() {
             );
         })
         .on("mousemove", (event) => {
-          tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
+          tooltip
+            .style("top", `${event.pageY - 10}px`)
+            .style("left", `${event.pageX + 10}px`);
         })
         .on("mouseout", () => {
           tooltip.style("visibility", "hidden");
@@ -375,8 +377,8 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl">
-          Enter Date Constraints
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
+            Enter Date Constraints
           </div>
           <div
             className={`flex items-center ${
@@ -388,19 +390,20 @@ export default function DataLineGraph() {
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
-            
+
             <DateBoundElement value={endDate} onChange={setEndDate} />
           </div>
 
           <div className="flex justify-center pt-4">
-          <button
-            className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
-            onClick={() => setShouldFetch(true)}
-            >Graph
-          </button>
+            <button
+              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
+              onClick={() => setShouldFetch(true)}
+            >
+              Graph
+            </button>
+          </div>
         </div>
-        </div>
-        
+
         <div
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}

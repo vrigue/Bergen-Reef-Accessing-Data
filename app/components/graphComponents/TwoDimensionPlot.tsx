@@ -38,7 +38,10 @@ export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(["Temperature", "ORP"]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([
+    "Temperature",
+    "ORP",
+  ]);
   const [zoom, setZoom] = useState(50);
   const [step, setStep] = useState(50);
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -53,7 +56,7 @@ export default function DataLineGraph() {
     "Calcium",
     "pH",
   ];
-  
+
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   useEffect(() => {
@@ -89,7 +92,9 @@ export default function DataLineGraph() {
       startDate.setHours(startDate.getHours() - 5);
       endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${selectedTypes.join(",")}`
+        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${selectedTypes.join(
+          ","
+        )}`
       );
 
       if (!response.ok) {
@@ -98,10 +103,11 @@ export default function DataLineGraph() {
 
       const result: DataPoint[] = await response.json();
       const filteredData = result.filter((d, i, arr) =>
-        arr.some((other) =>
-          other.datetime === d.datetime &&
-          other.name === typeMapping[selectedTypes[0]] &&
-          d.name === typeMapping[selectedTypes[1]]
+        arr.some(
+          (other) =>
+            other.datetime === d.datetime &&
+            other.name === typeMapping[selectedTypes[0]] &&
+            d.name === typeMapping[selectedTypes[1]]
         )
       );
       setData(filteredData);
@@ -117,7 +123,8 @@ export default function DataLineGraph() {
   }, [data, zoom, step]);
 
   const drawChart = () => {
-    if (selectedTypes.length < 2 || selectedTypes[0] === selectedTypes[1]) return;
+    if (selectedTypes.length < 2 || selectedTypes[0] === selectedTypes[1])
+      return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -130,15 +137,20 @@ export default function DataLineGraph() {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleLinear().domain(d3.extent(data, (d) => d.value)).range([0, width]);
-    const y = d3.scaleLinear().domain(d3.extent(data, (d) => d.value)).range([height, 0]);
+    const x = d3
+      .scaleLinear()
+      .domain(d3.extent(data, (d) => d.value))
+      .range([0, width]);
+    const y = d3
+      .scaleLinear()
+      .domain(d3.extent(data, (d) => d.value))
+      .range([height, 0]);
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x));
 
-    g.append("g")
-      .call(d3.axisLeft(y));
+    g.append("g").call(d3.axisLeft(y));
 
     // Plot points
     g.selectAll("circle")
@@ -242,8 +254,8 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl">
-          Enter Date Constraints
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
+            Enter Date Constraints
           </div>
           <div
             className={`flex items-center ${
@@ -255,19 +267,20 @@ export default function DataLineGraph() {
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
-            
+
             <DateBoundElement value={endDate} onChange={setEndDate} />
           </div>
 
           <div className="flex justify-center pt-4">
-          <button
-            className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
-            onClick={() => setShouldFetch(true)}
-            >Graph
-          </button>
+            <button
+              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
+              onClick={() => setShouldFetch(true)}
+            >
+              Graph
+            </button>
+          </div>
         </div>
-        </div>
-        
+
         <div
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
