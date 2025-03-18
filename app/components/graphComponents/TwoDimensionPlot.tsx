@@ -10,6 +10,14 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 interface DataPoint {
+  datetime: string;
+  x: number;
+  y: number;
+  type1: string;
+  type2: string;
+}
+
+interface RawDataPoint {
   id: number;
   datetime: string;
   name: string;
@@ -101,16 +109,32 @@ export default function DataLineGraph() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: DataPoint[] = await response.json();
-      const filteredData = result.filter((d, i, arr) =>
-        arr.some(
-          (other) =>
-            other.datetime === d.datetime &&
-            other.name === typeMapping[selectedTypes[0]] &&
-            d.name === typeMapping[selectedTypes[1]]
+      const result: RawDataPoint[] = await response.json();
+      
+      // Group data points by datetime
+      const groupedByTime = result.reduce((acc, point) => {
+        if (!acc[point.datetime]) {
+          acc[point.datetime] = {};
+        }
+        acc[point.datetime][point.name] = point.value;
+        return acc;
+      }, {} as Record<string, Record<string, number>>);
+
+      // Create paired data points
+      const pairedData = Object.entries(groupedByTime)
+        .filter(([_, values]) => 
+          values[typeMapping[selectedTypes[0]]] !== undefined && 
+          values[typeMapping[selectedTypes[1]]] !== undefined
         )
-      );
-      setData(filteredData);
+        .map(([datetime, values]) => ({
+          datetime,
+          x: values[typeMapping[selectedTypes[0]]],
+          y: values[typeMapping[selectedTypes[1]]],
+          type1: selectedTypes[0],
+          type2: selectedTypes[1]
+        }));
+
+      setData(pairedData);
     } catch (error: any) {
       console.error("Error searching for data: ", error);
     }
@@ -123,8 +147,7 @@ export default function DataLineGraph() {
   }, [data, zoom, step]);
 
   const drawChart = () => {
-    if (selectedTypes.length < 2 || selectedTypes[0] === selectedTypes[1])
-      return;
+    if (selectedTypes.length < 2 || selectedTypes[0] === selectedTypes[1]) return; // Not plottable with this sparse data
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -139,11 +162,11 @@ export default function DataLineGraph() {
 
     const x = d3
       .scaleLinear()
-      .domain(d3.extent(data, (d) => d.value))
+      .domain(d3.extent(data, d => d.x) as [number, number])
       .range([0, width]);
     const y = d3
       .scaleLinear()
-      .domain(d3.extent(data, (d) => d.value))
+      .domain(d3.extent(data, d => d.y) as [number, number])
       .range([height, 0]);
 
     g.append("g")
@@ -179,15 +202,17 @@ export default function DataLineGraph() {
       .data(data)
       .enter()
       .append("circle")
-      .attr("cx", (d) => x(d.value))
-      .attr("cy", (d) => y(d.value))
+      .attr("cx", d => x(d.x))
+      .attr("cy", d => y(d.y))
       .attr("r", 4)
       .attr("fill", "steelblue")
       .on("mouseover", (event, d) => {
         tooltip
           .style("visibility", "visible")
           .html(
-            `Time: ${d.datetime}<br>DataType1: ${selectedTypes[0]} (${d.value})<br>DataType2: ${selectedTypes[1]} (${d.value})`
+            `Time: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>
+             ${d.type1}: ${d.x} ${units[d.type1]}<br>
+             ${d.type2}: ${d.y} ${units[d.type2]}`
           );
       })
       .on("mousemove", (event) => {

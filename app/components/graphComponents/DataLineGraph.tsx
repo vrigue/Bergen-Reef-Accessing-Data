@@ -221,18 +221,6 @@ export default function DataLineGraph() {
         .style("font-size", "16px")
         .style("font-weight", "bold")
         .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
-
-      // Add color box next to y-axis labels
-      const addColorBox = (g, x, y, color) => {
-        g.append("rect")
-          .attr("x", x)
-          .attr("y", y)
-          .attr("width", 10)
-          .attr("height", 10)
-          .attr("fill", color);
-      };
-
-      const color = d3.scaleOrdinal(d3.schemeCategory10);
     }
 
     const line = d3
