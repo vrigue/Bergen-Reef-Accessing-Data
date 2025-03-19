@@ -61,6 +61,9 @@ export default function HomePageGraph() {
     }
 
     fetchData();
+    const interval = setInterval(fetchData, 10000); // Fetch every 5 minutes (300,000 ms) (10,000)
+    console.log("fetched the data pooks");
+    return () => clearInterval(interval);
   }, [selectedType]); // Runs when selectedType changes
 
   return (
