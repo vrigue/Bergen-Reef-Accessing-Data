@@ -89,14 +89,15 @@ export default function HomePageGraph() {
       <div className="bg-white rounded-lg p-5">
         <LineChart width={800} height={450} data={chartData}> 
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 16)}/>
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 4)}/>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
           <Tooltip/>
           <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
         </LineChart>
       </div>
       
-      <div
+      
+      <div  //Text Area for the element information
         className="mt-6 p-10 bg-white drop-shadow-orange rounded-lg"
         style={{
           fontSize: "16px",
