@@ -89,6 +89,20 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       </button>
                     </a>
                   </MenuItem>
+                  <MenuItem>
+                    <a href="/data/boxplot">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Box Plot
+                      </button>
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a href="/data/heatmap">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        HeatMap
+                      </button>
+                    </a>
+                  </MenuItem>
                 </MenuItems>
               </Menu>
               <a href="/history">
@@ -161,6 +175,20 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                     <a href="/data/twodimgraph">
                       <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         Two Dimension Plot
+                      </button>
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a href="/data/boxplot">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Box Plot
+                      </button>
+                    </a>
+                  </MenuItem>
+                  <MenuItem>
+                    <a href="/data/heatmap">
+                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        HeatMap
                       </button>
                     </a>
                   </MenuItem>
