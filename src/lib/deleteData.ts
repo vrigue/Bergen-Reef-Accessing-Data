@@ -11,7 +11,6 @@ export default async function deleteData(ids: number[]) {
         // Iterate over all pieces of data (ids) in the array
         for (let i = 0; i < ids.length; i++) {
             // Mark each row from the database as deleted corresponding to the id
-            console.log(dataTable);
             await db.update(dataTable as any).set({ deleted: 0 }).where(eq(dataTable.id, ids[i]));
         }
     } 
