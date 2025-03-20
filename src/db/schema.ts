@@ -6,4 +6,5 @@ export const dataTable = mysqlTable('test_data', {
   name: varchar({ length: 45 }).notNull(),
   type: varchar({ length: 45 }).notNull(),
   value: decimal({ precision: 1, scale: 1,}).notNull(),
+  deleted: int().notNull().default(1),
 });

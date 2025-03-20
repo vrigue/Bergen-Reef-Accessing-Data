@@ -4,7 +4,7 @@ An interactive web application that not only displays graphical representations 
 
 ## Technologies used:
 
-- [ESP32](http://esp32.net/), [CircuitPython](https://circuitpython.org/), [Cron-Job](https://cron-job.org/)
+- [Raspberry Pi](https://www.raspberrypi.org/), [Python](https://www.python.org/), [Cron-Job](https://cron-job.org/)
     The tech stack used to pull data from Apex Fusion in the Coral Reef Lab and push it to the server at regular intervals
 
 - [xml2js](https://www.npmjs.com/package/xml2js)

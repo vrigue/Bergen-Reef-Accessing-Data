@@ -41,6 +41,8 @@ ModuleRegistry.registerModules([
   ValidationModule,
 ]);
 
+import Dialog from "./HistoryPageDialog";
+
 export default function HistoryPageGrid() {
 
   const { user, error, isLoading } = useUser();
@@ -59,10 +61,19 @@ export default function HistoryPageGrid() {
 
   const [data, setData] = useState<any[]>([]);
   const [rowData, setRowData] = useState<any[]>([]);
+
   const gridApiRef = useRef<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedRows, setEditedRows] = useState<Record<number, any>>({});
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
+
+  const [dialog, setDialog] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "",
+    onConfirm: null
+  });
 
   function isCellEditable(params: EditableCallbackParams | CellClassParams) {
     return isEditing;
@@ -83,9 +94,17 @@ export default function HistoryPageGrid() {
   };
 
   const handleDeleteRow = async (params) => {
-    const rowId = params.data.id;
+    setDialog({
+      isOpen: true,
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this entry?",
+      type: "warning",
+      onConfirm: () => deleteRow(params)
+    });
+  }
 
-    if (!confirm("Are you sure you want to delete this entry?")) return;
+  const deleteRow = async (params) => {
+    const rowId = params.data.id;
   
     try {
       const response = await fetch(`/api/deleteData`, {
@@ -98,19 +117,39 @@ export default function HistoryPageGrid() {
   
       setRowData((prev) => prev.filter((row) => row.id !== rowId));
 
-      alert("The selected entry has been deleted.");
+      setDialog({
+        isOpen: true,
+        title: "Success",
+        message: "The selected entry has been deleted.",
+        type: "success",
+        onConfirm: null
+      });
     } 
     catch (error) {
       console.error("Error deleting row: ", error);
-      alert("There was an error in deleting the selected entry.");
+      setDialog({
+        isOpen: true,
+        title: "Error",
+        message: "There was an error in deleting the selected entry.",
+        type: "error",
+        onConfirm: null
+      });
     }
   };
 
-  const handleDeleteSelectedRows = async () => {
+  const handleDeleteSelectedRows = () => {
+    setDialog({
+      isOpen: true,
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete these entries?",
+      type: "warning",
+      onConfirm: () => deleteSelectedRows(), // Function to call on confirm
+    });
+  };
+
+  const deleteSelectedRows = async () => {
     const selectedRows = gridApiRef.current?.getSelectedRows();
     if (!selectedRows || selectedRows.length === 0) return;
-  
-    if (!confirm("Are you sure you want to delete the selected entries?")) return;
   
     const idsToDelete = selectedRows.map((row) => row.id);
   
@@ -125,17 +164,33 @@ export default function HistoryPageGrid() {
   
       setRowData((prev) => prev.filter((row) => !idsToDelete.includes(row.id)));
 
-      alert("The selected entries have been deleted.");
+      setDialog({
+        isOpen: true,
+        title: "Success",
+        message: "The selected entries have been deleted.",
+        type: "success",
+        onConfirm: null
+      });
+      
     } catch (error) {
       console.error("Error deleting rows: ", error);
-      alert("There was an error in deleting the selected entries.");
+      setDialog({
+        isOpen: true,
+        title: "Error",
+        message: "There was an error in deleting the selected entries.",
+        type: "error",
+        onConfirm: null
+      });
     }
   };  
 
 const handleCreateRow = async () => {
+  const now = new Date();
+  const estDate = toZonedTime(now, "America/New_York");
+
   const newRow = {
-    id: 0, // Temporary ID, will be replaced by DB
-    datetime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+    id: 1, // Temporary ID, will be replaced by DB
+    datetime: format(estDate, "yyyy-MM-dd HH:mm:ss"),
     name: "",
     type: "",
     value: 0,
@@ -149,33 +204,50 @@ const handleCreateRow = async () => {
 
   
 const handleSaveNewRow = async (params) => {
-  const rowId = params.data.id;
-  const rowToSave = rowData.find((row) => row.isNewRow === true);
-  if (!rowToSave) return;
+  const newRowData = { ...params.data };
+
+  if (!newRowData || !newRowData.isNewRow) {
+    return;
+  }
 
   // Remove isNewRow attribute
-  rowToSave.isNewRow = false;
+  newRowData.isNewRow = false;
 
   try {
     const response = await fetch("/api/createData", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(rowToSave),
+      body: JSON.stringify(newRowData),
     });
 
-    if (!response.ok) throw new Error("Failed to save row");
+    if (!response.ok) {
+      throw new Error("Failed to save row");
+    }
 
     const result = await response.json();
 
     setRowData((prev) =>
-      prev.map((row) => (row.id === 0 ? { ...row, id: result.id } : row))
+      prev.map((row) => (row.id === 1 ? { ...row, id: result.id } : row))
     );
 
-    alert("The new entry has been created.");
+    setDialog({
+      isOpen: true,
+      title: "Success",
+      message: "The new entry has been created.",
+      type: "success",
+      onConfirm: null
+    });
+    fetchData();
   } 
   catch (error) {
     console.error("Error saving row: ", error);
-    alert("There was an error in creating the new entry.");
+    setDialog({
+      isOpen: true,
+      title: "Error",
+      message: "There was an error in creating the new entry.",
+      type: "error",
+      onConfirm: null
+    });
   }
 };
   
@@ -188,15 +260,28 @@ const handleSaveNewRow = async (params) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ updates: Object.values(editedRows) }),
       });
+
       if (!response.ok) throw new Error("Failed to update database");
 
-      alert("All changes have been saved.");
+      setDialog({
+      isOpen: true,
+      title: "Success",
+      message: "All changes have been saved.",
+      type: "success",
+      onConfirm: null
+    });
       setEditedRows({});
       fetchData();
     } 
     catch (error) {
       console.error("Error saving changes: ", error);
-      alert("There was an error in saving the changes.");
+      setDialog({
+      isOpen: true,
+      title: "Error",
+      message: "There was an error in saving the changes.",
+      type: "error",
+      onConfirm: null
+    });
     }
   };
 
@@ -233,7 +318,7 @@ const handleSaveNewRow = async (params) => {
           width: "31%",
           position: "fixed",
           top: "12.8%",
-          height: "76%",
+          height: "79%",
           overflowY: "auto",
           margin: "23px",
         }}
@@ -284,7 +369,6 @@ const handleSaveNewRow = async (params) => {
               <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
               Graphs
             </button>
-            {/* isAdmin && */}
             {isAdmin && (
             <div className="w-full flex flex-col gap-2">
               <button
@@ -295,7 +379,7 @@ const handleSaveNewRow = async (params) => {
               </button>
 
               {isEditing && (
-                <div className="w-full flex flex-col gap-3 bg-light-teal p-4 rounded-lg">
+                <div className="w-full flex flex-col gap-3 bg-light-teal p-4 rounded-lg mt-2">
                   <div className="w-1/3 bg-teal text-white font-semibold text-center p-1 rounded-xl">Edit Controls</div>
                   <button
                   onClick={handleCreateRow}
@@ -424,6 +508,15 @@ const handleSaveNewRow = async (params) => {
         </div>
       </div>
       <br></br>
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        onConfirm={dialog.onConfirm}
+      />
     </div>
   );
 }
