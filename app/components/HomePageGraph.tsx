@@ -5,12 +5,12 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
 import "../globals.css";
 
 const infoContent = {
-  pH: 'This is the pH info!',
-  Cax4: 'This is the calcium info!',
+  pH: 'PH measures the acidity or alkalinity of the water. An ideal, stable pH promotes coral growth, allows them to expand their skeletons, and assists in nutrient availability.',
+  Cax4: 'Calcium is a crucial component for coral skeletons and is one of the most abundant ions in seawater. Without enough calcium, stony corals cannot grow or strengthen their foundations, so dosing this supplement is a key part of maintaining a healthy reef tank.',
   Alkx4: 'This is the alkalinity info!',
-  ORP: 'This is the ORP info!',
-  Tmp: 'This is the temperature info!',
-  Salt: 'This is the salinity info!',
+  ORP: 'ORP provides reef-keepers with a way to monitor water quality and stability, with the most drastic changes being seen when decaying organic matter is present in the tank. This level is maintained through additional filtration such as UV sterilizers or activated carbon.',
+  Tmp: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae from their tissue, causing them to turn white and die quickly.',
+  Salt: 'Salt provides the necessary minerals to maintain the environment in a reef tank. Keeping a desirable salinity level and selecting a high-quality reef salt mix provides an opportunity to replicate seawater conditions.',
 };
 
 
@@ -61,6 +61,9 @@ export default function HomePageGraph() {
     }
 
     fetchData();
+    const interval = setInterval(fetchData, 300000); // Fetch every 5 minutes (300,000 ms) (10,000)
+    console.log("fetched the data pooks");
+    return () => clearInterval(interval);
   }, [selectedType]); // Runs when selectedType changes
 
   return (
@@ -89,14 +92,15 @@ export default function HomePageGraph() {
       <div className="bg-white rounded-lg p-5">
         <LineChart width={800} height={450} data={chartData}> 
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 16)}/>
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 4)}/>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
           <Tooltip/>
           <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
         </LineChart>
       </div>
       
-      <div
+      
+      <div  //Text Area for the element information
         className="mt-6 p-10 bg-white drop-shadow-orange rounded-lg"
         style={{
           fontSize: "16px",

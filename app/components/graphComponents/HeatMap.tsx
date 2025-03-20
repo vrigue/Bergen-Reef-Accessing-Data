@@ -10,14 +10,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 interface DataPoint {
-  datetime: string;
-  x: number;
-  y: number;
-  type1: string;
-  type2: string;
-}
-
-interface RawDataPoint {
   id: number;
   datetime: string;
   name: string;
@@ -46,10 +38,7 @@ export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([
-    "Temperature",
-    "ORP",
-  ]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [zoom, setZoom] = useState(50);
   const [step, setStep] = useState(50);
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -91,7 +80,7 @@ export default function DataLineGraph() {
     lastWeek.setDate(today.getDate() - 7);
     setStartDate(lastWeek);
     setEndDate(today);
-    setSelectedTypes(["Temperature", "ORP"]);
+    setSelectedTypes(["Salinity"]);
     setShouldFetch(true);
   }, []);
 
@@ -109,32 +98,8 @@ export default function DataLineGraph() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: RawDataPoint[] = await response.json();
-      
-      // Group data points by datetime
-      const groupedByTime = result.reduce((acc, point) => {
-        if (!acc[point.datetime]) {
-          acc[point.datetime] = {};
-        }
-        acc[point.datetime][point.name] = point.value;
-        return acc;
-      }, {} as Record<string, Record<string, number>>);
-
-      // Create paired data points
-      const pairedData = Object.entries(groupedByTime)
-        .filter(([_, values]) => 
-          values[typeMapping[selectedTypes[0]]] !== undefined && 
-          values[typeMapping[selectedTypes[1]]] !== undefined
-        )
-        .map(([datetime, values]) => ({
-          datetime,
-          x: values[typeMapping[selectedTypes[0]]],
-          y: values[typeMapping[selectedTypes[1]]],
-          type1: selectedTypes[0],
-          type2: selectedTypes[1]
-        }));
-
-      setData(pairedData);
+      const result: DataPoint[] = await response.json();
+      setData(result);
     } catch (error: any) {
       console.error("Error searching for data: ", error);
     }
@@ -147,7 +112,7 @@ export default function DataLineGraph() {
   }, [data, zoom, step]);
 
   const drawChart = () => {
-    if (selectedTypes.length < 2 || selectedTypes[0] === selectedTypes[1]) return; // Not plottable with this sparse data
+    if (selectedTypes.length < 1) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -160,29 +125,109 @@ export default function DataLineGraph() {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3
-      .scaleLinear()
-      .domain(d3.extent(data, d => d.x) as [number, number])
-      .range([0, width]);
-    const y = d3
-      .scaleLinear()
-      .domain(d3.extent(data, d => d.y) as [number, number])
-      .range([height, 0]);
+    const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
+
+    // Calculate y-axis for the first selected type
+    const yDomain = d3.extent(
+      data.filter((d) => d.name === typeMapping[selectedTypes[0]]),
+      (d) => +d.value
+    ) as [number, number];
+    const y = d3.scaleLinear().domain(yDomain).nice().range([height, 0]);
+
+    // Calculate yRight-axis for the second selected type if it exists
+    const yRight = selectedTypes[1]
+      ? d3
+          .scaleLinear()
+          .domain(
+            d3.extent(
+              data.filter((d) => d.name === typeMapping[selectedTypes[1]]),
+              (d) => +d.value
+            ) as [number, number]
+          )
+          .nice()
+          .range([height, 0])
+      : null;
+
+    const dayCount = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    // Calculate tick values with a staggered approach
+    const tickValues = [];
+    for (let i = 0; i < dayCount; i++) {
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      if (i % 2 === 0) {
+        // Stagger: only add every other day
+        tickValues.push(date);
+      }
+    }
+
+    // Adjust x-axis ticks based on the number of days in the range
+    const xAxis = d3
+      .axisBottom(x)
+      .ticks(Math.min(dayCount, 10))
+      .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x))
-      .selectAll("path, line")
-      .style("stroke-width", "2px")
+      .call(xAxis)
       .selectAll("text")
       .style("font-size", "12px");
 
+    // Add x-axis label
+    g.append("text")
+      .attr("fill", "black")
+      .attr("x", width / 2)
+      .attr("y", height + 110) // Position it below the axis
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px") // Increase label font size
+      .style("font-weight", "bold") // Make label bold
+      .text("Time");
+
+    const tickCount = Math.min(5, Math.ceil(yDomain[1] - yDomain[0])); // Dynamically set ticks based on range
+
     g.append("g")
-      .call(d3.axisLeft(y))
-      .selectAll("path, line")
-      .style("stroke-width", "2px")
+      .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
       .selectAll("text")
       .style("font-size", "12px");
+
+    // Update font size and weight for labels
+    g.append("text")
+      .attr("fill", d3.schemeCategory10[0])
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", -margin.left + 20)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
+      .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
+
+    // Add right y-axis
+    if (yRight) {
+      const yRightAxis = g
+        .append("g")
+        .attr("transform", `translate(${width},0)`)
+        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
+        .selectAll("text")
+        .style("font-size", "12px");
+
+      const yRightLabel = g
+        .append("text")
+        .attr("fill", d3.schemeCategory10[1])
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", width + margin.right - 5)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
+    }
+
+    const line = d3
+      .line<DataPoint>()
+      .defined((d) => !isNaN(d.value) && d.value !== null)
+      .x((d) => x(new Date(d.datetime)))
+      .y((d) => y(d.value));
 
     // Add tooltip div
     const tooltip = d3
@@ -197,59 +242,61 @@ export default function DataLineGraph() {
       .style("border-radius", "4px")
       .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
 
-    // Plot points with tooltip interaction
-    g.selectAll("circle")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("cx", d => x(d.x))
-      .attr("cy", d => y(d.y))
-      .attr("r", 4)
-      .attr("fill", "steelblue")
-      .on("mouseover", (event, d) => {
-        tooltip
-          .style("visibility", "visible")
-          .html(
-            `Time: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>
-             ${d.type1}: ${d.x} ${units[d.type1]}<br>
-             ${d.type2}: ${d.y} ${units[d.type2]}`
-          );
-      })
-      .on("mousemove", (event) => {
-        tooltip
-          .style("top", `${event.pageY - 10}px`)
-          .style("left", `${event.pageX + 10}px`);
-      })
-      .on("mouseout", () => {
-        tooltip.style("visibility", "hidden");
-      });
+    // Add circles for each data point and tooltip interaction
+    selectedTypes.forEach((type, index) => {
+      const mappedType = typeMapping[type] || type;
+      const typeData = data.filter((d) => d.name === mappedType);
+      const lineFunction =
+        index === 0
+          ? line
+          : d3
+              .line<DataPoint>()
+              .defined((d) => !isNaN(d.value) && d.value !== null)
+              .x((d) => x(new Date(d.datetime)))
+              .y((d) => (yRight ? yRight(d.value) : y(d.value)));
 
-    g.append("text")
-      .attr("fill", "black")
-      .attr("x", width / 2)
-      .attr("y", height + margin.bottom - 10) // Position it below the axis
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("font-weight", "bold")
-      .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
+      g.append("path")
+        .datum(typeData)
+        .attr("fill", "none")
+        .attr("stroke", d3.schemeCategory10[index])
+        .attr("stroke-width", 1.5)
+        .attr("d", lineFunction);
 
-    g.append("text")
-      .attr("fill", "black")
-      .attr("transform", "rotate(-90)")
-      .attr("x", -height / 2)
-      .attr("y", -margin.left + 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("font-weight", "bold")
-      .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
+      g.selectAll(`circle.series-${index}`)
+        .data(typeData)
+        .enter()
+        .append("circle")
+        .attr("class", `series-${index}`)
+        .attr("cx", (d) => x(new Date(d.datetime)))
+        .attr("cy", (d) =>
+          index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value)
+        )
+        .attr("r", 4)
+        .attr("fill", d3.schemeCategory10[index])
+        .on("mouseover", (event, d) => {
+          tooltip
+            .style("visibility", "visible")
+            .html(
+              `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
+                new Date(d.datetime)
+              )}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`
+            );
+        })
+        .on("mousemove", (event) => {
+          tooltip
+            .style("top", `${event.pageY - 10}px`)
+            .style("left", `${event.pageX + 10}px`);
+        })
+        .on("mouseout", () => {
+          tooltip.style("visibility", "hidden");
+        });
+    });
   };
 
   const handleTypeSelect = (index: number, type: string) => {
     const newSelectedTypes = [...selectedTypes];
     newSelectedTypes[index] = type;
-    if (newSelectedTypes[0] !== newSelectedTypes[1]) {
-      setSelectedTypes(newSelectedTypes);
-    }
+    setSelectedTypes(newSelectedTypes);
   };
 
   const addPlot = () => {
@@ -270,7 +317,7 @@ export default function DataLineGraph() {
 
       <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
-          Two Dimensional Plot
+          Heat Map
         </h1>
         <div className="flex flex-col">
           {selectedTypes.map((type, index) => (

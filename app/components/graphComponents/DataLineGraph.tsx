@@ -53,7 +53,7 @@ export default function DataLineGraph() {
     "Calcium",
     "pH",
   ];
-  
+
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   useEffect(() => {
@@ -172,8 +172,7 @@ export default function DataLineGraph() {
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
       .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end");
+      .style("font-size", "12px");
 
     // Add x-axis label
     g.append("text")
@@ -181,26 +180,26 @@ export default function DataLineGraph() {
       .attr("x", width / 2)
       .attr("y", height + 110) // Position it below the axis
       .attr("text-anchor", "middle")
+      .style("font-size", "16px") // Increase label font size
+      .style("font-weight", "bold") // Make label bold
       .text("Time");
 
     const tickCount = Math.min(5, Math.ceil(yDomain[1] - yDomain[0])); // Dynamically set ticks based on range
 
     g.append("g")
       .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
-      .append("text")
-      .attr("fill", "black")
-      .attr("transform", "rotate(-90)")
-      .attr("y", -70)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end");
+      .selectAll("text")
+      .style("font-size", "12px");
 
-    // Add y-axis label for the selected type
+    // Update font size and weight for labels
     g.append("text")
       .attr("fill", d3.schemeCategory10[0])
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
     // Add right y-axis
@@ -208,9 +207,10 @@ export default function DataLineGraph() {
       const yRightAxis = g
         .append("g")
         .attr("transform", `translate(${width},0)`)
-        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")));
+        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
+        .selectAll("text")
+        .style("font-size", "12px");
 
-      // Add y-axis label for the second selected type
       const yRightLabel = g
         .append("text")
         .attr("fill", d3.schemeCategory10[1])
@@ -218,19 +218,9 @@ export default function DataLineGraph() {
         .attr("x", -height / 2)
         .attr("y", width + margin.right - 5)
         .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
         .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
-
-      // Add color box next to y-axis labels
-      const addColorBox = (g, x, y, color) => {
-        g.append("rect")
-          .attr("x", x)
-          .attr("y", y)
-          .attr("width", 10)
-          .attr("height", 10)
-          .attr("fill", color);
-      };
-
-      const color = d3.scaleOrdinal(d3.schemeCategory10);
     }
 
     const line = d3
@@ -293,7 +283,9 @@ export default function DataLineGraph() {
             );
         })
         .on("mousemove", (event) => {
-          tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
+          tooltip
+            .style("top", `${event.pageY - 10}px`)
+            .style("left", `${event.pageX + 10}px`);
         })
         .on("mouseout", () => {
           tooltip.style("visibility", "hidden");
@@ -375,8 +367,8 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl">
-          Enter Date Constraints
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
+            Enter Date Constraints
           </div>
           <div
             className={`flex items-center ${
@@ -388,19 +380,20 @@ export default function DataLineGraph() {
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
-            
+
             <DateBoundElement value={endDate} onChange={setEndDate} />
           </div>
 
           <div className="flex justify-center pt-4">
-          <button
-            className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
-            onClick={() => setShouldFetch(true)}
-            >Graph
-          </button>
+            <button
+              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
+              onClick={() => setShouldFetch(true)}
+            >
+              Graph
+            </button>
+          </div>
         </div>
-        </div>
-        
+
         <div
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
