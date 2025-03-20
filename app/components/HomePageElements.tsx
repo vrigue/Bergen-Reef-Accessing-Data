@@ -33,6 +33,8 @@ export default function HomePageElements() {
         }
     
         fetchData();
+        const interval = setInterval(fetchData, 300000); // Fetch every 5 minutes (300,000 ms) (10,000)
+        return () => clearInterval(interval);
         console.log(elementData[0])
       }, []);
 
