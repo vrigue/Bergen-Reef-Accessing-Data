@@ -45,7 +45,7 @@ const getAccessToken = async () => {
   export const assignAdminRole = async (userId: string) => {
     const token = await getAccessToken();
   
-    const ADMIN_ROLE_ID = '<your-admin-role-id>'; // Get this from the Auth0 dashboard
+    const ADMIN_ROLE_ID = 'rol_EOFGI0Lo7BYvxqCL'; 
   
     const response = await fetch(`${process.env.AUTH0_MGMT_AUDIENCE}users/${userId}/roles`, {
       method: 'POST',
