@@ -46,7 +46,7 @@ export default function BoxPlot() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedType, setSelectedType] = useState<string>("Salinity");
+  const [selectedType, setSelectedType] = useState<string>("Temperature");
   const [numBoxPlots, setNumBoxPlots] = useState<number>(5);
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -141,7 +141,7 @@ export default function BoxPlot() {
         const q3 = sortedData[q3Index];
         const max = sortedData[sortedData.length - 1];
         
-        // Calculate outliers (values beyond 1.5 * IQR)
+        // Calculate outliers (values beyond 1.5 * IQR) // this is wrong
         const iqr = q3 - q1;
         const lowerBound = q1 - 1.5 * iqr;
         const upperBound = q3 + 1.5 * iqr;
@@ -172,15 +172,28 @@ export default function BoxPlot() {
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
+    // Add tooltip div
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background", "rgba(255, 255, 255, 0.9)")
+      .style("padding", "8px")
+      .style("border-radius", "4px")
+      .style("border", "1px solid #ddd")
+      .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+      .style("font-size", "12px");
+
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const boxPlotData = calculateBoxPlotData(data);
     
-    // Create scales
+    // Create scales with padding
     const x = d3.scaleLinear()
-      .domain([0, numBoxPlots - 1])
+      .domain([-0.5, numBoxPlots - 0.5]) // Add padding to domain
       .range([0, width]);
 
     const y = d3.scaleLinear()
@@ -205,7 +218,20 @@ export default function BoxPlot() {
         .attr("height", y(d.q1) - y(d.q3))
         .attr("fill", "white")
         .attr("stroke", "black")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 1)
+        .on("mouseover", (event) => {
+          tooltip
+            .style("visibility", "visible")
+            .html(`Q1: ${Number(d.q1).toFixed(2)}<br/>Q3: ${Number(d.q3).toFixed(2)}<br/>IQR: ${Number(d.q3 - d.q1).toFixed(2)}`);
+        })
+        .on("mousemove", (event) => {
+          tooltip
+            .style("top", (event.pageY - 10) + "px")
+            .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.style("visibility", "hidden");
+        });
 
       // Draw median line
       g.append("line")
@@ -214,24 +240,49 @@ export default function BoxPlot() {
         .attr("y1", y(d.median))
         .attr("y2", y(d.median))
         .attr("stroke", "black")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 2)
+        .style("cursor", "pointer")
+        .on("mouseover", (event) => {
+          tooltip
+            .style("visibility", "visible")
+            .html(`Median: ${Number(d.median).toFixed(2)}`);
+        })
+        .on("mousemove", (event) => {
+          tooltip
+            .style("top", (event.pageY - 10) + "px")
+            .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.style("visibility", "hidden");
+        });
 
-      // Draw whiskers
-      g.append("line")
-        .attr("x1", xPos)
-        .attr("x2", xPos)
-        .attr("y1", y(d.max))
-        .attr("y2", y(d.q3))
-        .attr("stroke", "black")
-        .attr("stroke-width", 1);
+      // Draw whiskers with hover
+      const drawWhisker = (y1: number, y2: number, label: string) => {
+        g.append("line")
+          .attr("x1", xPos)
+          .attr("x2", xPos)
+          .attr("y1", y(y1))
+          .attr("y2", y(y2))
+          .attr("stroke", "black")
+          .attr("stroke-width", 1)
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => {
+            tooltip
+              .style("visibility", "visible")
+              .html(`${label}: ${Number(y1).toFixed(2)}`);
+          })
+          .on("mousemove", (event) => {
+            tooltip
+              .style("top", (event.pageY - 10) + "px")
+              .style("left", (event.pageX + 10) + "px");
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+          });
+      };
 
-      g.append("line")
-        .attr("x1", xPos)
-        .attr("x2", xPos)
-        .attr("y1", y(d.min))
-        .attr("y2", y(d.q1))
-        .attr("stroke", "black")
-        .attr("stroke-width", 1);
+      drawWhisker(d.max, d.q3, "Maximum");
+      drawWhisker(d.min, d.q1, "Minimum");
 
       // Draw whisker caps
       g.append("line")
@@ -250,22 +301,58 @@ export default function BoxPlot() {
         .attr("stroke", "black")
         .attr("stroke-width", 1);
 
-      // Draw outliers
+      // Draw outliers with hover
       d.outliers.forEach(outlier => {
         g.append("circle")
           .attr("cx", xPos)
           .attr("cy", y(outlier))
           .attr("r", 3)
           .attr("fill", "red")
-          .attr("stroke", "none");
+          .attr("stroke", "none")
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => {
+            const iqr = Number(d.q3 - d.q1);
+            const lowerBound = Number(d.q1 - 1.5 * iqr);
+            const upperBound = Number(d.q3 + 1.5 * iqr);
+            tooltip
+              .style("visibility", "visible")
+              .html(
+                `<strong>Outlier Value:</strong> ${Number(outlier).toFixed(2)}<br/>` +
+                `<strong>Why is this an outlier?</strong><br/>` +
+                `This value falls ${outlier > upperBound ? 'above' : 'below'} the expected range.<br/><br/>` +
+                `<strong>Expected Range:</strong><br/>` +
+                `Lower bound: ${lowerBound.toFixed(2)}<br/>` +
+                `Upper bound: ${upperBound.toFixed(2)}<br/>`
+              );
+          })
+          .on("mousemove", (event) => {
+            tooltip
+              .style("top", (event.pageY - 10) + "px")
+              .style("left", (event.pageX + 10) + "px");
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+          });
       });
     });
 
-    // Add axes
+    // Add axes with formatted date ranges
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(numBoxPlots))
+      .call(d3.axisBottom(x)
+        .ticks(numBoxPlots)
+        .tickFormat((d, i) => {
+          if (i < boxPlotData.length) {
+            const dates = boxPlotData[i].timeRange.split(" to ");
+            return `${dates[0]}\n${dates[1]}`;
+          }
+          return "";
+        }))
       .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-45)")
       .style("font-size", "12px");
 
     g.append("g")
