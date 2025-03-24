@@ -72,33 +72,33 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
                 </MenuButton>
                 <MenuItems
-                  className="absolute z-50 right-0 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5 z-50"
+                  className="absolute z-50 right-0 mt-2 w-56 bg-light-gray shadow-lg ring-1 ring-black/5"
                   style={{ zIndex: 20 }}
                 >
                   <MenuItem>
                     <a href="/data/linegraph">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
                         Line Graph
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/twodimgraph">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
                         Two Dimension Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/boxplot">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
                         Box Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/heatmap">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
                         HeatMap
                       </button>
                     </a>

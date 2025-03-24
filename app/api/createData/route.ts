@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
+import { toZonedTime } from "date-fns-tz";
 import insertData from 'src/lib/insertData';
 
 export async function POST(request: Request) {
     try {
         // Get the data within the request
         const data = await request.json();
+        const utcDate = toZonedTime(new Date(data.datetime), "America/New_York");
+        const estDate = new Date(utcDate.getTime() - (4 * 60 * 60 * 1000));
 
         // Check if all the necessary fields have been provided
         if (!data.name || !data.type || !data.value) {
@@ -15,7 +18,7 @@ export async function POST(request: Request) {
         }
 
         // Pass data to database helper function
-        await insertData([data], data.datetime);
+        await insertData([data], estDate);
 
         return NextResponse.json({
             status: 200,

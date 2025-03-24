@@ -20,7 +20,7 @@ module.exports = {
         'medium-orange': '#FFCA57',
         'orange': '#FEB934',
         'dark-orange': '#FFA900',
-        'light-gray': '#F1F0F0',
+        'light-gray': '#F8F8F9',
         'medium-gray': '#B1B1B4',
         'gray': '#757575',
         'dark-gray': '#5E5E5E'
