@@ -4,7 +4,7 @@ import { dataTable } from 'src/db/data-schema';
 
 const db = drizzle(process.env.DATABASE_URL!);
 
-export default async function insertData(data : Array<Record<string, any>>, date : Date) {
+export default async function insertData(data : Array<Record<string, any>>, date : string) {
     // Iterate over all pieces of data (nodes) in the array from the JSON
     for (let i = 0; i < data.length; i++) {
         // Check name of the current data node to determine its type
@@ -27,15 +27,19 @@ export default async function insertData(data : Array<Record<string, any>>, date
 
         // Construct row of the current data node with all its attributes
         const entry : typeof dataTable.$inferInsert = {
-            datetime: date,
+            datetime: new Date(date),
             name: data[i].name,
             type: type,
             value: data[i].value,
-            deleted: 1,
-            updated_at: date
-        } as typeof dataTable.$inferInsert;
+            updated_at: new Date(date)
+        };
         
         // Insert row into the database
-        await db.insert(dataTable).values(entry);
+        try {
+            await db.insert(dataTable).values(entry);
+            console.log("Insertion successful:", entry);
+        } catch (error) {
+            console.error("Database Insertion Error:", error);
+        }
     }
 }
