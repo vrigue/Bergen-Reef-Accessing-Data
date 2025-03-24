@@ -153,7 +153,7 @@ export default function HistoryPageGrid() {
     if (!selectedRows || selectedRows.length === 0) return;
   
     const idsToDelete = selectedRows.map((row) => row.id);
-    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");;
+    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
   
     try {
       const response = await fetch(`/api/deleteData`, {

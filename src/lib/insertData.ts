@@ -31,8 +31,9 @@ export default async function insertData(data : Array<Record<string, any>>, date
             name: data[i].name,
             type: type,
             value: data[i].value,
+            deleted: 1,
             updated_at: date
-        };
+        } as typeof dataTable.$inferInsert;
         
         // Insert row into the database
         await db.insert(dataTable).values(entry);
