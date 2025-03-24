@@ -56,7 +56,7 @@ const UserList = () => {
             {user.email}
             <button 
               onClick={() => handleAssignAdmin(user.user_id)}
-              className="ml-10 bg-blue-500 text-white px-2 py-1 rounded"
+              className="ml-10 bg-teal text-white px-2 py-1 rounded"
               disabled={loading}
             >
               {loading ? 'Assigning...' : 'Make Admin'}
