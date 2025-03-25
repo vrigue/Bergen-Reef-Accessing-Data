@@ -105,13 +105,12 @@ export default function HistoryPageGrid() {
 
   const deleteRow = async (params) => {
     const rowId = params.data.id;
-    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     try {
       const response = await fetch(`/api/deleteData`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: rowId, date: date }),
+        body: JSON.stringify({ id: rowId }),
       });
   
       if (!response.ok) throw new Error("Failed to delete row");
@@ -153,13 +152,12 @@ export default function HistoryPageGrid() {
     if (!selectedRows || selectedRows.length === 0) return;
   
     const idsToDelete = selectedRows.map((row) => row.id);
-    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
   
     try {
       const response = await fetch(`/api/deleteData`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: idsToDelete, date: date }),
+        body: JSON.stringify({ ids: idsToDelete }),
       });
   
       if (!response.ok) throw new Error("Failed to delete rows");
