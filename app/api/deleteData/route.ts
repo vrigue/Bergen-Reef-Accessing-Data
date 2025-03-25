@@ -9,10 +9,10 @@ export async function DELETE(request: Request) {
 
         // Pass ids to database helper function
         if (data.id) {
-            await deleteData([data.id], new Date());
+            await deleteData([data.id], new Date(data.datetime));
         }
         else if (data.ids && Array.isArray(data.ids)) {
-            await deleteData(data.ids, new Date());
+            await deleteData(data.ids, new Date(data.datetime));
         } 
         else {
             return NextResponse.json({
