@@ -6,19 +6,19 @@ export async function DELETE(request: Request) {
     try {
         // Get the data (ids) within the request
         const data = await request.json();
-        const estDateStr = formatInTimeZone(
-                    new Date(data.datetime),
-                    "America/New_York",
-                    "yyyy-MM-dd HH:mm:ss"
-                );
-        const estDate = new Date(estDateStr);
+        // const estDateStr = formatInTimeZone(
+        //             new Date(data.datetime),
+        //             "America/New_York",
+        //             "yyyy-MM-dd HH:mm:ss"
+        //         );
+        // const estDate = new Date(estDateStr);
 
         // Pass ids to database helper function
         if (data.id) {
-            await deleteData([data.id], estDate);
+            await deleteData([data.id], new Date(data.datetime));
         }
         else if (data.ids && Array.isArray(data.ids)) {
-            await deleteData(data.ids, estDate);
+            await deleteData(data.ids, new Date(data.datetime));
         } 
         else {
             return NextResponse.json({
