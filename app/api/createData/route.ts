@@ -1,13 +1,20 @@
 import { NextResponse } from 'next/server';
-import { toZonedTime } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 import createData from 'src/lib/createData';
 
 export async function POST(request: Request) {
     try {
         // Get the data within the request
         const data = await request.json();
-        const utcDate = toZonedTime(new Date(data.datetime), "America/New_York");
-        const estDate = new Date(utcDate.getTime() - (4 * 60 * 60 * 1000));
+        // const utcDate = toZonedTime(new Date(data.datetime), "America/New_York");
+        // const estDate = new Date(utcDate.getTime() - (4 * 60 * 60 * 1000));
+        
+        const estDateStr = formatInTimeZone(
+            new Date(data.datetime),
+            "America/New_York",
+            "yyyy-MM-dd HH:mm:ss"
+        );
+        const estDate = new Date(estDateStr);
 
         // Check if all the necessary fields have been provided
         if (!data.name || !data.type || !data.value) {

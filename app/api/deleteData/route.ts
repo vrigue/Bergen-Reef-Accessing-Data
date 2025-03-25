@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
-import { toZonedTime } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 import deleteData from 'src/lib/deleteData';
 
 export async function DELETE(request: Request) {
     try {
         // Get the data (ids) within the request
         const data = await request.json();
-        const utcDate = toZonedTime(new Date(data.date), "America/New_York");
-        const estDate = new Date(utcDate.getTime() - (4 * 60 * 60 * 1000));
+        const estDateStr = formatInTimeZone(
+                    new Date(data.datetime),
+                    "America/New_York",
+                    "yyyy-MM-dd HH:mm:ss"
+                );
+        const estDate = new Date(estDateStr);
 
         // Pass ids to database helper function
         if (data.id) {
