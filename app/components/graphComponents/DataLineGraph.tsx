@@ -172,7 +172,7 @@ export default function DataLineGraph() {
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "24px");
 
     // Add x-axis label
     g.append("text")
@@ -189,7 +189,7 @@ export default function DataLineGraph() {
     g.append("g")
       .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "20px");
 
     // Update font size and weight for labels
     g.append("text")
@@ -198,7 +198,7 @@ export default function DataLineGraph() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "20px")
       .style("font-weight", "bold")
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
@@ -209,16 +209,16 @@ export default function DataLineGraph() {
         .attr("transform", `translate(${width},0)`)
         .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
         .selectAll("text")
-        .style("font-size", "12px");
+        .style("font-size", "20px");
 
       const yRightLabel = g
         .append("text")
         .attr("fill", d3.schemeCategory10[1])
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", width + margin.right - 5)
+        .attr("y", width + margin.right + 10)
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "20px")
         .style("font-weight", "bold")
         .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
     }
