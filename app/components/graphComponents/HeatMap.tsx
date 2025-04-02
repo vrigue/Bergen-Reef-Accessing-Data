@@ -148,7 +148,7 @@ export default function DataLineGraph() {
       heatMapData.push({
         week,
         day,
-        value: values.max, // Use max value for coloring
+        value: values.max - values.min, // Use range (max-min) for coloring
         minValue: values.min,
         maxValue: values.max
       });
@@ -190,11 +190,24 @@ export default function DataLineGraph() {
 
     const heatMapData = processDataForHeatMap();
     
-    // Calculate the value range for color scaling
-    const valueRange = d3.extent(heatMapData, d => d.value) as [number, number];
+    // Calculate quartiles and IQR for outlier detection
+    const values = heatMapData.map(d => d.value).sort((a, b) => a - b);
+    const q1 = d3.quantile(values, 0.25) || 0;
+    const q3 = d3.quantile(values, 0.75) || 0;
+    const iqr = q3 - q1;
+    const upperBound = q3 + 1.5 * iqr;
+
+    // Calculate the value range for color scaling, excluding outliers
+    const valueRange: [number, number] = [
+      0,
+      Math.min(upperBound, d3.max(values) || 0)
+    ];
+
+    // Create color scale that emphasizes variation
     const colorScale = d3.scaleSequential()
-      .domain(valueRange)
-      .interpolator(d3.interpolateRdYlBu);
+      .domain([valueRange[0], valueRange[1]])
+      .interpolator(d3.interpolateRdYlBu)
+      .clamp(true); // Clamp values outside the domain
 
     // Create the heat map grid
     const cellWidth = width / 7;
@@ -251,7 +264,10 @@ export default function DataLineGraph() {
       .attr("y", d => d.day * cellHeight)
       .attr("width", cellWidth)
       .attr("height", cellHeight)
-      .attr("fill", d => colorScale(d.value))
+      .attr("fill", d => {
+        // If value is above upperBound, it's an outlier - color it red
+        return d.value > upperBound ? "#67000d" : colorScale(d.value);
+      })
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function(event, d) {
@@ -263,7 +279,8 @@ export default function DataLineGraph() {
           .style("opacity", .9);
         tooltip.html(`${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedType]}<br/>
-          Max: ${d.maxValue.toFixed(2)} ${units[selectedType]}`)
+          Max: ${d.maxValue.toFixed(2)} ${units[selectedType]}<br/>
+          Range: ${d.value.toFixed(2)} ${units[selectedType]}${d.value > upperBound ? '<br/>(Outlier)' : ''}`)
           .style("left", (event.pageX + 10) + "px")
           .style("top", (event.pageY - 28) + "px");
       })
@@ -322,17 +339,55 @@ export default function DataLineGraph() {
       .domain(valueRange)
       .range([legendHeight, 0]);
 
+    // Create evenly spaced ticks
+    const numTicks = 5;
+    const ticks = d3.range(numTicks).map(i => {
+      const t = i / (numTicks - 1);
+      return valueRange[0] + t * (valueRange[1] - valueRange[0]);
+    });
+
     const legendAxis = d3.axisRight(legendScale)
-      .ticks(5)
-      .tickFormat(d3.format(".2f"));
+      .tickValues([...ticks, upperBound])
+      .tickFormat(d => {
+        const value = parseFloat(d);
+        return value === upperBound ? `>${value.toFixed(2)}` : value.toFixed(2);
+      });
 
-    g.append("g")
-      .attr("transform", `translate(${legendX},${legendY})`)
-      .call(legendAxis)
-      .selectAll("text")
-      .style("font-size", "18px");
+    // Add legend title
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 65)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(selectedType);
 
-    // Add color gradient
+    // Add units below
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 35)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(`Range`);
+
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 5)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(`(${units[selectedType]})`);
+
+    // Create gradient stops
+    const gradientStops = [
+      ...ticks.map((t, i) => ({
+        offset: `${100 * i / (numTicks - 1)}%`,
+        color: colorScale(t)
+      })),
+      { offset: "100%", color: "#67000d" } // Add outlier color at the top
+    ];
+
     const gradient = g.append("defs")
       .append("linearGradient")
       .attr("id", "color-gradient")
@@ -342,36 +397,28 @@ export default function DataLineGraph() {
       .attr("y2", "100%");
 
     gradient.selectAll("stop")
-      .data(colorScale.ticks().map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
+      .data(gradientStops)
       .enter()
       .append("stop")
       .attr("offset", d => d.offset)
       .attr("stop-color", d => d.color);
 
+    // Move the legend rectangle and axis down slightly
+    const legendYOffset = 20;
+    
     g.append("rect")
       .attr("x", legendX - legendWidth)
-      .attr("y", legendY)
+      .attr("y", legendY + legendYOffset)
       .attr("width", legendWidth)
       .attr("height", legendHeight)
       .style("fill", "url(#color-gradient)");
 
-    // Add legend title
-    g.append("text")
-      .attr("x", legendX)
-      .attr("y", legendY - 35)
-      .attr("text-anchor", "middle")
-      .style("font-size", "24px")
-      .style("font-weight", "bold")
-      .text(selectedType);
-
-    // Add units below
-    g.append("text")
-      .attr("x", legendX)
-      .attr("y", legendY - 15)
-      .attr("text-anchor", "middle")
-      .style("font-size", "24px")
-      .style("font-weight", "bold")
-      .text(`(${units[selectedType]})`);
+    // Adjust the legend axis position to match the rectangle
+    g.append("g")
+      .attr("transform", `translate(${legendX},${legendY + legendYOffset})`)
+      .call(legendAxis)
+      .selectAll("text")
+      .style("font-size", "18px");
   };
 
   const handleTypeSelect = (type: string) => {
