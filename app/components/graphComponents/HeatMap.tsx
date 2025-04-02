@@ -127,30 +127,32 @@ export default function DataLineGraph() {
     // Group data by week and day
     typeData.forEach((d) => {
       const date = new Date(d.datetime);
-      const week = Math.floor((date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
+      const week = Math.floor(
+        (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
+      );
       const day = date.getDay();
       const key = `${week}-${day}`;
-      
+
       if (!valueMap.has(key)) {
         valueMap.set(key, { min: d.value, max: d.value });
       } else {
         const current = valueMap.get(key)!;
         valueMap.set(key, {
           min: Math.min(current.min, d.value),
-          max: Math.max(current.max, d.value)
+          max: Math.max(current.max, d.value),
         });
       }
     });
 
     // Convert map to array format
     valueMap.forEach((values, key) => {
-      const [week, day] = key.split('-').map(Number);
+      const [week, day] = key.split("-").map(Number);
       heatMapData.push({
         week,
         day,
         value: values.max - values.min, // Use range (max-min) for coloring
         minValue: values.min,
-        maxValue: values.max
+        maxValue: values.max,
       });
     });
 
@@ -175,7 +177,8 @@ export default function DataLineGraph() {
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Add tooltip div
-    const tooltip = d3.select("body")
+    const tooltip = d3
+      .select("body")
       .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0)
@@ -189,9 +192,9 @@ export default function DataLineGraph() {
       .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
     const heatMapData = processDataForHeatMap();
-    
+
     // Calculate quartiles and IQR for outlier detection
-    const values = heatMapData.map(d => d.value).sort((a, b) => a - b);
+    const values = heatMapData.map((d) => d.value).sort((a, b) => a - b);
     const q1 = d3.quantile(values, 0.25) || 0;
     const q3 = d3.quantile(values, 0.75) || 0;
     const iqr = q3 - q1;
@@ -200,11 +203,12 @@ export default function DataLineGraph() {
     // Calculate the value range for color scaling, excluding outliers
     const valueRange: [number, number] = [
       0,
-      Math.min(upperBound, d3.max(values) || 0)
+      Math.min(upperBound, d3.max(values) || 0),
     ];
 
     // Create color scale that emphasizes variation
-    const colorScale = d3.scaleSequential()
+    const colorScale = d3
+      .scaleSequential()
       .domain([valueRange[0], valueRange[1]])
       .interpolator(d3.interpolateRdYlBu)
       .clamp(true); // Clamp values outside the domain
@@ -230,64 +234,66 @@ export default function DataLineGraph() {
       .enter()
       .append("rect")
       .attr("class", "background-cell")
-      .attr("x", d => d.week * cellWidth)
-      .attr("y", d => d.day * cellHeight)
+      .attr("x", (d) => d.week * cellWidth)
+      .attr("y", (d) => d.day * cellHeight)
       .attr("width", cellWidth)
       .attr("height", cellHeight)
-      .attr("fill", "#f0f0f0")  // Light gray background
+      .attr("fill", "#f0f0f0") // Light gray background
       .attr("stroke", "white")
       .attr("stroke-width", 1)
-      .on("mouseover", function(event, d) {
+      .on("mouseover", function (event, d) {
         const weekStart = new Date(startDate);
         weekStart.setDate(startDate.getDate() + d.week * 7);
         const dayName = days[d.day];
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(`${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>No data available`)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 28) + "px");
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(
+            `${dayName}, Week of ${d3.timeFormat("%m-%d")(
+              weekStart
+            )}<br/>No data available`
+          )
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 28 + "px");
       })
-      .on("mouseout", function() {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+      .on("mouseout", function () {
+        tooltip.transition().duration(500).style("opacity", 0);
       });
 
     // Add cells with data
     g.selectAll(".data-cell")
-      .data(heatMapData.filter(d => d.week < 7))
+      .data(heatMapData.filter((d) => d.week < 7))
       .enter()
       .append("rect")
       .attr("class", "data-cell")
-      .attr("x", d => d.week * cellWidth)
-      .attr("y", d => d.day * cellHeight)
+      .attr("x", (d) => d.week * cellWidth)
+      .attr("y", (d) => d.day * cellHeight)
       .attr("width", cellWidth)
       .attr("height", cellHeight)
-      .attr("fill", d => {
+      .attr("fill", (d) => {
         // If value is above upperBound, it's an outlier - color it red
         return d.value > upperBound ? "#67000d" : colorScale(d.value);
       })
       .attr("stroke", "white")
       .attr("stroke-width", 1)
-      .on("mouseover", function(event, d) {
+      .on("mouseover", function (event, d) {
         const weekStart = new Date(startDate);
         weekStart.setDate(startDate.getDate() + d.week * 7);
         const dayName = days[d.day];
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(`${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(
+            `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedType]}<br/>
           Max: ${d.maxValue.toFixed(2)} ${units[selectedType]}<br/>
-          Range: ${d.value.toFixed(2)} ${units[selectedType]}${d.value > upperBound ? '<br/>(Outlier)' : ''}`)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 28) + "px");
+          Range: ${d.value.toFixed(2)} ${units[selectedType]}${
+              d.value > upperBound ? "<br/>(Outlier)" : ""
+            }`
+          )
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 28 + "px");
       })
-      .on("mouseout", function() {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+      .on("mouseout", function () {
+        tooltip.transition().duration(500).style("opacity", 0);
       });
 
     // Add a note about missing data
@@ -300,7 +306,7 @@ export default function DataLineGraph() {
       .text("Gray cells = No data");
 
     // Add week labels with actual dates
-    const weekLabels = d3.range(7).map(week => {
+    const weekLabels = d3.range(7).map((week) => {
       const weekStart = new Date(startDate);
       weekStart.setDate(startDate.getDate() + week * 7);
       return d3.timeFormat("%m-%d")(weekStart);
@@ -315,7 +321,7 @@ export default function DataLineGraph() {
       .attr("y", -5)
       .attr("text-anchor", "middle")
       .style("font-size", "18px")
-      .text(d => d);
+      .text((d) => d);
 
     // Add day labels
     g.selectAll(".day-label")
@@ -324,10 +330,10 @@ export default function DataLineGraph() {
       .append("text")
       .attr("class", "day-label")
       .attr("x", -5)
-      .attr("y", d => days.indexOf(d) * cellHeight + cellHeight / 2)
+      .attr("y", (d) => days.indexOf(d) * cellHeight + cellHeight / 2)
       .attr("text-anchor", "end")
       .style("font-size", "18px")
-      .text(d => d);
+      .text((d) => d);
 
     // Add color legend
     const legendWidth = 20;
@@ -335,20 +341,22 @@ export default function DataLineGraph() {
     const legendX = width + 60;
     const legendY = height * 0.15;
 
-    const legendScale = d3.scaleLinear()
+    const legendScale = d3
+      .scaleLinear()
       .domain(valueRange)
       .range([legendHeight, 0]);
 
     // Create evenly spaced ticks
     const numTicks = 5;
-    const ticks = d3.range(numTicks).map(i => {
+    const ticks = d3.range(numTicks).map((i) => {
       const t = i / (numTicks - 1);
       return valueRange[0] + t * (valueRange[1] - valueRange[0]);
     });
 
-    const legendAxis = d3.axisRight(legendScale)
+    const legendAxis = d3
+      .axisRight(legendScale)
       .tickValues([...ticks, upperBound])
-      .tickFormat(d => {
+      .tickFormat((d) => {
         const value = parseFloat(d);
         return value === upperBound ? `>${value.toFixed(2)}` : value.toFixed(2);
       });
@@ -382,13 +390,14 @@ export default function DataLineGraph() {
     // Create gradient stops
     const gradientStops = [
       ...ticks.map((t, i) => ({
-        offset: `${100 * i / (numTicks - 1)}%`,
-        color: colorScale(t)
+        offset: `${(100 * i) / (numTicks - 1)}%`,
+        color: colorScale(t),
       })),
-      { offset: "100%", color: "#67000d" } // Add outlier color at the top
+      { offset: "100%", color: "#67000d" }, // Add outlier color at the top
     ];
 
-    const gradient = g.append("defs")
+    const gradient = g
+      .append("defs")
       .append("linearGradient")
       .attr("id", "color-gradient")
       .attr("x1", "0%")
@@ -396,16 +405,17 @@ export default function DataLineGraph() {
       .attr("x2", "0%")
       .attr("y2", "100%");
 
-    gradient.selectAll("stop")
+    gradient
+      .selectAll("stop")
       .data(gradientStops)
       .enter()
       .append("stop")
-      .attr("offset", d => d.offset)
-      .attr("stop-color", d => d.color);
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
 
     // Move the legend rectangle and axis down slightly
     const legendYOffset = 20;
-    
+
     g.append("rect")
       .attr("x", legendX - legendWidth)
       .attr("y", legendY + legendYOffset)
@@ -483,7 +493,10 @@ export default function DataLineGraph() {
               isSmallScreen ? "flex-col" : "space-x-4"
             } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={handleStartDateChange} />
+            <DateBoundElement
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
 
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
