@@ -46,7 +46,7 @@ export default function BoxPlot() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedType, setSelectedType] = useState<string>("Temperature");
+  const [selectedType, setSelectedType] = useState<string>("Salinity");
   const [numBoxPlots, setNumBoxPlots] = useState<number>(5);
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -168,7 +168,7 @@ export default function BoxPlot() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 60, bottom: 120, left: 90 };
+    const margin = { top: 40, right: 90, bottom: 70, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -178,12 +178,11 @@ export default function BoxPlot() {
       .attr("class", "tooltip")
       .style("position", "absolute")
       .style("visibility", "hidden")
-      .style("background", "rgba(255, 255, 255, 0.9)")
-      .style("padding", "8px")
+      .style("background", "rgba(255, 255, 255, 0.8)")
+      .style("border", "1px solid #ccc")
+      .style("padding", "10px")
       .style("border-radius", "4px")
-      .style("border", "1px solid #ddd")
-      .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
-      .style("font-size", "12px");
+      .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
 
     const g = svg
       .append("g")
@@ -193,7 +192,7 @@ export default function BoxPlot() {
     
     // Create scales with padding
     const x = d3.scaleLinear()
-      .domain([-0.5, numBoxPlots - 0.5]) // Add padding to domain
+      .domain([-0.5, numBoxPlots - 0.5])
       .range([0, width]);
 
     const y = d3.scaleLinear()
@@ -344,31 +343,28 @@ export default function BoxPlot() {
         .tickFormat((d, i) => {
           if (i < boxPlotData.length) {
             const dates = boxPlotData[i].timeRange.split(" to ");
-            return `${dates[0]}\n${dates[1]}`;
+            return d3.timeFormat("%m-%d")(new Date(dates[0]));
           }
           return "";
         }))
       .selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-.8em")
-      .attr("dy", ".15em")
-      .attr("transform", "rotate(-45)")
-      .style("font-size", "12px");
+      .style("font-size", "18px")
+      .attr("text-anchor", "middle");
 
     g.append("g")
-      .call(d3.axisLeft(y))
+      .call(d3.axisLeft(y).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "18px");
 
     // Add labels
     g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
-      .attr("y", height + 110)
+      .attr("y", height + 45)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text("Time Period");
+      .text("Time");
 
     g.append("text")
       .attr("fill", "black")
@@ -376,15 +372,17 @@ export default function BoxPlot() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
       .text(`${selectedType} (${units[selectedType]})`);
   };
 
   return (
     <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
-        <svg ref={svgRef} width="100%" height="100%"></svg>
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg h-[600px] flex justify-center items-center">
+        <div className="w-[calc(100%-40px)] h-[calc(100%-20px)]">
+          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+        </div>
       </div>
 
       <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">

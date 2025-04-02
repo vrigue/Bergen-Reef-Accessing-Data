@@ -117,10 +117,13 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 60, bottom: 120, left: 90 };
+    // Calculate margins based on whether we have one or two series
+    const rightMargin = selectedTypes.length > 1 ? 90 : 60;
+    const margin = { top: 30, right: rightMargin, bottom: 120, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
+    // Center the graph group within the SVG
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -165,23 +168,24 @@ export default function DataLineGraph() {
     // Adjust x-axis ticks based on the number of days in the range
     const xAxis = d3
       .axisBottom(x)
-      .ticks(Math.min(dayCount, 10))
-      .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
+      .ticks(5)  // Limit to 5 ticks
+      .tickFormat(d3.timeFormat("%m-%d"));  // Show only month-day
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
       .selectAll("text")
-      .style("font-size", "24px");
+      .style("font-size", "18px")
+      .attr("text-anchor", "middle");  // Center align the text
 
     // Add x-axis label
     g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
-      .attr("y", height + 110) // Position it below the axis
+      .attr("y", height + 45)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px") // Increase label font size
-      .style("font-weight", "bold") // Make label bold
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
       .text("Time");
 
     const tickCount = Math.min(5, Math.ceil(yDomain[1] - yDomain[0])); // Dynamically set ticks based on range
@@ -189,7 +193,7 @@ export default function DataLineGraph() {
     g.append("g")
       .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "20px");
+      .style("font-size", "18px");
 
     // Update font size and weight for labels
     g.append("text")
@@ -198,7 +202,7 @@ export default function DataLineGraph() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .style("font-size", "20px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
@@ -209,7 +213,7 @@ export default function DataLineGraph() {
         .attr("transform", `translate(${width},0)`)
         .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
         .selectAll("text")
-        .style("font-size", "20px");
+        .style("font-size", "18px");
 
       const yRightLabel = g
         .append("text")
@@ -218,7 +222,7 @@ export default function DataLineGraph() {
         .attr("x", -height / 2)
         .attr("y", width + margin.right + 10)
         .attr("text-anchor", "middle")
-        .style("font-size", "20px")
+        .style("font-size", "24px")
         .style("font-weight", "bold")
         .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
     }
@@ -310,9 +314,11 @@ export default function DataLineGraph() {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
-        <svg ref={svgRef} width="100%" height="100%"></svg>
+    <div className="grid grid-cols-4 gap-7 pt-5">
+      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
+        <div className="w-[calc(100%-20px)] h-full">
+          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+        </div>
       </div>
 
       <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
@@ -372,7 +378,7 @@ export default function DataLineGraph() {
           </div>
           <div
             className={`flex items-center ${
-              isSmallScreen ? "flex-col" : "space-x-4"
+              true ? "flex-col" : "space-x-4" // Can change this to make it horizontal using isSmallScreen
             } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
             <DateBoundElement value={startDate} onChange={setStartDate} />

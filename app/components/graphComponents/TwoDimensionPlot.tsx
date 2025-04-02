@@ -152,7 +152,8 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 60, bottom: 120, left: 90 };
+    // Calculate margins based on whether we have one or two series
+    const margin = { top: 30, right: 90, bottom: 120, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -169,20 +170,18 @@ export default function DataLineGraph() {
       .domain(d3.extent(data, d => d.y) as [number, number])
       .range([height, 0]);
 
+    // X axis
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x))
-      .selectAll("path, line")
-      .style("stroke-width", "2px")
+      .call(d3.axisBottom(x).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "18px");
 
+    // Y axis
     g.append("g")
-      .call(d3.axisLeft(y))
-      .selectAll("path, line")
-      .style("stroke-width", "2px")
+      .call(d3.axisLeft(y).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "18px");
 
     // Add tooltip div
     const tooltip = d3
@@ -224,22 +223,24 @@ export default function DataLineGraph() {
         tooltip.style("visibility", "hidden");
       });
 
+    // X axis label
     g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
-      .attr("y", height + margin.bottom - 10) // Position it below the axis
+      .attr("y", height + 45)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
       .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
 
+    // Y axis label
     g.append("text")
       .attr("fill", "black")
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
       .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
   };
@@ -263,9 +264,11 @@ export default function DataLineGraph() {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
-        <svg ref={svgRef} width="100%" height="100%"></svg>
+    <div className="grid grid-cols-4 gap-7 pt-5">
+      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
+        <div className="w-[calc(100%-20px)] h-full">
+          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+        </div>
       </div>
 
       <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
