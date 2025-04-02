@@ -21,6 +21,8 @@ interface HeatMapData {
   week: number;
   day: number;
   value: number;
+  minValue: number;
+  maxValue: number;
 }
 
 const units = {
@@ -119,15 +121,36 @@ export default function DataLineGraph() {
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
 
+    // Create a map to store min/max values for each week/day combination
+    const valueMap = new Map<string, { min: number; max: number }>();
+
     // Group data by week and day
     typeData.forEach((d) => {
       const date = new Date(d.datetime);
       const week = Math.floor((date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
       const day = date.getDay();
+      const key = `${week}-${day}`;
+      
+      if (!valueMap.has(key)) {
+        valueMap.set(key, { min: d.value, max: d.value });
+      } else {
+        const current = valueMap.get(key)!;
+        valueMap.set(key, {
+          min: Math.min(current.min, d.value),
+          max: Math.max(current.max, d.value)
+        });
+      }
+    });
+
+    // Convert map to array format
+    valueMap.forEach((values, key) => {
+      const [week, day] = key.split('-').map(Number);
       heatMapData.push({
         week,
         day,
-        value: d.value,
+        value: values.max, // Use max value for coloring
+        minValue: values.min,
+        maxValue: values.max
       });
     });
 
@@ -140,6 +163,9 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Remove any existing tooltips
+    d3.selectAll(".tooltip").remove();
+
     const margin = { top: 30, right: 120, bottom: 60, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
@@ -147,6 +173,20 @@ export default function DataLineGraph() {
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Add tooltip div
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0)
+      .style("position", "absolute")
+      .style("background-color", "white")
+      .style("border", "1px solid #ddd")
+      .style("border-radius", "4px")
+      .style("padding", "8px")
+      .style("pointer-events", "none")
+      .style("font-size", "14px")
+      .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
     const heatMapData = processDataForHeatMap();
     
@@ -160,18 +200,87 @@ export default function DataLineGraph() {
     const cellWidth = width / 7;
     const cellHeight = height / 7;
 
-    // Add cells
-    g.selectAll("rect")
-      .data(heatMapData)
+    // Define days array
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    // Create all possible week-day combinations
+    const allCells = [];
+    for (let week = 0; week < 7; week++) {
+      for (let day = 0; day < 7; day++) {
+        allCells.push({ week, day });
+      }
+    }
+
+    // Add background cells for all positions
+    g.selectAll(".background-cell")
+      .data(allCells)
       .enter()
       .append("rect")
+      .attr("class", "background-cell")
+      .attr("x", d => d.week * cellWidth)
+      .attr("y", d => d.day * cellHeight)
+      .attr("width", cellWidth)
+      .attr("height", cellHeight)
+      .attr("fill", "#f0f0f0")  // Light gray background
+      .attr("stroke", "white")
+      .attr("stroke-width", 1)
+      .on("mouseover", function(event, d) {
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + d.week * 7);
+        const dayName = days[d.day];
+        tooltip.transition()
+          .duration(200)
+          .style("opacity", .9);
+        tooltip.html(`${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>No data available`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
+
+    // Add cells with data
+    g.selectAll(".data-cell")
+      .data(heatMapData.filter(d => d.week < 7))
+      .enter()
+      .append("rect")
+      .attr("class", "data-cell")
       .attr("x", d => d.week * cellWidth)
       .attr("y", d => d.day * cellHeight)
       .attr("width", cellWidth)
       .attr("height", cellHeight)
       .attr("fill", d => colorScale(d.value))
       .attr("stroke", "white")
-      .attr("stroke-width", 1);
+      .attr("stroke-width", 1)
+      .on("mouseover", function(event, d) {
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + d.week * 7);
+        const dayName = days[d.day];
+        tooltip.transition()
+          .duration(200)
+          .style("opacity", .9);
+        tooltip.html(`${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+          Min: ${d.minValue.toFixed(2)} ${units[selectedType]}<br/>
+          Max: ${d.maxValue.toFixed(2)} ${units[selectedType]}`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
+
+    // Add a note about missing data
+    g.append("text")
+      .attr("x", width / 2)
+      .attr("y", height + 30)
+      .attr("text-anchor", "middle")
+      .style("font-size", "14px")
+      .style("fill", "#666")
+      .text("Gray cells = No data");
 
     // Add week labels with actual dates
     const weekLabels = d3.range(7).map(week => {
@@ -192,7 +301,6 @@ export default function DataLineGraph() {
       .text(d => d);
 
     // Add day labels
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     g.selectAll(".day-label")
       .data(days)
       .enter()
