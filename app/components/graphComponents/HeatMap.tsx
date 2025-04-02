@@ -140,7 +140,7 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 100, bottom: 30, left: 60 };
+    const margin = { top: 30, right: 120, bottom: 60, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -177,7 +177,7 @@ export default function DataLineGraph() {
     const weekLabels = d3.range(7).map(week => {
       const weekStart = new Date(startDate);
       weekStart.setDate(startDate.getDate() + week * 7);
-      return d3.timeFormat("%b %d")(weekStart);
+      return d3.timeFormat("%m-%d")(weekStart);
     });
 
     g.selectAll(".week-label")
@@ -188,6 +188,7 @@ export default function DataLineGraph() {
       .attr("x", (d, i) => i * cellWidth + cellWidth / 2)
       .attr("y", -5)
       .attr("text-anchor", "middle")
+      .style("font-size", "18px")
       .text(d => d);
 
     // Add day labels
@@ -200,24 +201,28 @@ export default function DataLineGraph() {
       .attr("x", -5)
       .attr("y", d => days.indexOf(d) * cellHeight + cellHeight / 2)
       .attr("text-anchor", "end")
+      .style("font-size", "18px")
       .text(d => d);
 
     // Add color legend
     const legendWidth = 20;
-    const legendHeight = 200;
-    const legendX = width + 20;
-    const legendY = 0;
+    const legendHeight = height * 0.8;
+    const legendX = width + 60;
+    const legendY = height * 0.15;
 
     const legendScale = d3.scaleLinear()
       .domain(valueRange)
       .range([legendHeight, 0]);
 
     const legendAxis = d3.axisRight(legendScale)
-      .ticks(5);
+      .ticks(5)
+      .tickFormat(d3.format(".2f"));
 
     g.append("g")
       .attr("transform", `translate(${legendX},${legendY})`)
-      .call(legendAxis);
+      .call(legendAxis)
+      .selectAll("text")
+      .style("font-size", "18px");
 
     // Add color gradient
     const gradient = g.append("defs")
@@ -244,10 +249,21 @@ export default function DataLineGraph() {
 
     // Add legend title
     g.append("text")
-      .attr("x", legendX + 30)
-      .attr("y", legendY - 10)
+      .attr("x", legendX)
+      .attr("y", legendY - 35)
       .attr("text-anchor", "middle")
-      .text(`${selectedType} (${units[selectedType]})`);
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(selectedType);
+
+    // Add units below
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 15)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(`(${units[selectedType]})`);
   };
 
   const handleTypeSelect = (type: string) => {
@@ -272,7 +288,7 @@ export default function DataLineGraph() {
 
   return (
     <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg h-[800px]">
         <svg ref={svgRef} width="100%" height="100%"></svg>
       </div>
 
