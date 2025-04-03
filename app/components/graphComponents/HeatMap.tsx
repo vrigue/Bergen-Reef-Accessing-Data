@@ -17,6 +17,14 @@ interface DataPoint {
   value: number;
 }
 
+interface HeatMapData {
+  week: number;
+  day: number;
+  value: number;
+  minValue: number;
+  maxValue: number;
+}
+
 const units = {
   Salinity: "ppt",
   ORP: "mV",
@@ -38,9 +46,7 @@ export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [zoom, setZoom] = useState(50);
-  const [step, setStep] = useState(50);
+  const [selectedType, setSelectedType] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -53,8 +59,6 @@ export default function DataLineGraph() {
     "Calcium",
     "pH",
   ];
-
-  const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,11 +80,10 @@ export default function DataLineGraph() {
 
   useEffect(() => {
     const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - 7);
-    setStartDate(lastWeek);
+    const sevenWeeksAgo = new Date();
+    sevenWeeksAgo.setDate(today.getDate() - 49); // 7 weeks = 49 days
+    setStartDate(sevenWeeksAgo);
     setEndDate(today);
-    setSelectedTypes(["Salinity"]);
     setShouldFetch(true);
   }, []);
 
@@ -89,9 +92,7 @@ export default function DataLineGraph() {
       startDate.setHours(startDate.getHours() - 5);
       endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${selectedTypes.join(
-          ","
-        )}`
+        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${selectedType}`
       );
 
       if (!response.ok) {
@@ -109,15 +110,65 @@ export default function DataLineGraph() {
     if (data.length > 0 && svgRef.current) {
       drawChart();
     }
-  }, [data, zoom, step]);
+  }, [data, selectedType]);
+
+  const processDataForHeatMap = (): HeatMapData[] => {
+    const heatMapData: HeatMapData[] = [];
+    const mappedType = typeMapping[selectedType];
+    const typeData = data.filter((d) => d.name === mappedType);
+
+    // Calculate the start of the first week
+    const firstWeekStart = new Date(startDate);
+    firstWeekStart.setHours(0, 0, 0, 0);
+
+    // Create a map to store min/max values for each week/day combination
+    const valueMap = new Map<string, { min: number; max: number }>();
+
+    // Group data by week and day
+    typeData.forEach((d) => {
+      const date = new Date(d.datetime);
+      const week = Math.floor(
+        (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
+      );
+      const day = date.getDay();
+      const key = `${week}-${day}`;
+
+      if (!valueMap.has(key)) {
+        valueMap.set(key, { min: d.value, max: d.value });
+      } else {
+        const current = valueMap.get(key)!;
+        valueMap.set(key, {
+          min: Math.min(current.min, d.value),
+          max: Math.max(current.max, d.value),
+        });
+      }
+    });
+
+    // Convert map to array format
+    valueMap.forEach((values, key) => {
+      const [week, day] = key.split("-").map(Number);
+      heatMapData.push({
+        week,
+        day,
+        value: values.max - values.min, // Use range (max-min) for coloring
+        minValue: values.min,
+        maxValue: values.max,
+      });
+    });
+
+    return heatMapData;
+  };
 
   const drawChart = () => {
-    if (selectedTypes.length < 1) return;
+    if (!selectedType) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 60, bottom: 120, left: 90 };
+    // Remove any existing tooltips
+    d3.selectAll(".tooltip").remove();
+
+    const margin = { top: 30, right: 120, bottom: 60, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -125,193 +176,284 @@ export default function DataLineGraph() {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
-
-    // Calculate y-axis for the first selected type
-    const yDomain = d3.extent(
-      data.filter((d) => d.name === typeMapping[selectedTypes[0]]),
-      (d) => +d.value
-    ) as [number, number];
-    const y = d3.scaleLinear().domain(yDomain).nice().range([height, 0]);
-
-    // Calculate yRight-axis for the second selected type if it exists
-    const yRight = selectedTypes[1]
-      ? d3
-          .scaleLinear()
-          .domain(
-            d3.extent(
-              data.filter((d) => d.name === typeMapping[selectedTypes[1]]),
-              (d) => +d.value
-            ) as [number, number]
-          )
-          .nice()
-          .range([height, 0])
-      : null;
-
-    const dayCount = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    // Calculate tick values with a staggered approach
-    const tickValues = [];
-    for (let i = 0; i < dayCount; i++) {
-      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
-      if (i % 2 === 0) {
-        // Stagger: only add every other day
-        tickValues.push(date);
-      }
-    }
-
-    // Adjust x-axis ticks based on the number of days in the range
-    const xAxis = d3
-      .axisBottom(x)
-      .ticks(Math.min(dayCount, 10))
-      .tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
-
-    g.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(xAxis)
-      .selectAll("text")
-      .style("font-size", "12px");
-
-    // Add x-axis label
-    g.append("text")
-      .attr("fill", "black")
-      .attr("x", width / 2)
-      .attr("y", height + 110) // Position it below the axis
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px") // Increase label font size
-      .style("font-weight", "bold") // Make label bold
-      .text("Time");
-
-    const tickCount = Math.min(5, Math.ceil(yDomain[1] - yDomain[0])); // Dynamically set ticks based on range
-
-    g.append("g")
-      .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
-      .selectAll("text")
-      .style("font-size", "12px");
-
-    // Update font size and weight for labels
-    g.append("text")
-      .attr("fill", d3.schemeCategory10[0])
-      .attr("transform", "rotate(-90)")
-      .attr("x", -height / 2)
-      .attr("y", -margin.left + 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("font-weight", "bold")
-      .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
-
-    // Add right y-axis
-    if (yRight) {
-      const yRightAxis = g
-        .append("g")
-        .attr("transform", `translate(${width},0)`)
-        .call(d3.axisRight(yRight).ticks(5).tickFormat(d3.format(".2f")))
-        .selectAll("text")
-        .style("font-size", "12px");
-
-      const yRightLabel = g
-        .append("text")
-        .attr("fill", d3.schemeCategory10[1])
-        .attr("transform", "rotate(-90)")
-        .attr("x", -height / 2)
-        .attr("y", width + margin.right - 5)
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .style("font-weight", "bold")
-        .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
-    }
-
-    const line = d3
-      .line<DataPoint>()
-      .defined((d) => !isNaN(d.value) && d.value !== null)
-      .x((d) => x(new Date(d.datetime)))
-      .y((d) => y(d.value));
-
     // Add tooltip div
     const tooltip = d3
       .select("body")
       .append("div")
       .attr("class", "tooltip")
+      .style("opacity", 0)
       .style("position", "absolute")
-      .style("visibility", "hidden")
-      .style("background", "rgba(255, 255, 255, 0.8)")
-      .style("border", "1px solid #ccc")
-      .style("padding", "10px")
+      .style("background-color", "white")
+      .style("border", "1px solid #ddd")
       .style("border-radius", "4px")
-      .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
+      .style("padding", "8px")
+      .style("pointer-events", "none")
+      .style("font-size", "14px")
+      .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
-    // Add circles for each data point and tooltip interaction
-    selectedTypes.forEach((type, index) => {
-      const mappedType = typeMapping[type] || type;
-      const typeData = data.filter((d) => d.name === mappedType);
-      const lineFunction =
-        index === 0
-          ? line
-          : d3
-              .line<DataPoint>()
-              .defined((d) => !isNaN(d.value) && d.value !== null)
-              .x((d) => x(new Date(d.datetime)))
-              .y((d) => (yRight ? yRight(d.value) : y(d.value)));
+    const heatMapData = processDataForHeatMap();
 
-      g.append("path")
-        .datum(typeData)
-        .attr("fill", "none")
-        .attr("stroke", d3.schemeCategory10[index])
-        .attr("stroke-width", 1.5)
-        .attr("d", lineFunction);
+    // Calculate quartiles and IQR for outlier detection
+    const values = heatMapData.map((d) => d.value).sort((a, b) => a - b);
+    const q1 = d3.quantile(values, 0.25) || 0;
+    const q3 = d3.quantile(values, 0.75) || 0;
+    const iqr = q3 - q1;
+    const upperBound = q3 + 1.5 * iqr;
 
-      g.selectAll(`circle.series-${index}`)
-        .data(typeData)
-        .enter()
-        .append("circle")
-        .attr("class", `series-${index}`)
-        .attr("cx", (d) => x(new Date(d.datetime)))
-        .attr("cy", (d) =>
-          index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value)
-        )
-        .attr("r", 4)
-        .attr("fill", d3.schemeCategory10[index])
-        .on("mouseover", (event, d) => {
-          tooltip
-            .style("visibility", "visible")
-            .html(
-              `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
-                new Date(d.datetime)
-              )}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`
-            );
-        })
-        .on("mousemove", (event) => {
-          tooltip
-            .style("top", `${event.pageY - 10}px`)
-            .style("left", `${event.pageX + 10}px`);
-        })
-        .on("mouseout", () => {
-          tooltip.style("visibility", "hidden");
-        });
-    });
-  };
+    // Calculate the value range for color scaling, excluding outliers
+    const valueRange: [number, number] = [
+      0,
+      Math.min(upperBound, d3.max(values) || 0),
+    ];
 
-  const handleTypeSelect = (index: number, type: string) => {
-    const newSelectedTypes = [...selectedTypes];
-    newSelectedTypes[index] = type;
-    setSelectedTypes(newSelectedTypes);
-  };
+    // Create color scale that emphasizes variation
+    const colorScale = d3
+      .scaleSequential()
+      .domain([valueRange[0], valueRange[1]])
+      .interpolator(d3.interpolateRdYlBu)
+      .clamp(true); // Clamp values outside the domain
 
-  const addPlot = () => {
-    if (selectedTypes.length < 5) {
-      setSelectedTypes([...selectedTypes, ""]);
+    // Create the heat map grid
+    const cellWidth = width / 7;
+    const cellHeight = height / 7;
+
+    // Define days array
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    // Create all possible week-day combinations
+    const allCells = [];
+    for (let week = 0; week < 7; week++) {
+      for (let day = 0; day < 7; day++) {
+        allCells.push({ week, day });
+      }
     }
+
+    // Add background cells for all positions
+    g.selectAll(".background-cell")
+      .data(allCells)
+      .enter()
+      .append("rect")
+      .attr("class", "background-cell")
+      .attr("x", (d) => d.week * cellWidth)
+      .attr("y", (d) => d.day * cellHeight)
+      .attr("width", cellWidth)
+      .attr("height", cellHeight)
+      .attr("fill", "#f0f0f0") // Light gray background
+      .attr("stroke", "white")
+      .attr("stroke-width", 1)
+      .on("mouseover", function (event, d) {
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + d.week * 7);
+        const dayName = days[d.day];
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(
+            `${dayName}, Week of ${d3.timeFormat("%m-%d")(
+              weekStart
+            )}<br/>No data available`
+          )
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 28 + "px");
+      })
+      .on("mouseout", function () {
+        tooltip.transition().duration(500).style("opacity", 0);
+      });
+
+    // Add cells with data
+    g.selectAll(".data-cell")
+      .data(heatMapData.filter((d) => d.week < 7))
+      .enter()
+      .append("rect")
+      .attr("class", "data-cell")
+      .attr("x", (d) => d.week * cellWidth)
+      .attr("y", (d) => d.day * cellHeight)
+      .attr("width", cellWidth)
+      .attr("height", cellHeight)
+      .attr("fill", (d) => {
+        // If value is above upperBound, it's an outlier - color it red
+        return d.value > upperBound ? "#67000d" : colorScale(d.value);
+      })
+      .attr("stroke", "white")
+      .attr("stroke-width", 1)
+      .on("mouseover", function (event, d) {
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + d.week * 7);
+        const dayName = days[d.day];
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(
+            `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+          Min: ${d.minValue.toFixed(2)} ${units[selectedType]}<br/>
+          Max: ${d.maxValue.toFixed(2)} ${units[selectedType]}<br/>
+          Range: ${d.value.toFixed(2)} ${units[selectedType]}${
+              d.value > upperBound ? "<br/>(Outlier)" : ""
+            }`
+          )
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 28 + "px");
+      })
+      .on("mouseout", function () {
+        tooltip.transition().duration(500).style("opacity", 0);
+      });
+
+    // Add a note about missing data
+    g.append("text")
+      .attr("x", width / 2)
+      .attr("y", height + 30)
+      .attr("text-anchor", "middle")
+      .style("font-size", "14px")
+      .style("fill", "#666")
+      .text("Gray cells = No data");
+
+    // Add week labels with actual dates
+    const weekLabels = d3.range(7).map((week) => {
+      const weekStart = new Date(startDate);
+      weekStart.setDate(startDate.getDate() + week * 7);
+      return d3.timeFormat("%m-%d")(weekStart);
+    });
+
+    g.selectAll(".week-label")
+      .data(weekLabels)
+      .enter()
+      .append("text")
+      .attr("class", "week-label")
+      .attr("x", (d, i) => i * cellWidth + cellWidth / 2)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .style("font-size", "18px")
+      .text((d) => d);
+
+    // Add day labels
+    g.selectAll(".day-label")
+      .data(days)
+      .enter()
+      .append("text")
+      .attr("class", "day-label")
+      .attr("x", -5)
+      .attr("y", (d) => days.indexOf(d) * cellHeight + cellHeight / 2)
+      .attr("text-anchor", "end")
+      .style("font-size", "18px")
+      .text((d) => d);
+
+    // Add color legend
+    const legendWidth = 20;
+    const legendHeight = height * 0.8;
+    const legendX = width + 60;
+    const legendY = height * 0.15;
+
+    const legendScale = d3
+      .scaleLinear()
+      .domain(valueRange)
+      .range([legendHeight, 0]);
+
+    // Create evenly spaced ticks
+    const numTicks = 5;
+    const ticks = d3.range(numTicks).map((i) => {
+      const t = i / (numTicks - 1);
+      return valueRange[0] + t * (valueRange[1] - valueRange[0]);
+    });
+
+    const legendAxis = d3
+      .axisRight(legendScale)
+      .tickValues([...ticks, upperBound])
+      .tickFormat((d) => {
+        const value = parseFloat(d);
+        return value === upperBound ? `>${value.toFixed(2)}` : value.toFixed(2);
+      });
+
+    // Add legend title
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 65)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(selectedType);
+
+    // Add units below
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 35)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(`Range`);
+
+    g.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 5)
+      .attr("text-anchor", "middle")
+      .style("font-size", "24px")
+      .style("font-weight", "bold")
+      .text(`(${units[selectedType]})`);
+
+    // Create gradient stops
+    const gradientStops = [
+      ...ticks.map((t, i) => ({
+        offset: `${(100 * i) / (numTicks - 1)}%`,
+        color: colorScale(t),
+      })),
+      { offset: "100%", color: "#67000d" }, // Add outlier color at the top
+    ];
+
+    const gradient = g
+      .append("defs")
+      .append("linearGradient")
+      .attr("id", "color-gradient")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "0%")
+      .attr("y2", "100%");
+
+    gradient
+      .selectAll("stop")
+      .data(gradientStops)
+      .enter()
+      .append("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    // Move the legend rectangle and axis down slightly
+    const legendYOffset = 20;
+
+    g.append("rect")
+      .attr("x", legendX - legendWidth)
+      .attr("y", legendY + legendYOffset)
+      .attr("width", legendWidth)
+      .attr("height", legendHeight)
+      .style("fill", "url(#color-gradient)");
+
+    // Adjust the legend axis position to match the rectangle
+    g.append("g")
+      .attr("transform", `translate(${legendX},${legendY + legendYOffset})`)
+      .call(legendAxis)
+      .selectAll("text")
+      .style("font-size", "18px");
   };
 
-  useEffect(() => {
-    setZoom(100); // Set default zoom to 100%
-  }, []);
+  const handleTypeSelect = (type: string) => {
+    setSelectedType(type);
+  };
+
+  const handleStartDateChange = (date: Date) => {
+    setStartDate(date);
+    // Calculate end date as 7 weeks from start date
+    const newEndDate = new Date(date);
+    newEndDate.setDate(date.getDate() + 49); // 7 weeks = 49 days
+    setEndDate(newEndDate);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    setEndDate(date);
+    // Calculate start date as 7 weeks before end date
+    const newStartDate = new Date(date);
+    newStartDate.setDate(date.getDate() - 49); // 7 weeks = 49 days
+    setStartDate(newStartDate);
+  };
 
   return (
     <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg h-[800px]">
         <svg ref={svgRef} width="100%" height="100%"></svg>
       </div>
 
@@ -320,50 +462,26 @@ export default function DataLineGraph() {
           Heat Map
         </h1>
         <div className="flex flex-col">
-          {selectedTypes.map((type, index) => (
-            <Menu
-              as="div"
-              key={index}
-              className="relative inline-block text-left m-3"
-            >
-              <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
-                <span style={{ color: colorScale(index) }}>
-                  {type || "Select Type"}
-                </span>
-                <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
-              </MenuButton>
-              <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
-                {availableTypes
-                  .filter((t) => !selectedTypes.includes(t))
-                  .map((t) => (
-                    <MenuItem key={t}>
-                      <button
-                        onClick={() => handleTypeSelect(index, t)}
-                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        {t}
-                      </button>
-                    </MenuItem>
-                  ))}
-              </MenuItems>
-            </Menu>
-          ))}
-          {selectedTypes.length < 2 && ( // keep to 2 plots for now
-            <button
-              onClick={addPlot}
-              className="bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-medium px-4 py-2 m-3 rounded-xl hover:bg-dark-orange"
-            >
-              Add Another Plot
-            </button>
-          )}
-          {selectedTypes.length > 1 && (
-            <button
-              onClick={() => setSelectedTypes(selectedTypes.slice(0, -1))}
-              className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 m-3 rounded-xl hover:bg-dark-teal"
-            >
-              Remove Last Plot
-            </button>
-          )}
+          <Menu as="div" className="relative inline-block text-left m-3">
+            <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
+              <span style={{ color: d3.schemeCategory10[0] }}>
+                {selectedType || "Select Type"}
+              </span>
+              <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
+            </MenuButton>
+            <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
+              {availableTypes.map((type) => (
+                <MenuItem key={type}>
+                  <button
+                    onClick={() => handleTypeSelect(type)}
+                    className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    {type}
+                  </button>
+                </MenuItem>
+              ))}
+            </MenuItems>
+          </Menu>
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
@@ -375,13 +493,16 @@ export default function DataLineGraph() {
               isSmallScreen ? "flex-col" : "space-x-4"
             } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={setStartDate} />
+            <DateBoundElement
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
 
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
 
-            <DateBoundElement value={endDate} onChange={setEndDate} />
+            <DateBoundElement value={endDate} onChange={handleEndDateChange} />
           </div>
 
           <div className="flex justify-center pt-4">
@@ -392,14 +513,6 @@ export default function DataLineGraph() {
               Graph
             </button>
           </div>
-        </div>
-
-        <div
-          className="flex flex-col items-center justify-center mt-auto"
-          style={{ visibility: "hidden" }}
-        >
-          <ZoomSlider value={zoom} onChange={setZoom} />
-          <StepSlider value={step} onChange={setStep} />
         </div>
       </div>
     </div>

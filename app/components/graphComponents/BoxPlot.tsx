@@ -141,7 +141,7 @@ export default function BoxPlot() {
         const q3 = sortedData[q3Index];
         const max = sortedData[sortedData.length - 1];
         
-        // Calculate outliers (values beyond 1.5 * IQR)
+        // Calculate outliers (values beyond 1.5 * IQR) // this is wrong
         const iqr = q3 - q1;
         const lowerBound = q1 - 1.5 * iqr;
         const upperBound = q3 + 1.5 * iqr;
@@ -168,9 +168,21 @@ export default function BoxPlot() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const margin = { top: 30, right: 60, bottom: 120, left: 90 };
+    const margin = { top: 40, right: 90, bottom: 70, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+
+    // Add tooltip div
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background", "rgba(255, 255, 255, 0.8)")
+      .style("border", "1px solid #ccc")
+      .style("padding", "10px")
+      .style("border-radius", "4px")
+      .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
 
     const g = svg
       .append("g")
@@ -178,9 +190,9 @@ export default function BoxPlot() {
 
     const boxPlotData = calculateBoxPlotData(data);
     
-    // Create scales
+    // Create scales with padding
     const x = d3.scaleLinear()
-      .domain([0, numBoxPlots - 1])
+      .domain([-0.5, numBoxPlots - 0.5])
       .range([0, width]);
 
     const y = d3.scaleLinear()
@@ -205,7 +217,20 @@ export default function BoxPlot() {
         .attr("height", y(d.q1) - y(d.q3))
         .attr("fill", "white")
         .attr("stroke", "black")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 1)
+        .on("mouseover", (event) => {
+          tooltip
+            .style("visibility", "visible")
+            .html(`Q1: ${Number(d.q1).toFixed(2)}<br/>Q3: ${Number(d.q3).toFixed(2)}<br/>IQR: ${Number(d.q3 - d.q1).toFixed(2)}`);
+        })
+        .on("mousemove", (event) => {
+          tooltip
+            .style("top", (event.pageY - 10) + "px")
+            .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.style("visibility", "hidden");
+        });
 
       // Draw median line
       g.append("line")
@@ -214,24 +239,49 @@ export default function BoxPlot() {
         .attr("y1", y(d.median))
         .attr("y2", y(d.median))
         .attr("stroke", "black")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 2)
+        .style("cursor", "pointer")
+        .on("mouseover", (event) => {
+          tooltip
+            .style("visibility", "visible")
+            .html(`Median: ${Number(d.median).toFixed(2)}`);
+        })
+        .on("mousemove", (event) => {
+          tooltip
+            .style("top", (event.pageY - 10) + "px")
+            .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.style("visibility", "hidden");
+        });
 
-      // Draw whiskers
-      g.append("line")
-        .attr("x1", xPos)
-        .attr("x2", xPos)
-        .attr("y1", y(d.max))
-        .attr("y2", y(d.q3))
-        .attr("stroke", "black")
-        .attr("stroke-width", 1);
+      // Draw whiskers with hover
+      const drawWhisker = (y1: number, y2: number, label: string) => {
+        g.append("line")
+          .attr("x1", xPos)
+          .attr("x2", xPos)
+          .attr("y1", y(y1))
+          .attr("y2", y(y2))
+          .attr("stroke", "black")
+          .attr("stroke-width", 1)
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => {
+            tooltip
+              .style("visibility", "visible")
+              .html(`${label}: ${Number(y1).toFixed(2)}`);
+          })
+          .on("mousemove", (event) => {
+            tooltip
+              .style("top", (event.pageY - 10) + "px")
+              .style("left", (event.pageX + 10) + "px");
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+          });
+      };
 
-      g.append("line")
-        .attr("x1", xPos)
-        .attr("x2", xPos)
-        .attr("y1", y(d.min))
-        .attr("y2", y(d.q1))
-        .attr("stroke", "black")
-        .attr("stroke-width", 1);
+      drawWhisker(d.max, d.q3, "Maximum");
+      drawWhisker(d.min, d.q1, "Minimum");
 
       // Draw whisker caps
       g.append("line")
@@ -250,38 +300,71 @@ export default function BoxPlot() {
         .attr("stroke", "black")
         .attr("stroke-width", 1);
 
-      // Draw outliers
+      // Draw outliers with hover
       d.outliers.forEach(outlier => {
         g.append("circle")
           .attr("cx", xPos)
           .attr("cy", y(outlier))
           .attr("r", 3)
           .attr("fill", "red")
-          .attr("stroke", "none");
+          .attr("stroke", "none")
+          .style("cursor", "pointer")
+          .on("mouseover", (event) => {
+            const iqr = Number(d.q3 - d.q1);
+            const lowerBound = Number(d.q1 - 1.5 * iqr);
+            const upperBound = Number(d.q3 + 1.5 * iqr);
+            tooltip
+              .style("visibility", "visible")
+              .html(
+                `<strong>Outlier Value:</strong> ${Number(outlier).toFixed(2)}<br/>` +
+                `<strong>Why is this an outlier?</strong><br/>` +
+                `This value falls ${outlier > upperBound ? 'above' : 'below'} the expected range.<br/><br/>` +
+                `<strong>Expected Range:</strong><br/>` +
+                `Lower bound: ${lowerBound.toFixed(2)}<br/>` +
+                `Upper bound: ${upperBound.toFixed(2)}<br/>`
+              );
+          })
+          .on("mousemove", (event) => {
+            tooltip
+              .style("top", (event.pageY - 10) + "px")
+              .style("left", (event.pageX + 10) + "px");
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+          });
       });
     });
 
-    // Add axes
+    // Add axes with formatted date ranges
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(numBoxPlots))
+      .call(d3.axisBottom(x)
+        .ticks(numBoxPlots)
+        .tickFormat((d, i) => {
+          if (i < boxPlotData.length) {
+            const dates = boxPlotData[i].timeRange.split(" to ");
+            return d3.timeFormat("%m-%d")(new Date(dates[0]));
+          }
+          return "";
+        }))
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "18px")
+      .attr("text-anchor", "middle");
 
     g.append("g")
-      .call(d3.axisLeft(y))
+      .call(d3.axisLeft(y).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "12px");
+      .style("font-size", "18px");
 
     // Add labels
     g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
-      .attr("y", height + 110)
+      .attr("y", height + 45)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text("Time Period");
+      .text("Time");
 
     g.append("text")
       .attr("fill", "black")
@@ -289,15 +372,17 @@ export default function BoxPlot() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
+      .style("font-size", "24px")
       .style("font-weight", "bold")
       .text(`${selectedType} (${units[selectedType]})`);
   };
 
   return (
     <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
-        <svg ref={svgRef} width="100%" height="100%"></svg>
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg h-[600px] flex justify-center items-center">
+        <div className="w-[calc(100%-40px)] h-[calc(100%-20px)]">
+          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+        </div>
       </div>
 
       <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">

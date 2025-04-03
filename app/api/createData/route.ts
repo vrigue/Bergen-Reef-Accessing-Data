@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import insertData from 'src/lib/insertData';
+import { formatInTimeZone } from "date-fns-tz";
+import createData from 'src/lib/createData';
 
 export async function POST(request: Request) {
     try {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
         }
 
         // Pass data to database helper function
-        await insertData([data], data.datetime);
+        await createData([data], new Date(data.datetime));
 
         return NextResponse.json({
             status: 200,

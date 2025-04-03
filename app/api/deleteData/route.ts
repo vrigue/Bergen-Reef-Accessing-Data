@@ -5,13 +5,14 @@ export async function DELETE(request: Request) {
     try {
         // Get the data (ids) within the request
         const data = await request.json();
+        console.log(new Date(data.date));
 
         // Pass ids to database helper function
-        if (data.rowId) {
-            await deleteData([data.rowId]);
+        if (data.id) {
+            await deleteData([data.id], new Date(data.date));
         }
         else if (data.ids && Array.isArray(data.ids)) {
-            await deleteData(data.ids);
+            await deleteData(data.ids, new Date(data.date));
         } 
         else {
             return NextResponse.json({

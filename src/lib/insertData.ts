@@ -30,10 +30,16 @@ export default async function insertData(data : Array<Record<string, any>>, date
             datetime: new Date(date),
             name: data[i].name,
             type: type,
-            value: data[i].value
+            value: data[i].value,
+            updated_at: new Date(date)
         };
         
         // Insert row into the database
-        await db.insert(dataTable).values(entry);
+        try {
+            await db.insert(dataTable).values(entry);
+            console.log("Insertion successful:", entry);
+        } catch (error) {
+            console.error("Database Insertion Error:", error);
+        }
     }
 }
