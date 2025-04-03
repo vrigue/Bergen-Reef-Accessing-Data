@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 type User = {
+  roles: string[];
   user_id: string;
   email: string;
 };
@@ -47,6 +48,35 @@ const UserList = () => {
     }
   };
 
+  const handleRemoveAdmin = async (userId: string) => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/takeRoles', {
+        method: 'POST',
+        body: JSON.stringify({ userId }), 
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) throw new Error('Failed to remove admin role');
+
+      // Update state to remove "admin" role
+      //setUsers((prevUsers) =>
+        //prevUsers.map((user) =>
+          //user.user_id === userId ? { ...user, roles: [] } : user
+        //)
+      //);
+
+      alert('Admin role removed successfully!');
+    } catch (err) {
+      console.error('Failed to remove admin role:', err);
+      alert('Failed to remove admin role.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
       <h2 className="text-xl font-bold mb-4">Users</h2>
@@ -55,7 +85,15 @@ const UserList = () => {
           <li key={user.user_id} className="mb-2">
             {user.email}
             <select
-              onClick={() => handleAssignAdmin(user.user_id)}
+              //value={user.roles.includes("admin") ? "admin" : "user"}
+              onChange={(e) => {
+                if (e.target.value === "admin") {
+                  handleAssignAdmin(user.user_id);
+                } else {
+                  handleRemoveAdmin(user.user_id);
+                }
+              }}
+              //onClick={() => handleAssignAdmin(user.user_id)}
               className="ml-10 bg-teal text-white px-2 py-1 rounded"
               disabled={loading}
             >

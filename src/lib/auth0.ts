@@ -61,17 +61,19 @@ const getAccessToken = async () => {
     if (!response.ok) throw new Error('Failed to assign admin role');
   };
 
-  export const takeAdminRole = async (userId: string) => {
+  export const removeAdminRole = async (userId: string) => {
     const token = await getAccessToken();
 
+    const ADMIN_ROLE_ID = 'rol_EOFGI0Lo7BYvxqCL'; 
+  
     const response = await fetch(`${process.env.AUTH0_MGMT_AUDIENCE}users/${userId}/roles`, {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        roles: []
+        roles: [ADMIN_ROLE_ID]
       })
     });
 
