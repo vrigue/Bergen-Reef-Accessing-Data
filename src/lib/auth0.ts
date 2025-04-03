@@ -60,4 +60,22 @@ const getAccessToken = async () => {
   
     if (!response.ok) throw new Error('Failed to assign admin role');
   };
+
+  export const takeAdminRole = async (userId: string) => {
+    const token = await getAccessToken();
+
+    const response = await fetch(`${process.env.AUTH0_MGMT_AUDIENCE}users/${userId}/roles`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        roles: []
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to take admin role');
+
+  };
   

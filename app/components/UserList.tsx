@@ -54,13 +54,15 @@ const UserList = () => {
         {users.map((user) => (
           <li key={user.user_id} className="mb-2">
             {user.email}
-            <button 
+            <select
               onClick={() => handleAssignAdmin(user.user_id)}
               className="ml-10 bg-teal text-white px-2 py-1 rounded"
               disabled={loading}
             >
+              <option value="admin">Administrator</option>
+              <option value="user">User</option>
               {loading ? 'Assigning...' : 'Make Admin'}
-            </button>
+            </select>
           </li>
         ))}
       </ul>
