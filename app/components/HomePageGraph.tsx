@@ -76,7 +76,7 @@ export default function HomePageGraph() {
               height: "30px",
               textAlign: "center",
               marginTop: -47
-            }} // could also use "left" here for og
+            }} // could also use "left" here for og HELLO substring(0, 4)
             onChange={handleChange}
             value={selectedType}
             className="mb-6 z-10 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
@@ -92,8 +92,8 @@ export default function HomePageGraph() {
       <div className="bg-white rounded-lg p-5">
         <LineChart width={800} height={450} data={chartData}> 
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.substring(0, 4)}/>
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']}/>
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] +"/" + tick.split("/")[1]}/> 
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]}/>
           <Tooltip/>
           <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
         </LineChart>
