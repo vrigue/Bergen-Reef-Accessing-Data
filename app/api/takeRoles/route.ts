@@ -1,6 +1,11 @@
+import { getUsersRoles } from "actions/getUsersRoles";
 import { removeAdminRole } from "src/lib/auth0";
 
 export const POST = async (req: Request) => {
+
+  const roles = await getUsersRoles();
+  console.log("roles:", roles)
+
   try {
     const { userId } = await req.json();
 

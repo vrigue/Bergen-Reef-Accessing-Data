@@ -1,7 +1,13 @@
+import { getUsersRoles } from 'actions/getUsersRoles';
 import { NextResponse } from 'next/server';
 import editValueData from 'src/lib/editValueData';
 
+
 export async function PUT(request: Request) {
+
+    const roles = await getUsersRoles();
+    console.log("roles:", roles)
+
     try {
         const { updates } = await request.json();
         if (!updates || !Array.isArray(updates)) {

@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { formatInTimeZone } from "date-fns-tz";
 import createData from 'src/lib/createData';
+import { getUsersRoles } from 'actions/getUsersRoles';
 
 export async function POST(request: Request) {
+
+    const roles = await getUsersRoles();
+    console.log("roles:", roles)
+
     try {
         // Get the data within the request
         const data = await request.json();

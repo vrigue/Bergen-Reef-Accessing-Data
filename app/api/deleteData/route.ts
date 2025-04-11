@@ -1,7 +1,12 @@
+import { getUsersRoles } from 'actions/getUsersRoles';
 import { NextResponse } from 'next/server';
 import deleteData from 'src/lib/deleteData';
 
 export async function DELETE(request: Request) {
+
+    const roles = await getUsersRoles();
+    console.log("roles:", roles)
+
     try {
         // Get the data (ids) within the request
         const data = await request.json();
