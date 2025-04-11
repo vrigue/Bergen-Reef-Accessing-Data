@@ -3,6 +3,7 @@
 import React from "react";
 import { createAccessToken } from "./createAccessToken";
 import { getSession } from "@auth0/nextjs-auth0";
+import { NextResponse } from "next/server";
 
 type Role = {
   id: string;
@@ -17,6 +18,7 @@ export async function getUsersRoles(): Promise<Role[]> {
     const user = session?.user;
 
     if (!user) {
+      //throw new NextResponse("Forbidden", { status: 403 });
       throw new Error("User not authenticated");
     }
 
