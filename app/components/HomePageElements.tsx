@@ -21,7 +21,15 @@ export default function HomePageElements() {
                 }
 
                 for (let i = 0; i < rawData.length; i++) {
-                    const value = rawData[i].value;
+                    var value = 0;
+
+                    if (i == 3 || i == 5) {
+                        value = Math.round(rawData[i].value);
+                    }
+                    else if (rawData[i]) {
+                        value = rawData[i].value;
+                    }
+
                     elementData.push(value);
                 }
 
@@ -35,52 +43,78 @@ export default function HomePageElements() {
         fetchData();
         const interval = setInterval(fetchData, 300000); // Fetch every 5 minutes (300,000 ms) (10,000)
         return () => clearInterval(interval);
-        console.log(elementData[0])
       }, []);
 
 
     return (
-        <div className="grid grid-flow-col grid-rows-3">
+        <div className="grid grid-cols-3 grid-rows-3">
             {/*PH*/}
             <div className="relative text-center">
-            <img src="/images/color-card-1.png" style={{width: "100%", height: "auto"}}></img>
-            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-5" style={{ fontSize: "16px"}}>PH</div>
-            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-10" style={{ fontSize: "45px"}}>{elementData[0]}</div>
-            </div>
-
-            {/*TEMPERATURE*/}
-            <div className="relative text-center">
-            <img src="/images/basic-card.png" style={{width: "100%", height: "auto"}}></img>
-            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-5" style={{ fontSize: "16px"}}>TEMPERATURE</div>
-            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-10" style={{ fontSize: "45px"}}>{elementData[1]}</div>
-            </div>
-
-            {/*ALKALINITY*/}
-            <div className="relative text-center">
-            <img src="/images/color-card-3.png" style={{width: "100%", height: "auto"}}></img>
-            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-5" style={{ fontSize: "16px"}}>ALKALINITY</div>
-            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-10" style={{ fontSize: "45px"}}>{elementData[2]}</div>
+            <img src="/images/coral-panel-1.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">PH</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[0]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">pH</div>
             </div>
 
             {/*SALINITY*/}
             <div className="relative text-center">
-            <img src="/images/basic-card.png" style={{width: "100%", height: "auto"}}></img>
-            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-5" style={{ fontSize: "16px"}}>SALINITY</div>
-            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-10" style={{ fontSize: "45px"}}>{elementData[3]}</div>
+            <img src="/images/basic-panel.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">SALINITY</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[1]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">PPT</div>
+            </div>
+
+            {/*TEMPERATURE*/}
+            <div className="relative text-center">
+            <img src="/images/basic-panel.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">TEMPERATURE</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[2]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">ºF</div>
             </div>
 
             {/*ORP*/}
             <div className="relative text-center">
-            <img src="/images/color-card-2.png" style={{width: "100%", height: "auto"}}></img>
-            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-5" style={{ fontSize: "16px"}}>ORP</div>
-            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-10" style={{ fontSize: "45px"}}>{elementData[4]}</div>
+            <img src="/images/coral-panel-2.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">ORP</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[3]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">mV</div>
+            </div>
+
+            {/*ALKALINITY*/}
+            <div className="relative text-center">
+            <img src="/images/coral-panel-3.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">ALKALINITY</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[4]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">dKH</div>
             </div>
 
             {/*CALCIUM*/}
             <div className="relative text-center">
-            <img src="/images/basic-card.png" style={{width: "100%", height: "auto"}}></img>
-            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-5" style={{ fontSize: "16px"}}>CALCIUM</div>
-            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-10" style={{ fontSize: "45px"}}>{elementData[5]}</div>
+            <img src="/images/basic-panel.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">CALCIUM</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[5]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">PPM</div>
+            </div>
+
+            {/*NITRATE*/}
+            <div className="relative text-center">
+            <img src="/images/coral-panel-2.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">NITRATE</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[6]}</div>
+            </div>
+
+            {/*NITRITE*/}
+            <div className="relative text-center">
+            <img src="/images/coral-panel-3.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">NITRITE</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[7]}</div>
+            </div>
+
+            {/*PHOSPHATE*/}
+            <div className="relative text-center">
+            <img src="/images/basic-panel.png" style={{width: "100%", height: "auto"}}></img>
+            <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">PHOSPHATE</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[8]}</div>
             </div>
         </div>
     );

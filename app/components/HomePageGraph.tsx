@@ -7,7 +7,7 @@ import "../globals.css";
 const infoContent = {
   pH: 'PH measures the acidity or alkalinity of the water. An ideal, stable pH promotes coral growth, allows them to expand their skeletons, and assists in nutrient availability.',
   Cax4: 'Calcium is a crucial component for coral skeletons and is one of the most abundant ions in seawater. Without enough calcium, stony corals cannot grow or strengthen their foundations, so dosing this supplement is a key part of maintaining a healthy reef tank.',
-  Alkx4: 'This is the alkalinity info!',
+  Alkx4: 'Alkalinity prevents drastic swings in pH and provides carbonate for coral growth. Since corals use alkalinity very often, it has to be regularly supplemented in the reef tank and balanced with calcium to provide sufficient calcium carbonate for coral skeletons.',
   ORP: 'ORP provides reef-keepers with a way to monitor water quality and stability, with the most drastic changes being seen when decaying organic matter is present in the tank. This level is maintained through additional filtration such as UV sterilizers or activated carbon.',
   Tmp: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae from their tissue, causing them to turn white and die quickly.',
   Salt: 'Salt provides the necessary minerals to maintain the environment in a reef tank. Keeping a desirable salinity level and selecting a high-quality reef salt mix provides an opportunity to replicate seawater conditions.',
@@ -72,7 +72,7 @@ export default function HomePageGraph() {
       <select //dropdown selecting element for graph
             style={{
               float: "right",
-              width: "840px",
+              width: "815px",
               height: "30px",
               textAlign: "center",
               marginTop: -47
@@ -89,11 +89,11 @@ export default function HomePageGraph() {
             <option value="Cax4">Calcium</option>
       </select>
       
-      <div className="bg-white rounded-lg p-5">
-        <LineChart width={800} height={450} data={chartData}> 
+      <div className="bg-white rounded-lg p-5 pl-1">
+        <LineChart width={790} height={410} data={chartData}> 
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] +"/" + tick.split("/")[1]}/> 
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]}/>
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] +"/" + tick.split("/")[1]} stroke = "#000000"/> 
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]} stroke = "#000000"/>
           <Tooltip/>
           <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
         </LineChart>
@@ -101,7 +101,7 @@ export default function HomePageGraph() {
       
       
       <div  //Text Area for the element information
-        className="mt-6 p-10 bg-white drop-shadow-orange rounded-lg"
+        className="mt-6 p-6 bg-white drop-shadow-orange rounded-lg"
         style={{
           fontSize: "16px",
           fontWeight: "normal",
