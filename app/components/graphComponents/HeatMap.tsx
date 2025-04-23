@@ -147,12 +147,14 @@ export default function DataLineGraph() {
     // Convert map to array format
     valueMap.forEach((values, key) => {
       const [week, day] = key.split("-").map(Number);
+      const minValue = Number(values.min);
+      const maxValue = Number(values.max);
       heatMapData.push({
         week,
         day,
-        value: values.max - values.min, // Use range (max-min) for coloring
-        minValue: values.min,
-        maxValue: values.max,
+        value: maxValue - minValue, // Use range (max-min) for coloring
+        minValue,
+        maxValue,
       });
     });
 
@@ -206,7 +208,7 @@ export default function DataLineGraph() {
       Math.min(upperBound, d3.max(values) || 0),
     ];
 
-    // Create color scale that emphasizes variation
+    // Create color scale that emphasizes variation // currently buggy
     const colorScale = d3
       .scaleSequential()
       .domain([valueRange[0], valueRange[1]])
@@ -368,7 +370,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(selectedType);
+      .text(selectedType === "Temperature" ? "Temp" : selectedType);
 
     // Add units below
     g.append("text")
@@ -489,9 +491,7 @@ export default function DataLineGraph() {
             Enter Date Constraints
           </div>
           <div
-            className={`flex items-center ${
-              isSmallScreen ? "flex-col" : "space-x-4"
-            } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
+            className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
             <DateBoundElement
               value={startDate}
