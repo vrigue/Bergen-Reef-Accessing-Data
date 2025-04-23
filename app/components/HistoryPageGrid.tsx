@@ -20,6 +20,7 @@ import {
   RowSelectionModule,
   ValidationModule,
   TextEditorModule,
+  SelectEditorModule
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -39,9 +40,12 @@ ModuleRegistry.registerModules([
   TextFilterModule,
   CellStyleModule,
   ValidationModule,
+  SelectEditorModule
 ]);
 
 import Dialog from "./HistoryPageDialog";
+import { dropdownValues } from 'src/dropdown-values';
+
 
 export default function HistoryPageGrid() {
 
@@ -411,7 +415,7 @@ const handleSaveNewRow = async (params) => {
       
 
       {/* Right Panel */}
-      <div className="flex-1 rounded-lg p-4" style={{ marginLeft: "35%"}}>
+      <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginLeft: "35%"}}>
         <div className="ag-theme-quartz" style={{ height: "400px" }}>
           <AgGridReact
             rowData={rowData}
@@ -432,12 +436,20 @@ const handleSaveNewRow = async (params) => {
                   },
                   {
                     field: "name",
-                    filter: "agTextColumnFilter",
+                    filter: "agTextColumnFilter",    
+                    cellEditor: "agSelectCellEditor",
+                    cellEditorParams: {
+                      "values": dropdownValues.name,
+                    },
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
                   {
                     field: "type",
                     filter: "agTextColumnFilter",
+                    cellEditor: "agSelectCellEditor",
+                    cellEditorParams: {
+                      "values": dropdownValues.type,
+                    },
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
                   {
