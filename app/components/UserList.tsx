@@ -85,7 +85,7 @@ const UserList = () => {
           <li key={user.user_id} className="mb-2">
             {user.email}
             <select
-              //value={user.roles.includes("admin") ? "admin" : "user"}
+              value={["coralreeves760@gmail.com", "anaghaajesh2010@gmail.com","vrielleguevarra@gmail.com","wukimberley98@gmail.com"].includes(user.email) ? "admin" : "user"}
               onChange={(e) => {
                 if (e.target.value === "admin") {
                   handleAssignAdmin(user.user_id);
