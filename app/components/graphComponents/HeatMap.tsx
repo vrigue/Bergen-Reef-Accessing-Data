@@ -505,6 +505,12 @@ export default function DataLineGraph() {
             <DateBoundElement value={endDate} onChange={handleEndDateChange} />
           </div>
 
+          <div className="flex justify-center mb-4">
+            <div className="bg-white p-3 rounded-lg shadow-sm text-center text-sm text-neutral-700">
+              Note: The date range will always be 7 weeks
+            </div>
+          </div>
+
           <div className="flex justify-center pt-4">
             <button
               className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
