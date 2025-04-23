@@ -440,6 +440,7 @@ const handleSaveNewRow = async (params) => {
                     cellEditor: "agSelectCellEditor",
                     cellEditorParams: {
                       "values": dropdownValues.name,
+                      valueListGap: 10
                     },
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
@@ -449,6 +450,7 @@ const handleSaveNewRow = async (params) => {
                     cellEditor: "agSelectCellEditor",
                     cellEditorParams: {
                       "values": dropdownValues.type,
+                      valueListGap: 10
                     },
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
