@@ -60,7 +60,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
               <Menu as="div" className="relative inline-block text-left">
                 <MenuButton
                   className={clsx(
-                    "tab-item px-6 py-2 rounded-full transition flex items-center justify-between",
+                    "tab-item px-6 py-2 transition flex items-center justify-between",
                     isDefaultIndexNegative
                       ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       : defaultIndex === 1
@@ -77,14 +77,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                 >
                   <MenuItem>
                     <a href="/data/linegraph">
-                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-base text-gray font-semibold hover:bg-gray-100">
                         Line Graph
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/twodimgraph">
-                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-base text-gray font-semibold hover:bg-gray-100">
                         Two Dimension Plot
                       </button>
                     </a>
@@ -99,7 +99,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   <MenuItem>
                     <a href="/data/heatmap">
                       <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
-                        HeatMap
+                        Heat Map
                       </button>
                     </a>
                   </MenuItem>
@@ -133,7 +133,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   {({ selected }) => (
                     <button
                       className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
+                        "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative
                           ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                           : selected
@@ -149,7 +149,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
               <Menu as="div" className="relative inline-block text-left">
                 <MenuButton
                   className={clsx(
-                    "tab-item px-6 py-2 rounded-full transition flex items-center justify-between",
+                    "tab-item px-6 py-2 rounded-xl transition flex items-center justify-between",
                     isDefaultIndexNegative
                       ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       : defaultIndex === 1
@@ -161,34 +161,34 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
                 </MenuButton>
                 <MenuItems
-                  className="absolute z-50 right-0 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5 z-50"
+                  className="absolute z-50 right-0 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black/5 z-50"
                   style={{ zIndex: 20 }}
                 >
                   <MenuItem>
                     <a href="/data/linegraph">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
                         Line Graph
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/twodimgraph">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
                         Two Dimension Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/boxplot">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
                         Box Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/heatmap">
-                      <button className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        HeatMap
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
+                        Heat Map
                       </button>
                     </a>
                   </MenuItem>
@@ -199,7 +199,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   {({ selected }) => (
                     <button
                       className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
+                        "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative || defaultIndex === 1
                           ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                           : selected

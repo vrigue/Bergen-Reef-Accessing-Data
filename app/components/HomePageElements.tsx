@@ -101,6 +101,7 @@ export default function HomePageElements() {
             <img src="/images/coral-panel-2.png" style={{width: "100%", height: "auto"}}></img>
             <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">NITRATE</div>
             <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[6]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">PPM</div>
             </div>
 
             {/*NITRITE*/}
@@ -108,6 +109,7 @@ export default function HomePageElements() {
             <img src="/images/coral-panel-3.png" style={{width: "100%", height: "auto"}}></img>
             <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">NITRITE</div>
             <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[7]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">PPM</div>
             </div>
 
             {/*PHOSPHATE*/}
@@ -115,6 +117,7 @@ export default function HomePageElements() {
             <img src="/images/basic-panel.png" style={{width: "100%", height: "auto"}}></img>
             <div className="w-full absolute top-0 left-0 text-center text-white font-semibold mt-3 text-base">PHOSPHATE</div>
             <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-5 text-5xl">{elementData[8]}</div>
+            <div className="w-full absolute top-10 left-0 text-center text-dark-gray font-semibold mt-14 pt-8 text-3xl">PPM</div>
             </div>
         </div>
     );
