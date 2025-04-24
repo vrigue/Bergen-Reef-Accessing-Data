@@ -7,7 +7,7 @@ const db = drizzle(process.env.DATABASE_URL!);
 
 export default async function getMostRecentElements() {
   try {
-    const elements = ["pH", "Salt", "Tmp", "ORP", "Alkx4", "Cax4", "NO3", "NO2", "PO4"];
+    const elements = ['pH', 'Salinity', 'Temperature', 'ORP', 'Alkalinity', 'Calcium', 'Nitrate', 'Nitrite', 'Phosphate'];
     let values = [];
 
     for (let i = 0; i < elements.length; i++) {

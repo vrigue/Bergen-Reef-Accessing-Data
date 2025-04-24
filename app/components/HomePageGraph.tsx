@@ -6,18 +6,18 @@ import "../globals.css";
 
 const infoContent = {
   pH: 'PH measures the acidity or alkalinity of the water. An ideal, stable pH promotes coral growth, allows them to expand their skeletons, and assists in nutrient availability.',
-  Cax4: 'Calcium is a crucial component for coral skeletons and is one of the most abundant ions in seawater. Without enough calcium, stony corals cannot grow or strengthen their foundations, so dosing this supplement is a key part of maintaining a healthy reef tank.',
-  Alkx4: 'Alkalinity prevents drastic swings in pH and provides carbonate for coral growth. Since corals use alkalinity very often, it has to be regularly supplemented in the reef tank and balanced with calcium to provide sufficient calcium carbonate for coral skeletons.',
+  Calcium: 'Calcium is a crucial component for coral skeletons and is one of the most abundant ions in seawater. Without enough calcium, stony corals cannot grow or strengthen their foundations, so dosing this supplement is a key part of maintaining a healthy reef tank.',
+  Alkalinity: 'Alkalinity prevents drastic swings in pH and provides carbonate for coral growth. Since corals use alkalinity very often, it has to be regularly supplemented in the reef tank and balanced with calcium to provide sufficient calcium carbonate for coral skeletons.',
   ORP: 'ORP provides reef-keepers with a way to monitor water quality and stability, with the most drastic changes being seen when decaying organic matter is present in the tank. This level is maintained through additional filtration such as UV sterilizers or activated carbon.',
-  Tmp: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae from their tissue, causing them to turn white and die quickly.',
-  Salt: 'Salt provides the necessary minerals to maintain the environment in a reef tank. Keeping a desirable salinity level and selecting a high-quality reef salt mix provides an opportunity to replicate seawater conditions.',
+  Temperature: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae from their tissue, causing them to turn white and die quickly.',
+  Salinity: 'Salt provides the necessary minerals to maintain the environment in a reef tank. Keeping a desirable salinity level and selecting a high-quality reef salt mix provides an opportunity to replicate seawater conditions.',
 };
 
 
 export default function HomePageGraph() {
   const [chartData, setChartData] = useState([]);
-  const [selectedType, setSelectedTypes] = useState<string | undefined>("Salt");
-  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.Salt);
+  const [selectedType, setSelectedTypes] = useState<string | undefined>("Salinity");
+  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.Salinity);
 
   //setSelectedTypes("pH");
 
@@ -82,11 +82,11 @@ export default function HomePageGraph() {
             className="mb-6 z-10 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
           >
             <option value="pH">PH</option>
-            <option value="Salt">Salinity</option>
-            <option value="Tmp">Temperature</option>
+            <option value="Salinity">Salinity</option>
+            <option value="Temperature">Temperature</option>
             <option value="ORP">Oxidation Reduction Potential (ORP)</option>
-            <option value="Alkx4">Alkalinity</option>
-            <option value="Cax4">Calcium</option>
+            <option value="Alkalinity">Alkalinity</option>
+            <option value="Calcium">Calcium</option>
       </select>
       
       <div className="bg-white rounded-lg p-5 pl-1">
