@@ -37,7 +37,7 @@ export default async function insertData(data : Array<Record<string, any>>, date
             unit = "°F";
         }
         else if (data[i].type === "alk") {
-            unit = "dKH";
+            unit = "dkH";
         }
         else if (data[i].type === "ca" || data[i].type === "mg") {
             unit = "ppm";

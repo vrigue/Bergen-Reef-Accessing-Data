@@ -3,7 +3,7 @@ export const dropdownMap : Record<string, string> = {
   'Salinity' : 'ppt', 
   'Temperature' : '°F', 
   'ORP' : 'mV',
-  'Alkalinity' : 'dKH',
+  'Alkalinity' : 'dkH',
   'Calcium' : 'ppm',
   'Nitrate' : 'ppm',
   'Nitrite' : 'ppm', 
