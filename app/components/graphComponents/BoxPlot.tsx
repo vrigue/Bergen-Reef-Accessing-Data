@@ -290,13 +290,11 @@ export default function BoxPlot() {
         .on("mouseover", (event) => {
           const iqr = Number(boxPlotData.q3 - boxPlotData.q1);
           const lowerBound = Number(boxPlotData.q1 - 1.5 * iqr);
-          const upperBound = Number(boxPlotData.q3 + 1.5 * iqr);
+          const upperBound = Number(boxPlotData.max);
           tooltip
             .style("visibility", "visible")
             .html(
-              `<strong>Outlier Value:</strong> ${Number(outlier).toFixed(2)}<br/>` +
-              `<strong>Why is this an outlier?</strong><br/>` +
-              `This value falls ${outlier > upperBound ? 'above' : 'below'} the expected range.<br/><br/>` +
+              `<strong>Outlier Value:</strong> ${Number(outlier).toFixed(2)}<br/><br/>` +
               `<strong>Expected Range:</strong><br/>` +
               `Lower bound: ${lowerBound.toFixed(2)}<br/>` +
               `Upper bound: ${upperBound.toFixed(2)}<br/>`
