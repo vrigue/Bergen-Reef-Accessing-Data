@@ -11,6 +11,7 @@ import NavigationBar from "../components/NavigationBar";
 import { isUserAdmin } from '../../actions/isUserAdmin';
 import { redirect } from "next/navigation";
 import { ResponsiveContainer } from "recharts";
+import { getUsersRoles } from "../../actions/getUsersRoles"
 import UserList from "app/components/UserList";
 
 
