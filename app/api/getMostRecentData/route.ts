@@ -9,11 +9,11 @@ export async function GET(request: Request) {
     const type = searchParams.get("type");
 
     const typeMapping: { [key: string]: string } = {
-      Temperature: "Tmp",
-      Salinity: "Salt",
+      Temperature: "Temperature",
+      Salinity: "Salinity",
       ORP: "ORP",
-      Alkalinity: "alkx4",
-      Calcium: "Cax4",
+      Alkalinity: "Alkalinity",
+      Calcium: "Calcium",
       pH: "pH"
     };
 

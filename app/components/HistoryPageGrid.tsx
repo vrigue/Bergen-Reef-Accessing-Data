@@ -100,7 +100,7 @@ export default function HistoryPageGrid() {
   
       // Only update if the type is different
       if (params.data.type !== correspondingType) {
-        params.node.setDataValue("type", correspondingType);
+        params.node.setDataValue("unit", correspondingType);
       }
     }
   };
@@ -460,7 +460,7 @@ const handleSaveNewRow = async (params) => {
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
                   {
-                    field: "type",
+                    field: "unit",
                     filter: "agTextColumnFilter",
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
