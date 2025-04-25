@@ -1,9 +1,10 @@
 import { getUsersRoles } from "actions/getUsersRoles";
 import { assignAdminRole } from "src/lib/auth0";
+import { blockJack } from "actions/blockJack";
 
 export const POST = async (req: Request) => {
 
-  const roles = await getUsersRoles();
+  const roles = await blockJack();
   console.log("roles:", roles)
 
   try {

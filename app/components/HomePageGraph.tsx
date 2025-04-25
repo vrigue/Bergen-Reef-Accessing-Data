@@ -67,49 +67,51 @@ export default function HomePageGraph() {
   }, [selectedType]); // Runs when selectedType changes
 
   return (
-
+    <>
     <div className="flex flex-col">
       <select //dropdown selecting element for graph
-            style={{
-              float: "right",
-              width: "815px",
-              height: "30px",
-              textAlign: "center",
-              marginTop: -47
-            }} // could also use "left" here for og HELLO substring(0, 4)
-            onChange={handleChange}
-            value={selectedType}
-            className="mb-6 z-10 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-          >
-            <option value="pH">PH</option>
-            <option value="Salt">Salinity</option>
-            <option value="Tmp">Temperature</option>
-            <option value="ORP">Oxidation Reduction Potential (ORP)</option>
-            <option value="Alkx4">Alkalinity</option>
-            <option value="Cax4">Calcium</option>
+
+        style={{
+          float: "right",
+          width: "815px",
+          height: "30px",
+          textAlign: "center",
+          marginTop: -47
+        }} // could also use "left" here for og HELLO substring(0, 4)
+        onChange={handleChange}
+        value={selectedType}
+        className="mb-6 z-10 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+      >
+        <option value="pH">PH</option>
+        <option value="Salt">Salinity</option>
+        <option value="Tmp">Temperature</option>
+        <option value="ORP">Oxidation Reduction Potential (ORP)</option>
+        <option value="Alkx4">Alkalinity</option>
+        <option value="Cax4">Calcium</option>
       </select>
-      
+
       <div className="bg-white rounded-lg p-5 pl-1">
-        <LineChart width={790} height={410} data={chartData}> 
+        <LineChart width={790} height={410} data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] +"/" + tick.split("/")[1]} stroke = "#000000"/> 
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]} stroke = "#000000"/>
-          <Tooltip/>
-          <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] + "/" + tick.split("/")[1]} stroke="#000000" />
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]} stroke="#000000" />
+          <Tooltip />
+          <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} strokeWidth='2.5'/>
         </LineChart>
       </div>
-      
-      
-      <div  //Text Area for the element information
+
+
+      <div //Text Area for the element information
+
         className="mt-6 p-6 bg-white drop-shadow-orange rounded-lg"
         style={{
           fontSize: "16px",
           fontWeight: "normal",
           color: "#333",
-          }}
+        }}
       >
         {selectedInfo}
       </div>
-    </div>
+    </div></>
   );
 }
