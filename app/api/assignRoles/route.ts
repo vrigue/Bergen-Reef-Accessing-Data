@@ -11,7 +11,7 @@ export const POST = async (req: Request) => {
     const { userId } = await req.json();
 
     if (!userId) {
-      return Response.json({ error: 'User ID is required' }, { status: 400 });
+      return Response.json({ error: 'Unauthorized' }, { status: 400 });
     }
 
     await assignAdminRole(userId);

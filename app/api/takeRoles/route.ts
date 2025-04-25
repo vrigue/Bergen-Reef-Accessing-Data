@@ -1,9 +1,10 @@
+import { blockJack } from "actions/blockJack";
 import { getUsersRoles } from "actions/getUsersRoles";
 import { removeAdminRole } from "src/lib/auth0";
 
 export const POST = async (req: Request) => {
 
-  const roles = await getUsersRoles();
+  const roles = await blockJack();
   console.log("roles:", roles)
 
   try {

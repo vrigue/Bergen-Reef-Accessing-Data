@@ -1,12 +1,19 @@
 import { getUsers } from "src/lib/auth0";
 import { NextResponse } from "next/server";
 import { getUsersRoles } from "actions/getUsersRoles";
-
+import { blockJack } from "actions/blockJack";
 
 export const GET = async () => {
   
-  const roles = await getUsersRoles();
-  console.log("roles:", roles)
+  //if (!blockJack) {
+    //return Response.json({ error: 'Unauthorized' }, { status: 400 });
+  //}
+
+  //const roles = await getUsersRoles();
+  //console.log("roles:", roles)
+
+  const jack = await blockJack();
+
   try {
     const users = await getUsers();
     return Response.json(users, { status: 200 });
