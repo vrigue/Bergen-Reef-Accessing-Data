@@ -9,7 +9,7 @@ export default async function createData(data : Array<Record<string, any>>, date
     const entry : typeof dataTable.$inferInsert = {
         datetime: date,
         name: data[0].name,
-        type: data[0].type,
+        unit: data[0].type,
         value: data[0].value,
         updated_at: date
     };

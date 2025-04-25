@@ -45,6 +45,7 @@ ModuleRegistry.registerModules([
 
 import Dialog from "./HistoryPageDialog";
 import { dropdownValues } from 'src/dropdown-values';
+import { dropdownMap } from 'src/dropdown-mapping';
 
 
 export default function HistoryPageGrid() {
@@ -91,6 +92,19 @@ export default function HistoryPageGrid() {
       [rowId]: { ...params.data, [params.column.getColId()]: params.newValue },
     }));
   };
+
+  const handleCellNameChanged = (params: any) => {
+    if (params.colDef.field === "name") {
+      const selectedName = params.newValue;
+      const correspondingType = dropdownMap[selectedName] || "";
+  
+      // Only update if the type is different
+      if (params.data.type !== correspondingType) {
+        params.node.setDataValue("unit", correspondingType);
+      }
+    }
+  };
+  
 
   const onSelectionChanged = () => {
     const selectedRows = gridApiRef.current?.getSelectedRows();
@@ -437,6 +451,7 @@ const handleSaveNewRow = async (params) => {
                   {
                     field: "name",
                     filter: "agTextColumnFilter",    
+                    onCellValueChanged: handleCellNameChanged,
                     cellEditor: "agSelectCellEditor",
                     cellEditorParams: {
                       "values": dropdownValues.name,
@@ -445,13 +460,8 @@ const handleSaveNewRow = async (params) => {
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
                   {
-                    field: "type",
+                    field: "unit",
                     filter: "agTextColumnFilter",
-                    cellEditor: "agSelectCellEditor",
-                    cellEditorParams: {
-                      "values": dropdownValues.type,
-                      valueListGap: 10
-                    },
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
                   {
