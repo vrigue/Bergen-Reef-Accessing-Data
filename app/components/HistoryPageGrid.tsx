@@ -96,10 +96,10 @@ export default function HistoryPageGrid() {
   const handleCellNameChanged = (params: any) => {
     if (params.colDef.field === "name") {
       const selectedName = params.newValue;
-      const correspondingType = dropdownMap[selectedName] || "";
+      const correspondingUnit = dropdownMap[selectedName] || "";
 
-      if (params.data.unit !== correspondingType) {
-        params.node.setDataValue("unit", correspondingType);
+      if (params.data.unit !== correspondingUnit) {
+        params.node.setDataValue("unit", correspondingUnit);
       }
     }
   };
