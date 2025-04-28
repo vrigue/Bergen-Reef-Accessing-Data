@@ -97,9 +97,8 @@ export default function HistoryPageGrid() {
     if (params.colDef.field === "name") {
       const selectedName = params.newValue;
       const correspondingType = dropdownMap[selectedName] || "";
-  
-      // Only update if the type is different
-      if (params.data.type !== correspondingType) {
+
+      if (params.data.unit !== correspondingType) {
         params.node.setDataValue("unit", correspondingType);
       }
     }
@@ -211,7 +210,7 @@ const handleCreateRow = async () => {
     id: 1, // Temporary ID, will be replaced by DB
     datetime: date,
     name: "",
-    type: "",
+    unit: "",
     value: 0,
     isNewRow: true, // Add isNewRow attribute
   };
