@@ -1,13 +1,21 @@
+import { blockJack } from 'actions/blockJack';
 import { getUsersRoles } from 'actions/getUsersRoles';
 import { NextResponse } from 'next/server';
 import deleteData from 'src/lib/deleteData';
+import { isUserAdmin } from 'actions/isUserAdmin';
 
 export async function DELETE(request: Request) {
 
-    const roles = await getUsersRoles();
+    const roles = await blockJack();
     console.log("roles:", roles)
 
     try {
+        const admin = await isUserAdmin();
+
+        if (!admin) {
+            return Response.json({ error: 'Unauthorized' }, { status: 400 });
+        }
+
         // Get the data (ids) within the request
         const data = await request.json();
         console.log(new Date(data.date));

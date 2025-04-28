@@ -67,7 +67,7 @@ export default function HomePageGraph() {
   }, [selectedType]); // Runs when selectedType changes
 
   return (
-
+    <>
     <div className="flex flex-col">
       <select //dropdown selecting element for graph
             style={{
@@ -88,28 +88,29 @@ export default function HomePageGraph() {
             <option value="Alkalinity">Alkalinity</option>
             <option value="Calcium">Calcium</option>
       </select>
-      
+
       <div className="bg-white rounded-lg p-5 pl-1">
-        <LineChart width={790} height={410} data={chartData}> 
+        <LineChart width={790} height={410} data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] +"/" + tick.split("/")[1]} stroke = "#000000"/> 
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]} stroke = "#000000"/>
-          <Tooltip/>
-          <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} />
+          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] + "/" + tick.split("/")[1]} stroke="#000000" />
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]} stroke="#000000" />
+          <Tooltip />
+          <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} strokeWidth='2.5'/>
         </LineChart>
       </div>
-      
-      
-      <div  //Text Area for the element information
+
+
+      <div //Text Area for the element information
+
         className="mt-6 p-6 bg-white drop-shadow-orange rounded-lg"
         style={{
           fontSize: "16px",
           fontWeight: "normal",
           color: "#333",
-          }}
+        }}
       >
         {selectedInfo}
       </div>
-    </div>
+    </div></>
   );
 }
