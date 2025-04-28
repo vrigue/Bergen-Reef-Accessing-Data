@@ -483,22 +483,26 @@ const handleSaveNewRow = async (params) => {
                     cellRenderer: (params) => {
                       if (params.data.isNewRow) {
                         return (
-                          <button
-                            onClick={() => handleSaveNewRow(params)}
-                            className="bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 text-xs px-1 py-0.5 w-14 h-6 rounded-lg shadow hover:bg-green-200"
-                          >
-                            Save
-                          </button>
+                          <div className="flex items-center justify-center h-full">
+                            <button
+                              onClick={() => handleSaveNewRow(params)}
+                              className="flex items-center justify-center bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 text-xs w-14 h-6 rounded-lg shadow hover:bg-green-200"
+                            >
+                              Save
+                            </button>
+                          </div>
                         );
                       }
 
                       return (
-                        <button
-                          onClick={() => handleDeleteRow(params)}
-                          className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold text-xs px-1 py-0.5 w-14 h-6 rounded-lg shadow hover:bg-red-200"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex items-center justify-center h-full">
+                            <button
+                              onClick={() => handleDeleteRow(params)}
+                              className="flex items-center justify-center bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold text-xs w-14 h-6 rounded-lg shadow hover:bg-red-200"
+                            >
+                              Delete
+                          </button>
+                          </div>
                       );
                     },
                     width: 80,
