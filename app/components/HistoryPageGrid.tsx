@@ -20,7 +20,9 @@ import {
   RowSelectionModule,
   ValidationModule,
   TextEditorModule,
-  SelectEditorModule
+  SelectEditorModule,
+  IFilterOptionDef,
+  ITextFilterParams,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -72,6 +74,30 @@ export default function HistoryPageGrid() {
   const [editedRows, setEditedRows] = useState<Record<number, any>>({});
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
+  const nameFilterOptions: IFilterOptionDef[] = (dropdownValues.name).map((name) => ({
+    displayKey: `is_${name}`,
+    displayName: `${name}`,
+    predicate: (_, cellValue) => cellValue === name,
+    numberOfInputs: 0,
+  }));
+  
+  const nameFilterParams: ITextFilterParams = {
+    defaultOption: "equals",
+    filterOptions: [...nameFilterOptions,],
+  };
+
+  const unitFilterOptions: IFilterOptionDef[] = (dropdownValues.unit).map((unit) => ({
+    displayKey: `is_${unit}`,
+    displayName: `${unit}`,
+    predicate: (_, cellValue) => cellValue === unit,
+    numberOfInputs: 0,
+  }));
+  
+  const unitFilterParams: ITextFilterParams = {
+    defaultOption: "equals",
+    filterOptions: [...unitFilterOptions,],
+  };
+
   const [dialog, setDialog] = useState({
     isOpen: false,
     title: "",
@@ -103,7 +129,6 @@ export default function HistoryPageGrid() {
       }
     }
   };
-  
 
   const onSelectionChanged = () => {
     const selectedRows = gridApiRef.current?.getSelectedRows();
@@ -449,7 +474,7 @@ const handleSaveNewRow = async (params) => {
                   },
                   {
                     field: "name",
-                    filter: "agTextColumnFilter",    
+                    filterParams: nameFilterParams, 
                     onCellValueChanged: handleCellNameChanged,
                     cellEditor: "agSelectCellEditor",
                     cellEditorParams: {
@@ -460,7 +485,7 @@ const handleSaveNewRow = async (params) => {
                   },
                   {
                     field: "unit",
-                    filter: "agTextColumnFilter",
+                    filterParams: unitFilterParams, 
                     editable: (params) => params.data?.isNewRow && isEditing,
                   },
                   {
