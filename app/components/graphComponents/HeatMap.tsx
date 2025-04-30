@@ -13,7 +13,7 @@ interface DataPoint {
   id: number;
   datetime: string;
   name: string;
-  type: string;
+  unit: string;
   value: number;
 }
 
@@ -33,25 +33,16 @@ const units = {
   Calcium: "ppm",
 };
 
-const typeMapping: { [key: string]: string } = {
-  Temperature: "Tmp",
-  Salinity: "Salt",
-  ORP: "ORP",
-  Alkalinity: "Alkx4",
-  Calcium: "Cax4",
-  pH: "pH",
-};
-
 export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedType, setSelectedType] = useState<string>("Salinity");
+  const [selectedName, setSelectedName] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  const availableTypes = [
+  const availableNames = [
     "Salinity",
     "ORP",
     "Temperature",
@@ -92,7 +83,7 @@ export default function DataLineGraph() {
       startDate.setHours(startDate.getHours() - 5);
       endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${selectedType}`
+        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -110,12 +101,11 @@ export default function DataLineGraph() {
     if (data.length > 0 && svgRef.current) {
       drawChart();
     }
-  }, [data, selectedType]);
+  }, [data, selectedName]);
 
   const processDataForHeatMap = (): HeatMapData[] => {
     const heatMapData: HeatMapData[] = [];
-    const mappedType = typeMapping[selectedType];
-    const typeData = data.filter((d) => d.name === mappedType);
+    const nameData = data.filter((d) => d.name === selectedName);
 
     // Calculate the start of the first week
     const firstWeekStart = new Date(startDate);
@@ -125,7 +115,7 @@ export default function DataLineGraph() {
     const valueMap = new Map<string, { min: number; max: number }>();
 
     // Group data by week and day
-    typeData.forEach((d) => {
+    nameData.forEach((d) => {
       const date = new Date(d.datetime);
       const week = Math.floor(
         (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
@@ -162,7 +152,7 @@ export default function DataLineGraph() {
   };
 
   const drawChart = () => {
-    if (!selectedType) return;
+    if (!selectedName) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -285,9 +275,9 @@ export default function DataLineGraph() {
         tooltip
           .html(
             `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
-          Min: ${d.minValue.toFixed(2)} ${units[selectedType]}<br/>
-          Max: ${d.maxValue.toFixed(2)} ${units[selectedType]}<br/>
-          Range: ${d.value.toFixed(2)} ${units[selectedType]}${
+          Min: ${d.minValue.toFixed(2)} ${units[selectedName]}<br/>
+          Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}<br/>
+          Range: ${d.value.toFixed(2)} ${units[selectedName]}${
               d.value > upperBound ? "<br/>(Outlier)" : ""
             }`
           )
@@ -370,7 +360,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(selectedType === "Temperature" ? "Temp" : selectedType);
+      .text(selectedName === "Temperature" ? "Temp" : selectedName);
 
     // Add units below
     g.append("text")
@@ -387,7 +377,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(`(${units[selectedType]})`);
+      .text(`(${units[selectedName]})`);
 
     // Create gradient stops
     const gradientStops = [
@@ -433,8 +423,8 @@ export default function DataLineGraph() {
       .style("font-size", "18px");
   };
 
-  const handleTypeSelect = (type: string) => {
-    setSelectedType(type);
+  const handleNameSelect = (name: string) => {
+    setSelectedName(name);
   };
 
   const handleStartDateChange = (date: Date) => {
@@ -467,18 +457,18 @@ export default function DataLineGraph() {
           <Menu as="div" className="relative inline-block text-left m-3">
             <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
               <span style={{ color: d3.schemeCategory10[0] }}>
-                {selectedType || "Select Type"}
+                {selectedName || "Select Name"}
               </span>
               <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
             </MenuButton>
             <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
-              {availableTypes.map((type) => (
-                <MenuItem key={type}>
+              {availableNames.map((name) => (
+                <MenuItem key={name}>
                   <button
-                    onClick={() => handleTypeSelect(type)}
+                    onClick={() => handleNameSelect(name)}
                     className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
-                    {type}
+                    {name}
                   </button>
                 </MenuItem>
               ))}

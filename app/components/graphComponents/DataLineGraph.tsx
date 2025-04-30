@@ -13,7 +13,7 @@ interface DataPoint {
   id: number;
   datetime: string;
   name: string;
-  type: string;
+  unit: string;
   value: number;
 }
 
@@ -25,27 +25,18 @@ const units = {
   Calcium: "ppm",
 };
 
-const typeMapping: { [key: string]: string } = {
-  Temperature: "Tmp",
-  Salinity: "Salt",
-  ORP: "ORP",
-  Alkalinity: "Alkx4",
-  Calcium: "Cax4",
-  pH: "pH",
-};
-
 export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedNames, setSelectedNames] = useState<string[]>([]);
   const [zoom, setZoom] = useState(50);
   const [step, setStep] = useState(50);
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  const availableTypes = [
+  const availableNames = [
     "Salinity",
     "ORP",
     "Temperature",
@@ -80,7 +71,7 @@ export default function DataLineGraph() {
     lastWeek.setDate(today.getDate() - 7);
     setStartDate(lastWeek);
     setEndDate(today);
-    setSelectedTypes(["Salinity"]);
+    setSelectedNames(["Salinity"]);
     setShouldFetch(true);
   }, []);
 
@@ -89,7 +80,7 @@ export default function DataLineGraph() {
       startDate.setHours(startDate.getHours() - 5);
       endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${selectedTypes.join(
+        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedNames.join(
           ","
         )}`
       );
@@ -112,13 +103,13 @@ export default function DataLineGraph() {
   }, [data, zoom, step]);
 
   const drawChart = () => {
-    if (selectedTypes.length < 1) return;
+    if (selectedNames.length < 1) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
     // Calculate margins based on whether we have one or two series
-    const rightMargin = selectedTypes.length > 1 ? 90 : 60;
+    const rightMargin = selectedNames.length > 1 ? 90 : 60;
     const margin = { top: 30, right: rightMargin, bottom: 120, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
@@ -130,20 +121,20 @@ export default function DataLineGraph() {
 
     const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
 
-    // Calculate y-axis for the first selected type
+    // Calculate y-axis for the first selected name
     const yDomain = d3.extent(
-      data.filter((d) => d.name === typeMapping[selectedTypes[0]]),
+      data.filter((d) => d.name === selectedNames[0]),
       (d) => +d.value
     ) as [number, number];
     const y = d3.scaleLinear().domain(yDomain).nice().range([height, 0]);
 
-    // Calculate yRight-axis for the second selected type if it exists
-    const yRight = selectedTypes[1]
+    // Calculate yRight-axis for the second selected name if it exists
+    const yRight = selectedNames[1]
       ? d3
           .scaleLinear()
           .domain(
             d3.extent(
-              data.filter((d) => d.name === typeMapping[selectedTypes[1]]),
+              data.filter((d) => d.name === selectedNames[1]),
               (d) => +d.value
             ) as [number, number]
           )
@@ -204,7 +195,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(`${selectedTypes[0]} (${units[selectedTypes[0]]})`);
+      .text(`${selectedNames[0]} (${units[selectedNames[0]]})`);
 
     // Add right y-axis
     if (yRight) {
@@ -224,7 +215,7 @@ export default function DataLineGraph() {
         .attr("text-anchor", "middle")
         .style("font-size", "24px")
         .style("font-weight", "bold")
-        .text(`${selectedTypes[1]} (${units[selectedTypes[1]]})`);
+        .text(`${selectedNames[1]} (${units[selectedNames[1]]})`);
     }
 
     const line = d3
@@ -247,9 +238,8 @@ export default function DataLineGraph() {
       .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
 
     // Add circles for each data point and tooltip interaction
-    selectedTypes.forEach((type, index) => {
-      const mappedType = typeMapping[type] || type;
-      const typeData = data.filter((d) => d.name === mappedType);
+    selectedNames.forEach((name, index) => {
+      const nameData = data.filter((d) => d.name === name);
       const lineFunction =
         index === 0
           ? line
@@ -260,14 +250,14 @@ export default function DataLineGraph() {
               .y((d) => (yRight ? yRight(d.value) : y(d.value)));
 
       g.append("path")
-        .datum(typeData)
+        .datum(nameData)
         .attr("fill", "none")
         .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
         .attr("d", lineFunction);
 
       g.selectAll(`circle.series-${index}`)
-        .data(typeData)
+        .data(nameData)
         .enter()
         .append("circle")
         .attr("class", `series-${index}`)
@@ -283,7 +273,7 @@ export default function DataLineGraph() {
             .html(
               `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
                 new Date(d.datetime)
-              )}<br>Name: ${d.name}<br>Type: ${d.type}<br>Value: ${d.value}`
+              )}<br>Name: ${d.name}<br>Unit: ${d.unit}<br>Value: ${d.value}`
             );
         })
         .on("mousemove", (event) => {
@@ -297,15 +287,15 @@ export default function DataLineGraph() {
     });
   };
 
-  const handleTypeSelect = (index: number, type: string) => {
-    const newSelectedTypes = [...selectedTypes];
-    newSelectedTypes[index] = type;
-    setSelectedTypes(newSelectedTypes);
+  const handleNameSelect = (index: number, name: string) => {
+    const newSelectedNames = [...selectedNames];
+    newSelectedNames[index] = name;
+    setSelectedNames(newSelectedNames);
   };
 
   const addPlot = () => {
-    if (selectedTypes.length < 5) {
-      setSelectedTypes([...selectedTypes, ""]);
+    if (selectedNames.length < 5) {
+      setSelectedNames([...selectedNames, ""]);
     }
   };
 
@@ -326,7 +316,7 @@ export default function DataLineGraph() {
           Line Plot
         </h1>
         <div className="flex flex-col">
-          {selectedTypes.map((type, index) => (
+          {selectedNames.map((name, index) => (
             <Menu
               as="div"
               key={index}
@@ -334,27 +324,27 @@ export default function DataLineGraph() {
             >
               <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
                 <span style={{ color: colorScale(index) }}>
-                  {type || "Select Type"}
+                  {name || "Select Name"}
                 </span>
                 <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
               </MenuButton>
               <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
-                {availableTypes
-                  .filter((t) => !selectedTypes.includes(t))
-                  .map((t) => (
-                    <MenuItem key={t}>
+                {availableNames
+                  .filter((n) => !selectedNames.includes(n))
+                  .map((n) => (
+                    <MenuItem key={n}>
                       <button
-                        onClick={() => handleTypeSelect(index, t)}
+                        onClick={() => handleNameSelect(index, n)}
                         className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        {t}
+                        {n}
                       </button>
                     </MenuItem>
                   ))}
               </MenuItems>
             </Menu>
           ))}
-          {selectedTypes.length < 2 && ( // keep to 2 plots for now
+          {selectedNames.length < 2 && ( // keep to 2 plots for now
             <button
               onClick={addPlot}
               className="bg-orange outline outline-1 outline-dark-orange drop-shadow-xl text-white font-medium px-4 py-2 m-3 rounded-xl hover:bg-dark-orange"
@@ -362,9 +352,9 @@ export default function DataLineGraph() {
               Add Another Plot
             </button>
           )}
-          {selectedTypes.length > 1 && (
+          {selectedNames.length > 1 && (
             <button
-              onClick={() => setSelectedTypes(selectedTypes.slice(0, -1))}
+              onClick={() => setSelectedNames(selectedNames.slice(0, -1))}
               className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 m-3 rounded-xl hover:bg-dark-teal"
             >
               Remove Last Plot
