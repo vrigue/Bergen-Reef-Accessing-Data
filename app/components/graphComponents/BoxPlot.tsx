@@ -11,7 +11,7 @@ interface DataPoint {
   id: number;
   datetime: string;
   name: string;
-  type: string;
+  unit: string;
   value: number;
 }
 
@@ -33,25 +33,16 @@ const units = {
   Calcium: "ppm",
 };
 
-const typeMapping: { [key: string]: string } = {
-  Temperature: "Tmp",
-  Salinity: "Salt",
-  ORP: "ORP",
-  Alkalinity: "Alkx4",
-  Calcium: "Cax4",
-  pH: "pH",
-};
-
 export default function BoxPlot() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [data, setData] = useState<DataPoint[]>([]);
-  const [selectedType, setSelectedType] = useState<string>("Salinity");
+  const [selectedName, setSelectedName] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  const availableTypes = [
+  const availableNames = [
     "Salinity",
     "ORP",
     "Temperature",
@@ -94,7 +85,7 @@ export default function BoxPlot() {
       startDate.setHours(startDate.getHours() - 5);
       endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&types=${typeMapping[selectedType]}`
+        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -143,7 +134,7 @@ export default function BoxPlot() {
   };
 
   const drawChart = () => {
-    if (!selectedType) return;
+    if (!selectedName) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -325,7 +316,7 @@ export default function BoxPlot() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(`${selectedType} (${units[selectedType]})`);
+      .text(`${selectedName} (${units[selectedName]})`);
   };
 
   return (
@@ -344,18 +335,18 @@ export default function BoxPlot() {
           <Menu as="div" className="relative inline-block text-left m-3">
             <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
               <span style={{ color: colorScale(0) }}>
-                {selectedType || "Select Type"}
+                {selectedName || "Select Name"}
               </span>
               <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
             </MenuButton>
             <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
-              {availableTypes.map((type) => (
-                <MenuItem key={type}>
+              {availableNames.map((name) => (
+                <MenuItem key={name}>
                   <button
-                    onClick={() => setSelectedType(type)}
+                    onClick={() => setSelectedName(name)}
                     className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
-                    {type}
+                    {name}
                   </button>
                 </MenuItem>
               ))}
