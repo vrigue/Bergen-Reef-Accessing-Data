@@ -17,12 +17,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
       style={{ position: "relative", zIndex: 10 }}
     >
       <a href="/">
-        <div className="text-3xl">
+        <div className="flex items-left text-2xl">
           <img
             src="/images/coral-reef-logo.png"
             style={{ width: "5%", height: "auto" }}
             alt="Coral Reef Logo"
           />
+          <h1 className = "text-dark-orange font-semibold pl-3 pt-1">Coral Reeve</h1>
         </div>
       </a>
       <div className="flex items-right justify-between">
@@ -44,7 +45,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   {({ selected }) => (
                     <button
                       className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
+                        "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative
                           ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                           : selected
@@ -60,7 +61,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
               <Menu as="div" className="relative inline-block text-left">
                 <MenuButton
                   className={clsx(
-                    "tab-item px-6 py-2 transition flex items-center justify-between",
+                    "tab-item px-6 py-2 rounded-xl transition flex items-center justify-between",
                     isDefaultIndexNegative
                       ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                       : defaultIndex === 1
@@ -68,7 +69,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                       : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                   )}
                 >
-                  <span>Data</span>
+                  <span>Graphs</span>
                   <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
                 </MenuButton>
                 <MenuItems
@@ -110,7 +111,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
                   {({ selected }) => (
                     <button
                       className={clsx(
-                        "tab-item px-6 py-2 rounded-full transition",
+                        "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative
                           ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
                           : selected
