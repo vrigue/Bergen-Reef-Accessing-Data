@@ -354,106 +354,8 @@ const handleSaveNewRow = async (params) => {
 
   return (
     <div className="flex gap-8 mt-6">
-      {/* Left Panel */}
-      <div
-        className="flex flex-col bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md"
-        style={{
-          width: "31%",
-          position: "fixed",
-          top: "12.8%",
-          height: "79%",
-          overflowY: "auto",
-          margin: "23px",
-        }}
-      >
-        <div className="flex flex-col h-full justify-start">
-          <div className="bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
-            <h2 className="flex justify-center text-xl text-white font-semibold">Actions</h2>
-          </div>
-          <div className="flex flex-col gap-4 p-6">
-            <button
-              onClick={() => gridApiRef.current?.setFilterModel(null)}
-              className="bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-medium px-4 py-2 rounded-xl hover:bg-medium-gray"
-            >
-              Clear Filters
-            </button>
-
-            <button
-              onClick={fetchData}
-              className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-teal"
-              style={{
-                padding: "8px 16px",
-                fontSize: "16px",
-                color: "white",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
-              Refresh
-            </button>
-            <button
-              onClick={handleGraphClick}
-              className="bg-orange text-white outline outline-1 outline-dark-orange drop-shadow-xl font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-orange"
-              style={{
-              padding: "8px 16px",
-              fontSize: "16px",
-              color: "white",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              }}
-              // onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#EA580C")}
-              // onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FFA500")}
-            >
-              <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
-              Graphs
-            </button>
-            {isAdmin && (
-            <div className="w-full flex flex-col gap-2">
-              <button
-                onClick={() => setIsEditing((prev) => !prev)}
-                className="bg-neutral-600 text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-neutral-700"
-              >
-                {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
-              </button>
-
-              {isEditing && (
-                <div className="w-full flex flex-col gap-3 bg-light-teal p-4 rounded-lg mt-2">
-                  <div className="w-1/3 bg-teal text-white font-semibold text-center p-1 rounded-xl">Edit Controls</div>
-                  <button
-                  onClick={handleCreateRow}
-                  className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-orange font-semibold px-4 py-2 rounded-xl shadow hover:bg-light-orange"
-                  >Create
-                  </button> 
-
-                  <button
-                  onClick={handleDeleteSelectedRows}
-                  className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-red-200"
-                  disabled={selectedRows.length === 0}
-                  >Delete Selected
-                  </button> 
-
-                  <button
-                  onClick={saveChanges}
-                  className="bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-200"
-                  disabled={Object.keys(editedRows).length === 0}
-                  >Save Changes
-                  </button> 
-                </div>
-              )}
-            </div>
-            )}
-          </div>
-        </div>
-      </div>
-      
-
       {/* Right Panel */}
-      <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginLeft: "35%"}}>
+      <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginRight: "35%" }}>
         <div className="ag-theme-quartz" style={{ height: "400px" }}>
           <AgGridReact
             rowData={rowData}
@@ -560,7 +462,109 @@ const handleSaveNewRow = async (params) => {
           />
         </div>
       </div>
-      <br></br>
+
+      {/* Left Panel */}
+      <div
+        className="flex flex-col bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md"
+        style={{
+          width: "31%",
+          position: "fixed",
+          top: "8%",
+          height: "79%",
+          overflowY: "auto",
+          margin: "23px",
+          right: "23px",
+        }}
+      >
+        <div className="flex flex-col h-full justify-start">
+          <div className="bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
+            <h2 className="flex justify-center text-xl text-white font-semibold">Actions</h2>
+          </div>
+          <div className="flex flex-col gap-4 p-6">
+            <div className="bg-light-teal p-4 rounded-lg">
+              <div className="text-sm text-neutral-700">
+                <p className="mb-2">To reorder a column, click on the column name.</p>
+                <p>To filter, click on the 3 horizontal lines icon for each column.</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => gridApiRef.current?.setFilterModel(null)}
+              className="bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-medium px-4 py-2 rounded-xl hover:bg-medium-gray"
+            >
+              Clear Filters
+            </button>
+
+            <button
+              onClick={fetchData}
+              className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-teal"
+              style={{
+                padding: "8px 16px",
+                fontSize: "16px",
+                color: "white",
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              Refresh
+            </button>
+            <button
+              onClick={handleGraphClick}
+              className="bg-orange text-white outline outline-1 outline-dark-orange drop-shadow-xl font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-orange"
+              style={{
+              padding: "8px 16px",
+              fontSize: "16px",
+              color: "white",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              }}
+            >
+              <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              Graphs
+            </button>
+            {isAdmin && (
+            <div className="w-full flex flex-col gap-2">
+              <button
+                onClick={() => setIsEditing((prev) => !prev)}
+                className="bg-neutral-600 text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-neutral-700"
+              >
+                {isEditing ? "Exit Edit Mode" : "Enter Edit Mode"}
+              </button>
+
+              {isEditing && (
+                <div className="w-full flex flex-col gap-3 bg-light-teal p-4 rounded-lg mt-2">
+                  <div className="w-1/3 bg-teal text-white font-semibold text-center p-1 rounded-xl">Edit Controls</div>
+                  <button
+                  onClick={handleCreateRow}
+                  className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-orange font-semibold px-4 py-2 rounded-xl shadow hover:bg-light-orange"
+                  >Create
+                  </button> 
+
+                  <button
+                  onClick={handleDeleteSelectedRows}
+                  className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-red-200"
+                  disabled={selectedRows.length === 0}
+                  >Delete Selected
+                  </button> 
+
+                  <button
+                  onClick={saveChanges}
+                  className="bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-200"
+                  disabled={Object.keys(editedRows).length === 0}
+                  >Save Changes
+                  </button> 
+                </div>
+              )}
+            </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       <Dialog
         isOpen={dialog.isOpen}
