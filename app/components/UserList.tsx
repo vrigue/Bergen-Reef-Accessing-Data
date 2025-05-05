@@ -81,9 +81,10 @@ const UserList = () => {
     //<div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
     <div className="bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-xl font-bold mb-4">Users</h2>
+      <div className="h-72 overflow-y-auto pr-2">
       <ul>
         {users.map((user) => (
-          <li key={user.user_id} className="mb-2">
+          <li key={user.user_id} className="flex justify-between items-center px-2 py-2 bg-white rounded shadow-sm">
             {user.email}
             <select
               value={["coralreeves760@gmail.com", "anaghaajesh2010@gmail.com","vrielleguevarra@gmail.com","wukimberley98@gmail.com"].includes(user.email) ? "admin" : "user"}
@@ -95,7 +96,7 @@ const UserList = () => {
                 }
               }}
               //onClick={() => handleAssignAdmin(user.user_id)}
-              className="ml-10 bg-teal text-white px-2 py-1 rounded"
+              className="ml-10 bg-teal text-white px-2 py-1 rounded "
               disabled={loading}
             >
               <option value="admin">Administrator</option>
@@ -105,6 +106,7 @@ const UserList = () => {
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 };
