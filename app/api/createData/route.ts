@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         const data = await request.json();
 
         // Check if all the necessary fields have been provided
-        if (!data.name || !data.type || !data.value) {
+        if (!data.name && !data.unit && !data.value) {
             return NextResponse.json({
                 status: 400,
                 message: 'Missing required field(s).',

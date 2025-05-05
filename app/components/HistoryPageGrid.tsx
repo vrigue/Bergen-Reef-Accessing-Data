@@ -20,7 +20,9 @@ import {
   RowSelectionModule,
   ValidationModule,
   TextEditorModule,
-  SelectEditorModule
+  SelectEditorModule,
+  IFilterOptionDef,
+  ITextFilterParams,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -72,6 +74,30 @@ export default function HistoryPageGrid() {
   const [editedRows, setEditedRows] = useState<Record<number, any>>({});
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
+  const nameFilterOptions: IFilterOptionDef[] = (dropdownValues.name).map((name) => ({
+    displayKey: `is_${name}`,
+    displayName: `${name}`,
+    predicate: (_, cellValue) => cellValue === name,
+    numberOfInputs: 0,
+  }));
+  
+  const nameFilterParams: ITextFilterParams = {
+    defaultOption: "equals",
+    filterOptions: [...nameFilterOptions,],
+  };
+
+  const unitFilterOptions: IFilterOptionDef[] = (dropdownValues.unit).map((unit) => ({
+    displayKey: `is_${unit}`,
+    displayName: `${unit}`,
+    predicate: (_, cellValue) => cellValue === unit,
+    numberOfInputs: 0,
+  }));
+  
+  const unitFilterParams: ITextFilterParams = {
+    defaultOption: "equals",
+    filterOptions: [...unitFilterOptions,],
+  };
+
   const [dialog, setDialog] = useState({
     isOpen: false,
     title: "",
@@ -96,15 +122,13 @@ export default function HistoryPageGrid() {
   const handleCellNameChanged = (params: any) => {
     if (params.colDef.field === "name") {
       const selectedName = params.newValue;
-      const correspondingType = dropdownMap[selectedName] || "";
-  
-      // Only update if the type is different
-      if (params.data.type !== correspondingType) {
-        params.node.setDataValue("unit", correspondingType);
+      const correspondingUnit = dropdownMap[selectedName] || "";
+
+      if (params.data.unit !== correspondingUnit) {
+        params.node.setDataValue("unit", correspondingUnit);
       }
     }
   };
-  
 
   const onSelectionChanged = () => {
     const selectedRows = gridApiRef.current?.getSelectedRows();
@@ -211,7 +235,7 @@ const handleCreateRow = async () => {
     id: 1, // Temporary ID, will be replaced by DB
     datetime: date,
     name: "",
-    type: "",
+    unit: "",
     value: 0,
     isNewRow: true, // Add isNewRow attribute
   };
@@ -330,16 +354,126 @@ const handleSaveNewRow = async (params) => {
 
   return (
     <div className="flex gap-8 mt-6">
+      {/* Right Panel */}
+      <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginRight: "35%" }}>
+        <div className="ag-theme-quartz" style={{ height: "400px" }}>
+          <AgGridReact
+            rowData={rowData}
+            rowSelection={"multiple" as any}
+            onSelectionChanged={onSelectionChanged}
+            columnDefs={useMemo(
+              () => {
+                const gridColumns = [
+                  {
+                    field: "datetime",
+                    filter: "agDateColumnFilter",
+                    minWidth: 225,
+                    filterParams: {
+                      defaultOption: "inRange",
+                      inRangeInclusive: true,
+                      comparator: timestampFilter,
+                    },
+                  },
+                  {
+                    field: "name",
+                    filterParams: nameFilterParams, 
+                    onCellValueChanged: handleCellNameChanged,
+                    cellEditor: "agSelectCellEditor",
+                    cellEditorParams: {
+                      "values": dropdownValues.name,
+                      valueListGap: 10
+                    },
+                    editable: (params) => params.data?.isNewRow && isEditing,
+                  },
+                  {
+                    field: "unit",
+                    filterParams: unitFilterParams, 
+                    editable: (params) => params.data?.isNewRow && isEditing,
+                  },
+                  {
+                    field: "value",
+                    filter: "agNumberColumnFilter",
+                    editable: (params) => params.data?.isNewRow || isCellEditable,
+                    onCellValueChanged: handleCellValueChanged,
+                    valueParser: (data) => {
+                      const newValue = parseFloat(data.newValue);
+                      return newValue;
+                    }
+                  }
+                ];
+
+                if (isEditing) {
+                  gridColumns.push({
+                    headerName: "Actions",
+                    field: "delete",
+                    cellRenderer: (params) => {
+                      if (params.data.isNewRow) {
+                        return (
+                          <div className="flex items-center justify-center h-full">
+                            <button
+                              onClick={() => handleSaveNewRow(params)}
+                              className="flex items-center justify-center bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 text-xs w-14 h-6 rounded-lg shadow hover:bg-green-200"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="flex items-center justify-center h-full">
+                            <button
+                              onClick={() => handleDeleteRow(params)}
+                              className="flex items-center justify-center bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold text-xs w-14 h-6 rounded-lg shadow hover:bg-red-200"
+                            >
+                              Delete
+                          </button>
+                          </div>
+                      );
+                    },
+                    width: 80,
+                  } as any);
+                }
+
+                return gridColumns;
+              },
+              [isEditing]
+            )}
+            defaultColDef={{
+              flex: 1,
+              minWidth: 100,
+              resizable: true,
+              sortable: true,
+              filter: true,
+              filterParams: {
+                buttons: ["apply", "clear", "reset"],
+              },
+            }}
+            domLayout="autoHeight"
+            pagination={true}
+            paginationPageSize={10}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            onGridReady={(params) => {
+              gridApiRef.current = params.api;
+            }}
+            components={{
+              agDateInput: DTPicker,
+            }}
+          />
+        </div>
+      </div>
+
       {/* Left Panel */}
       <div
         className="flex flex-col bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md"
         style={{
           width: "31%",
           position: "fixed",
-          top: "12.8%",
+          top: "8%",
           height: "79%",
           overflowY: "auto",
           margin: "23px",
+          right: "23px",
         }}
       >
         <div className="flex flex-col h-full justify-start">
@@ -347,6 +481,13 @@ const handleSaveNewRow = async (params) => {
             <h2 className="flex justify-center text-xl text-white font-semibold">Actions</h2>
           </div>
           <div className="flex flex-col gap-4 p-6">
+            <div className="bg-light-teal p-4 rounded-lg">
+              <div className="text-sm text-neutral-700">
+                <p className="mb-2">To reorder a column, click on the column name.</p>
+                <p>To filter, click on the 3 horizontal lines icon for each column.</p>
+              </div>
+            </div>
+
             <button
               onClick={() => gridApiRef.current?.setFilterModel(null)}
               className="bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-medium px-4 py-2 rounded-xl hover:bg-medium-gray"
@@ -382,8 +523,6 @@ const handleSaveNewRow = async (params) => {
               alignItems: "center",
               justifyContent: "center",
               }}
-              // onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#EA580C")}
-              // onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#FFA500")}
             >
               <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
               Graphs
@@ -426,113 +565,6 @@ const handleSaveNewRow = async (params) => {
           </div>
         </div>
       </div>
-      
-
-      {/* Right Panel */}
-      <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginLeft: "35%"}}>
-        <div className="ag-theme-quartz" style={{ height: "400px" }}>
-          <AgGridReact
-            rowData={rowData}
-            rowSelection={"multiple" as any}
-            onSelectionChanged={onSelectionChanged}
-            columnDefs={useMemo(
-              () => {
-                const gridColumns = [
-                  {
-                    field: "datetime",
-                    filter: "agDateColumnFilter",
-                    minWidth: 225,
-                    filterParams: {
-                      defaultOption: "inRange",
-                      inRangeInclusive: true,
-                      comparator: timestampFilter,
-                    },
-                  },
-                  {
-                    field: "name",
-                    filter: "agTextColumnFilter",    
-                    onCellValueChanged: handleCellNameChanged,
-                    cellEditor: "agSelectCellEditor",
-                    cellEditorParams: {
-                      "values": dropdownValues.name,
-                      valueListGap: 10
-                    },
-                    editable: (params) => params.data?.isNewRow && isEditing,
-                  },
-                  {
-                    field: "unit",
-                    filter: "agTextColumnFilter",
-                    editable: (params) => params.data?.isNewRow && isEditing,
-                  },
-                  {
-                    field: "value",
-                    filter: "agNumberColumnFilter",
-                    editable: (params) => params.data?.isNewRow || isCellEditable,
-                    onCellValueChanged: handleCellValueChanged,
-                    valueParser: (data) => {
-                      const newValue = parseFloat(data.newValue);
-                      return newValue;
-                    }
-                  }
-                ];
-
-                if (isEditing) {
-                  gridColumns.push({
-                    headerName: "Actions",
-                    field: "delete",
-                    cellRenderer: (params) => {
-                      if (params.data.isNewRow) {
-                        return (
-                          <button
-                            onClick={() => handleSaveNewRow(params)}
-                            className="bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 text-xs px-1 py-0.5 w-14 h-6 rounded-lg shadow hover:bg-green-200"
-                          >
-                            Save
-                          </button>
-                        );
-                      }
-
-                      return (
-                        <button
-                          onClick={() => handleDeleteRow(params)}
-                          className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold text-xs px-1 py-0.5 w-14 h-6 rounded-lg shadow hover:bg-red-200"
-                        >
-                          Delete
-                        </button>
-                      );
-                    },
-                    width: 80,
-                  } as any);
-                }
-
-                return gridColumns;
-              },
-              [isEditing]
-            )}
-            defaultColDef={{
-              flex: 1,
-              minWidth: 100,
-              resizable: true,
-              sortable: true,
-              filter: true,
-              filterParams: {
-                buttons: ["apply", "clear", "reset"],
-              },
-            }}
-            domLayout="autoHeight"
-            pagination={true}
-            paginationPageSize={10}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            onGridReady={(params) => {
-              gridApiRef.current = params.api;
-            }}
-            components={{
-              agDateInput: DTPicker,
-            }}
-          />
-        </div>
-      </div>
-      <br></br>
 
       <Dialog
         isOpen={dialog.isOpen}
