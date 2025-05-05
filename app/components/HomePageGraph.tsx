@@ -11,6 +11,9 @@ const infoContent = {
   ORP: 'ORP provides reef-keepers with a way to monitor water quality and stability, with the most drastic changes being seen when decaying organic matter is present in the tank. This level is maintained through additional filtration such as UV sterilizers or activated carbon.',
   Temperature: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae from their tissue, causing them to turn white and die quickly.',
   Salinity: 'Salt provides the necessary minerals to maintain the environment in a reef tank. Keeping a desirable salinity level and selecting a high-quality reef salt mix provides an opportunity to replicate seawater conditions.',
+  Nitrate: 'Nitrate results in a reef tank from the breakdown of organic matter. It is an important nutrient due to its use by zooxanthellae, a microscopic algae housed in coral polyps which has a symbiotic relationship with coral. Too much nitrate can result in algae blooms and cause corals to lose their vibrant colors.',
+  Nitrite: 'Nitrite is harmful to many of the organisms in a reef tank and needs to be managed so that its levels stay almost undetectable. This is done by establishing beneficial bacteria in the tank through a dark cycle before any animals are placed in it.',
+  Phosphate: 'Phosphate presence is necessary for coral tissue growth, but too much can actually reduce growth and bring algae to the tank which will compete with the corals for nutrients. Regular water changes and proper filtration allow reef keepers to regulate these levels.',
 };
 
 
@@ -87,6 +90,9 @@ export default function HomePageGraph() {
             <option value="ORP">Oxidation Reduction Potential (ORP)</option>
             <option value="Alkalinity">Alkalinity</option>
             <option value="Calcium">Calcium</option>
+            <option value="Nitrate">Nitrate</option>
+            <option value="Phosphate">Phosphate</option>
+            <option value="Nitrite">Nitrite</option>
       </select>
 
       <div className="bg-white rounded-lg p-5 pl-1">
