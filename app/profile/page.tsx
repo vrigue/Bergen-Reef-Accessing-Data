@@ -56,12 +56,14 @@ export default function Page() {
         <div>
         </div>
         <div className="flex flex-col space-y-4">
-          <a
+          {!user && (
+            <a
             href="/api/auth/login"
             className="bg-black text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition text-center"
           >
              Login
           </a>
+          )}
           <a
             href="/api/auth/logout"
             className="bg-black text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
