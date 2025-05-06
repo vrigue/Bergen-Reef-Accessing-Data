@@ -39,8 +39,8 @@ export default function Page() {
       <br></br>
       <br></br>
 
-      {/* top orange box*/}
-      <div className="bg-light-orange p-6 rounded-lg shadow-lg flex justify-between items-center w-1/2 mx-auto">
+      {/* top white box*/}
+      <div className="bg-white rounded shadow-sm p-6 rounded-lg flex justify-between items-center w-1/2 mx-auto">
         
         {user ? (
           <div>
@@ -59,14 +59,14 @@ export default function Page() {
           {!user && (
             <a
             href="/api/auth/login"
-            className="bg-black text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition text-center"
+            className="bg-teal text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition text-center"
           >
              Login
           </a>
           )}
           <a
             href="/api/auth/logout"
-            className="bg-black text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
+            className="bg-teal text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
           >
             Logout
           </a>

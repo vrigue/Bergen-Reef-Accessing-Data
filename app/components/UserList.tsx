@@ -80,7 +80,7 @@ const UserList = () => {
   return (
     //<div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
     <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Users</h2>
+      <h2 className="text-xl font-bold mb-4 text-orange">Users</h2>
       <div className="h-72 overflow-y-auto pr-2">
       <ul>
         {users.map((user) => (
