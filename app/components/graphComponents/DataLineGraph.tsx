@@ -110,7 +110,7 @@ export default function DataLineGraph() {
 
     // Calculate margins based on whether we have one or two series
     const rightMargin = selectedNames.length > 1 ? 90 : 60;
-    const margin = { top: 30, right: rightMargin, bottom: 120, left: 90 };
+    const margin = { top: 20, right: rightMargin, bottom: 60, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -304,9 +304,9 @@ export default function DataLineGraph() {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 gap-7 pt-5">
+    <div className="grid grid-cols-4 gap-7 h-full p-5">
       <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
-        <div className="w-[calc(100%-20px)] h-full">
+        <div className="w-full h-full">
           <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
         </div>
       </div>

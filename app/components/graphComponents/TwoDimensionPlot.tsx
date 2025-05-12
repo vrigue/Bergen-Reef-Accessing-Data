@@ -144,7 +144,7 @@ export default function DataLineGraph() {
     svg.selectAll("*").remove();
 
     // Calculate margins based on whether we have one or two series
-    const margin = { top: 30, right: 90, bottom: 120, left: 90 };
+    const margin = { top: 20, right: 90, bottom: 60, left: 90 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -166,13 +166,13 @@ export default function DataLineGraph() {
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "18px");
+      .style("font-size", "14px");
 
     // Y axis
     g.append("g")
       .call(d3.axisLeft(y).tickFormat(d3.format(".2f")))
       .selectAll("text")
-      .style("font-size", "18px");
+      .style("font-size", "14px");
 
     // Add tooltip div
     const tooltip = d3
@@ -218,9 +218,9 @@ export default function DataLineGraph() {
     g.append("text")
       .attr("fill", "black")
       .attr("x", width / 2)
-      .attr("y", height + 45)
+      .attr("y", height + 35)
       .attr("text-anchor", "middle")
-      .style("font-size", "24px")
+      .style("font-size", "18px")
       .style("font-weight", "bold")
       .text(`${selectedNames[0]} (${units[selectedNames[0]]})`);
 
@@ -231,7 +231,7 @@ export default function DataLineGraph() {
       .attr("x", -height / 2)
       .attr("y", -margin.left + 20)
       .attr("text-anchor", "middle")
-      .style("font-size", "24px")
+      .style("font-size", "18px")
       .style("font-weight", "bold")
       .text(`${selectedNames[1]} (${units[selectedNames[1]]})`);
   };
@@ -255,9 +255,9 @@ export default function DataLineGraph() {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 gap-7 pt-5">
+    <div className="grid grid-cols-4 gap-7 h-full p-5">
       <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
-        <div className="w-[calc(100%-20px)] h-full">
+        <div className="w-full h-full">
           <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
         </div>
       </div>

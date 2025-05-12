@@ -5,11 +5,12 @@ import DataLineGraph from "../../components/graphComponents/DataLineGraph";
 import NavigationBar from "../../components/NavigationBar";
 
 export default function Page() {
-
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <NavigationBar defaultIndex={1} />
+      <div className="flex-1">
       <DataLineGraph />
+      </div>
     </div>
   );
 }
