@@ -23,6 +23,8 @@ import {
   SelectEditorModule,
   IFilterOptionDef,
   ITextFilterParams,
+  SortIndicatorComp,
+  ColumnApiModule
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -42,7 +44,8 @@ ModuleRegistry.registerModules([
   TextFilterModule,
   CellStyleModule,
   ValidationModule,
-  SelectEditorModule
+  SelectEditorModule,
+  ColumnApiModule
 ]);
 
 import Dialog from "./HistoryPageDialog";
@@ -330,12 +333,11 @@ return (
                     suppressMenu: true,
                     pinned: "left" as "left",
                     editable: false,
-                    sortable: false,
                     filter: false,
                   },                  
                   {
                     field: "datetime",
-                    sort: "desc" as "asc" | "desc",
+                    sortable: true,
                     filter: "agDateColumnFilter",
                     minWidth: 225,
                     filterParams: {
@@ -384,7 +386,7 @@ return (
               filter: true,
               filterParams: {
                 buttons: ["apply", "clear", "reset"],
-              },
+              }
             }}
             domLayout="autoHeight"
             pagination={true}
@@ -392,6 +394,14 @@ return (
             paginationPageSizeSelector={[10, 20, 50, 100]}
             onGridReady={(params) => {
               gridApiRef.current = params.api;
+              params.api.applyColumnState({
+                state: [
+                    {
+                        colId: "datetime",
+                        sort: "desc"
+                    }
+                ]
+            });
             }}
             components={{
               agDateInput: DTPicker,
