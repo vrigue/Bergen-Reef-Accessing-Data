@@ -61,29 +61,46 @@ const UserList = () => {
 
       if (!res.ok) throw new Error('Failed to remove admin role');
 
-      // Update state to remove "admin" role
-      //setUsers((prevUsers) =>
-        //prevUsers.map((user) =>
-          //user.user_id === userId ? { ...user, roles: [] } : user
-        //)
-      //);
-
       alert('Admin role removed successfully!');
     } catch (err) {
       console.error('Failed to remove admin role:', err);
-      alert('Failed to remove admin role.');
+      alert('Failed to remove admin role!');
     } finally {
       setLoading(false);
     }
   };
 
+  const removeUser = async (userId: string) => {
+    try {
+      //setLoading(true);
+      const res = await fetch('/api/removeUser', {
+        method: 'POST',
+        body: JSON.stringify({ userId }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      alert('YOO U CLICKED HTE BUTTONNN')
+    } catch (err) {
+      console.error('Failed to delete user :(', err);
+      alert('Failed to delete user!')
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     //<div className="bg-white rounded-lg shadow-lg p-6" style={{height:370}}>
     <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Users</h2>
+      <h2 className="text-xl font-bold mb-4 text-orange">Users</h2>
+      <div className="h-72 overflow-y-auto pr-2">
       <ul>
-        {users.map((user) => (
-          <li key={user.user_id} className="mb-2">
+        {users.map((user) => (          
+          <li key={user.user_id} className="flex justify-between items-center px-2 py-2 bg-white rounded shadow-sm">
+            <button onClick={() => removeUser(user.user_id)}>
+              <img src="/images/delete-button.png" style={{width: "15%", height: "15%"}}></img>
+            </button>
             {user.email}
             <select
               value={["coralreeves760@gmail.com", "anaghaajesh2010@gmail.com","vrielleguevarra@gmail.com","wukimberley98@gmail.com"].includes(user.email) ? "admin" : "user"}
@@ -95,7 +112,7 @@ const UserList = () => {
                 }
               }}
               //onClick={() => handleAssignAdmin(user.user_id)}
-              className="ml-10 bg-teal text-white px-2 py-1 rounded"
+              className="ml-10 bg-teal text-white px-2 py-1 rounded "
               disabled={loading}
             >
               <option value="admin">Administrator</option>
@@ -105,6 +122,7 @@ const UserList = () => {
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 };

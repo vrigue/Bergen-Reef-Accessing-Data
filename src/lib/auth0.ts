@@ -81,4 +81,23 @@ const getAccessToken = async () => {
     if (!response.ok) throw new Error('Failed to take admin role');
 
   };
+
+  export const deleteUser = async (userId : string) => {
+    const token = await getAccessToken();
+    
+    const DELETED_ROLE_ID = 'rol_I3LgSeihyKIw1iAf';
+
+    const response = await fetch(`${process.env.AUTH0_MGMT_AUDIENCE}users/${userId}/roles`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        roles: [DELETED_ROLE_ID]
+      })
+    });
+
+    if (!response.ok) throw new Error('u did not delete this user :(');
+  }
   
