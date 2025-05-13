@@ -4,7 +4,7 @@ import "./globals.css"; // These styles apply to every route in the application
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 
 export const metadata = {
-  title: "Coral Reeve",
+  title: "Bergen Reef Accessing Data",
   description: "Data Visualization Web Application for the BCA Coral Reef Research Lab ",
 };
 
