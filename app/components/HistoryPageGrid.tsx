@@ -24,7 +24,7 @@ import {
   IFilterOptionDef,
   ITextFilterParams,
   SortIndicatorComp,
-  ColumnApiModule
+  ColumnApiModule,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -45,7 +45,7 @@ ModuleRegistry.registerModules([
   CellStyleModule,
   ValidationModule,
   SelectEditorModule,
-  ColumnApiModule
+  ColumnApiModule,
 ]);
 
 import Dialog from "./HistoryPageDialog";

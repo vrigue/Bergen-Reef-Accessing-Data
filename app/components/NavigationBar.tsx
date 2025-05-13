@@ -23,7 +23,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
             style={{ width: "5%", height: "auto" }}
             alt="Coral Reef Logo"
           />
-          <h1 className = "text-dark-orange font-semibold pl-3 pt-1">Coral Reeve</h1>
+          <h1 className = "text-dark-orange font-semibold pl-3 pt-1">Bergen Reef Accessing Data</h1>
         </div>
       </a>
       <div className="flex items-right justify-between">
