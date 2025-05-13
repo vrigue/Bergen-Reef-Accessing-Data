@@ -135,51 +135,6 @@ export default function HistoryPageGrid() {
     setSelectedRows(selectedRows || []);
   };
 
-  const handleDeleteRow = async (params) => {
-    setDialog({
-      isOpen: true,
-      title: "Confirm Delete",
-      message: "Are you sure you want to delete this entry?",
-      type: "warning",
-      onConfirm: () => deleteRow(params)
-    });
-  }
-
-  const deleteRow = async (params) => {
-    const rowId = params.data.id;
-    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-
-    try {
-      const response = await fetch(`/api/deleteData`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: rowId, date: date}),
-      });
-  
-      if (!response.ok) throw new Error("Failed to delete row");
-  
-      setRowData((prev) => prev.filter((row) => row.id !== rowId));
-
-      setDialog({
-        isOpen: true,
-        title: "Success",
-        message: "The selected entry has been deleted.",
-        type: "success",
-        onConfirm: null
-      });
-    } 
-    catch (error) {
-      console.error("Error deleting row: ", error);
-      setDialog({
-        isOpen: true,
-        title: "Error",
-        message: "There was an error in deleting the selected entry.",
-        type: "error",
-        onConfirm: null
-      });
-    }
-  };
-
   const handleDeleteSelectedRows = () => {
     setDialog({
       isOpen: true,
@@ -243,118 +198,121 @@ const handleCreateRow = async () => {
   setRowData((prev) => {
     return [newRow, ...prev.map((row) => ({ ...row }))];
   });
+
+  setTimeout(() => {
+    gridApiRef.current?.startEditingCell({
+      rowIndex: 0,
+      colKey: "name",
+    });
+  }, 0);
 };
-
   
-const handleSaveNewRow = async (params) => {
-  const newRowData = { ...params.data };
-
-  if (!newRowData || !newRowData.isNewRow) {
-    return;
-  }
-
-  // Remove isNewRow attribute
-  newRowData.isNewRow = false;
-
+const saveChanges = async () => {
   try {
-    const response = await fetch("/api/createData", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newRowData),
-    });
+    const editedRowList = Object.values(editedRows);
+    var error = null;
 
-    if (!response.ok) {
-      throw new Error("Failed to save row");
-    }
+    if (Object.keys(editedRows).length === 1) {
+      const newRow = rowData.find((row) => row.id === 1);
+      const newRowData = { ...newRow };
 
-    const result = await response.json();
-
-    setRowData((prev) =>
-      prev.map((row) => (row.id === 1 ? { ...row, id: result.id } : row))
-    );
-
-    setDialog({
-      isOpen: true,
-      title: "Success",
-      message: "The new entry has been created.",
-      type: "success",
-      onConfirm: null
-    });
-    fetchData();
-  } 
-  catch (error) {
-    console.error("Error saving row: ", error);
-    setDialog({
-      isOpen: true,
-      title: "Error",
-      message: "There was an error in creating the new entry.",
-      type: "error",
-      onConfirm: null
-    });
-  }
-};
-  
-  
-  const saveChanges = async () => {
-    if (Object.keys(editedRows).length === 0) return;
-    try {
-      const response = await fetch("/api/updateData", {
-        method: "PUT",
+      const createResponse = await fetch("/api/createData", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ updates: Object.values(editedRows) }),
+        body: JSON.stringify(newRowData),
       });
 
-      if (!response.ok) throw new Error("Failed to update database");
+      if (!createResponse.ok) {
+        error = new Error("Failed to create new row");
+      }
+      else {
+        const result = await createResponse.json();
 
+        setRowData((prev) =>
+          prev.map((row) =>
+            row.id === 1 ? { ...row, id: result.id } : row
+          )
+        );
+      }
+    }
+    else {
+      const rowsToUpdate = editedRowList.filter((row) => !row.isNewRow);
+
+      if (rowsToUpdate.length > 0) {
+        const response = await fetch("/api/updateData", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ updates: Object.values(rowsToUpdate) }),
+        });
+
+        if (!response.ok) {
+          error = new Error("Failed to update database");
+        }
+      }
+    }
+
+    if (!error) {
       setDialog({
-      isOpen: true,
-      title: "Success",
-      message: "All changes have been saved.",
-      type: "success",
-      onConfirm: null
-    });
-      setEditedRows({});
-      fetchData();
-    } 
-    catch (error) {
+        isOpen: true,
+        title: "Success",
+        message: "All changes have been saved.",
+        type: "success",
+        onConfirm: null
+      });
+    }
+    else {
       console.error("Error saving changes: ", error);
       setDialog({
+        isOpen: true,
+        title: "Error",
+        message: "There was an error in saving the changes.",
+        type: "error",
+        onConfirm: null
+      });
+    }
+
+    setEditedRows({});
+    fetchData();
+  }
+  catch (error) {
+    console.error("Error saving changes: ", error);
+    setDialog({
       isOpen: true,
       title: "Error",
       message: "There was an error in saving the changes.",
       type: "error",
       onConfirm: null
     });
-    }
-  };
-
-  async function fetchData() {
-    const response = await fetch("/api/data");
-    const result = await response.json();
-    setData(result);
-    setRowData(
-      result.map((item) => ({
-        ...item,
-        datetime: formatInTimeZone(
-          item.datetime,
-          "UTC",
-          "yyyy-MM-dd HH:mm:ss"
-        ),
-      }))
-    );
   }
+};
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+async function fetchData() {
+  const response = await fetch("/api/data");
+  const result = await response.json();
+  setData(result);
+  setRowData(
+    result.map((item) => ({
+      ...item,
+      datetime: formatInTimeZone(
+        item.datetime,
+        "UTC",
+        "yyyy-MM-dd HH:mm:ss"
+      ),
+    }))
+  );
+}
 
-  const handleGraphClick = () => {
-    window.location.href = "/data";
-  };
+useEffect(() => {
+  fetchData();
+}, []);
 
-  return (
+const handleGraphClick = () => {
+  window.location.href = "/data";
+};
+
+return (
     <div className="flex gap-8 mt-6">
-      {/* Right Panel */}
+      {/* Left Panel */}
       <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginRight: "35%" }}>
         <div className="ag-theme-quartz" style={{ height: "400px" }}>
           <AgGridReact
@@ -365,7 +323,19 @@ const handleSaveNewRow = async (params) => {
               () => {
                 const gridColumns = [
                   {
+                    headerName: "",
+                    checkboxSelection: true,
+                    headerCheckboxSelection: true,
+                    width: 40,
+                    suppressMenu: true,
+                    pinned: "left" as "left",
+                    editable: false,
+                    sortable: false,
+                    filter: false,
+                  },                  
+                  {
                     field: "datetime",
+                    sort: "desc" as "asc" | "desc",
                     filter: "agDateColumnFilter",
                     minWidth: 225,
                     filterParams: {
@@ -402,39 +372,6 @@ const handleSaveNewRow = async (params) => {
                   }
                 ];
 
-                if (isEditing) {
-                  gridColumns.push({
-                    headerName: "Actions",
-                    field: "delete",
-                    cellRenderer: (params) => {
-                      if (params.data.isNewRow) {
-                        return (
-                          <div className="flex items-center justify-center h-full">
-                            <button
-                              onClick={() => handleSaveNewRow(params)}
-                              className="flex items-center justify-center bg-white outline outline-1 outline-green-500 drop-shadow-xl text-green-500 text-xs w-14 h-6 rounded-lg shadow hover:bg-green-200"
-                            >
-                              Save
-                            </button>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div className="flex items-center justify-center h-full">
-                            <button
-                              onClick={() => handleDeleteRow(params)}
-                              className="flex items-center justify-center bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold text-xs w-14 h-6 rounded-lg shadow hover:bg-red-200"
-                            >
-                              Delete
-                          </button>
-                          </div>
-                      );
-                    },
-                    width: 80,
-                  } as any);
-                }
-
                 return gridColumns;
               },
               [isEditing]
@@ -463,7 +400,7 @@ const handleSaveNewRow = async (params) => {
         </div>
       </div>
 
-      {/* Left Panel */}
+      {/* Right Panel */}
       <div
         className="flex flex-col bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md"
         style={{
@@ -541,7 +478,8 @@ const handleSaveNewRow = async (params) => {
                   <div className="w-1/3 bg-teal text-white font-semibold text-center p-1 rounded-xl">Edit Controls</div>
                   <button
                   onClick={handleCreateRow}
-                  className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-orange font-semibold px-4 py-2 rounded-xl shadow hover:bg-light-orange"
+                  className={`bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-orange font-semibold px-4 py-2 rounded-xl shadow 
+                            ${(selectedRows.length > 0) || (rowData.find((row) => row.id === 1)) ? "opacity-50 cursor-not-allowed" : "hover:bg-light-orange"}`}
                   >Create
                   </button> 
 
