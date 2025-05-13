@@ -144,7 +144,7 @@ export default function HistoryPageGrid() {
       title: "Confirm Delete",
       message: "Are you sure you want to delete these entries?",
       type: "warning",
-      onConfirm: () => deleteSelectedRows(), // Function to call on confirm
+      onConfirm: () => deleteSelectedRows(),
     });
   };
 
@@ -187,35 +187,52 @@ export default function HistoryPageGrid() {
   };  
 
 const handleCreateRow = async () => {
-  const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-
-  const newRow = {
-    id: 1, // Temporary ID, will be replaced by DB
-    datetime: date,
-    name: "",
-    unit: "",
-    value: 0,
-    isNewRow: true, // Add isNewRow attribute
-  };
-
-  setRowData((prev) => {
-    return [newRow, ...prev.map((row) => ({ ...row }))];
-  });
-
-  setTimeout(() => {
-    gridApiRef.current?.startEditingCell({
-      rowIndex: 0,
-      colKey: "name",
+  const unsavedNewRow = rowData.some((row) => row.id === 1);
+  
+  if (unsavedNewRow) {
+    setDialog({
+      isOpen: true,
+      title: "Notice",
+      message: "Please save the existing new row before creating another row.",
+      type: "notice",
+      onConfirm: null,
     });
-  }, 0);
+    
+    return;
+  }
+  else {
+    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+
+    const newRow = {
+      id: 1, // Temporary ID, will be replaced by DB
+      datetime: date,
+      name: "",
+      unit: "",
+      value: 0,
+      isNewRow: true, // Add isNewRow attribute
+    };
+
+    setRowData((prev) => {
+      return [newRow, ...prev.map((row) => ({ ...row }))];
+    });
+
+    setTimeout(() => {
+      gridApiRef.current?.startEditingCell({
+        rowIndex: 0,
+        colKey: "name",
+      });
+    }, 0);
+  }
+  
 };
   
 const saveChanges = async () => {
   try {
     const editedRowList = Object.values(editedRows);
+    const unsavedNewRow = rowData.some((row) => row.id === 1);
     var error = null;
 
-    if (Object.keys(editedRows).length === 1) {
+    if (unsavedNewRow) {
       const newRow = rowData.find((row) => row.id === 1);
       const newRowData = { ...newRow };
 
@@ -238,19 +255,17 @@ const saveChanges = async () => {
         );
       }
     }
-    else {
-      const rowsToUpdate = editedRowList.filter((row) => !row.isNewRow);
+    const rowsToUpdate = editedRowList.filter((row) => !row.isNewRow);
 
-      if (rowsToUpdate.length > 0) {
-        const response = await fetch("/api/updateData", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ updates: Object.values(rowsToUpdate) }),
-        });
+    if (rowsToUpdate.length > 0) {
+      const response = await fetch("/api/updateData", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates: Object.values(rowsToUpdate) }),
+      });
 
-        if (!response.ok) {
-          error = new Error("Failed to update database");
-        }
+      if (!response.ok) {
+        error = new Error("Failed to update database");
       }
     }
 

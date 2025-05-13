@@ -34,7 +34,7 @@ const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) 
                 <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
                 <div className="grid grid-flow-col grid-rows-1 place-content-center gap-2 bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
                     <h2 className="text-xl text-white font-semibold">{title}</h2>
-                    {type === 'warning' && (
+                    {(type === 'warning' || type === 'notice') && (
                         <ExclamationTriangleIcon className="w-6 h-6 text-white mt-1/2"/>
                     )}
                     {type === 'success' && (
@@ -49,14 +49,14 @@ const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) 
                     {type === 'warning' ? (
                         <div className="grid grid-flow-col grid-rows-1 gap-4">
                             <button
-                                className="bg-orange text-lg text-white mt-4 px-4 py-2 rounded-xl shadow hover:bg-dark-orange"
+                                className="bg-teal text-lg text-white mt-4 px-4 py-2 rounded-xl shadow hover:bg-medium-teal"
                                 onClick={onClose}
                             >Cancel
                             </button>
                             <button
-                                className="bg-teal text-lg text-white mt-4 px-4 py-2 rounded-xl shadow hover:bg-medium-teal"
+                                className="bg-orange text-lg text-white mt-4 px-4 py-2 rounded-xl shadow hover:bg-dark-orange"
                                 onClick={onConfirm}
-                            >OK
+                            >Delete
                             </button>
                         </div>
                     ) : (
