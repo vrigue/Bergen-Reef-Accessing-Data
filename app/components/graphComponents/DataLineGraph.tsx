@@ -63,7 +63,13 @@ export default function DataLineGraph() {
       fetchData();
       setShouldFetch(false);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, startDate, endDate, selectedNames]);
+
+  useEffect(() => {
+    if (data.length > 0 && svgRef.current) {
+      drawChart();
+    }
+  }, [data, selectedNames, startDate, endDate]);
 
   useEffect(() => {
     const today = new Date();
@@ -95,12 +101,6 @@ export default function DataLineGraph() {
       console.error("Error searching for data: ", error);
     }
   }
-
-  useEffect(() => {
-    if (data.length > 0 && svgRef.current) {
-      drawChart();
-    }
-  }, [data, zoom, step]);
 
   const drawChart = () => {
     if (selectedNames.length < 1) return;
@@ -291,6 +291,7 @@ export default function DataLineGraph() {
     const newSelectedNames = [...selectedNames];
     newSelectedNames[index] = name;
     setSelectedNames(newSelectedNames);
+    setShouldFetch(true);
   };
 
   const addPlot = () => {

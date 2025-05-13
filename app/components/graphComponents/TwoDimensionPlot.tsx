@@ -74,7 +74,13 @@ export default function DataLineGraph() {
       fetchData();
       setShouldFetch(false);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, startDate, endDate, selectedNames]);
+
+  useEffect(() => {
+    if (data.length > 0 && svgRef.current) {
+      drawChart();
+    }
+  }, [data, selectedNames, startDate, endDate, shouldFetch]);
 
   useEffect(() => {
     const today = new Date();
@@ -130,12 +136,6 @@ export default function DataLineGraph() {
       console.error("Error searching for data: ", error);
     }
   }
-
-  useEffect(() => {
-    if (data.length > 0 && svgRef.current) {
-      drawChart();
-    }
-  }, [data, zoom, step]);
 
   const drawChart = () => {
     if (selectedNames.length < 2 || selectedNames[0] === selectedNames[1]) return; // Not plottable with this sparse data
@@ -241,6 +241,7 @@ export default function DataLineGraph() {
     newSelectedNames[index] = name;
     if (newSelectedNames[0] !== newSelectedNames[1]) {
       setSelectedNames(newSelectedNames);
+      setShouldFetch(true);
     }
   };
 
@@ -253,6 +254,16 @@ export default function DataLineGraph() {
   useEffect(() => {
     setZoom(100); // Set default zoom to 100%
   }, []);
+
+  const handleStartDateChange = (date: Date) => {
+    setStartDate(date);
+    setShouldFetch(true);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    setEndDate(date);
+    setShouldFetch(true);
+  };
 
   return (
     <div className="grid grid-cols-4 gap-7 h-full p-5">
@@ -320,13 +331,13 @@ export default function DataLineGraph() {
           <div
             className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={setStartDate} />
+            <DateBoundElement value={startDate} onChange={handleStartDateChange} />
 
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
 
-            <DateBoundElement value={endDate} onChange={setEndDate} />
+            <DateBoundElement value={endDate} onChange={handleEndDateChange} />
           </div>
 
           <div className="flex justify-center pt-4">

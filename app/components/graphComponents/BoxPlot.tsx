@@ -31,6 +31,7 @@ const units = {
   Temperature: "°C",
   Alkalinity: "dKH",
   Calcium: "ppm",
+  pH: "no unit",
 };
 
 export default function BoxPlot() {
@@ -69,7 +70,13 @@ export default function BoxPlot() {
       fetchData();
       setShouldFetch(false);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, startDate, endDate, selectedName]);
+
+  useEffect(() => {
+    if (data.length > 0 && svgRef.current) {
+      drawChart();
+    }
+  }, [data, selectedName, startDate, endDate, shouldFetch]);
 
   useEffect(() => {
     const today = new Date();
@@ -98,12 +105,6 @@ export default function BoxPlot() {
       console.error("Error searching for data: ", error);
     }
   }
-
-  useEffect(() => {
-    if (data.length > 0 && svgRef.current) {
-      drawChart();
-    }
-  }, [data]);
 
   const calculateBoxPlotData = (data: DataPoint[]): BoxPlotData => {
     const sortedData = [...data].map(d => d.value).sort((a, b) => a - b);
@@ -319,6 +320,21 @@ export default function BoxPlot() {
       .text(`${selectedName} (${units[selectedName]})`);
   };
 
+  const handleNameSelect = (name: string) => {
+    setSelectedName(name);
+    setShouldFetch(true);
+  };
+
+  const handleStartDateChange = (date: Date) => {
+    setStartDate(date);
+    setShouldFetch(true);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    setEndDate(date);
+    setShouldFetch(true);
+  };
+
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
       <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
@@ -343,7 +359,7 @@ export default function BoxPlot() {
               {availableNames.map((name) => (
                 <MenuItem key={name}>
                   <button
-                    onClick={() => setSelectedName(name)}
+                    onClick={() => handleNameSelect(name)}
                     className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     {name}
@@ -361,13 +377,13 @@ export default function BoxPlot() {
           <div
             className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={setStartDate} />
+            <DateBoundElement value={startDate} onChange={handleStartDateChange} />
 
             <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
 
-            <DateBoundElement value={endDate} onChange={setEndDate} />
+            <DateBoundElement value={endDate} onChange={handleEndDateChange} />
           </div>
 
           <div className="flex justify-center pt-4">

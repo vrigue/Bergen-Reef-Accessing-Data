@@ -31,6 +31,7 @@ const units = {
   Temperature: "°C",
   Alkalinity: "dKH",
   Calcium: "ppm",
+  pH: "no unit",
 };
 
 export default function DataLineGraph() {
@@ -67,7 +68,13 @@ export default function DataLineGraph() {
       fetchData();
       setShouldFetch(false);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, startDate, endDate, selectedName]);
+
+  useEffect(() => {
+    if (data.length > 0 && svgRef.current) {
+      drawChart();
+    }
+  }, [data, selectedName, startDate, endDate, shouldFetch]);
 
   useEffect(() => {
     const today = new Date();
@@ -96,12 +103,6 @@ export default function DataLineGraph() {
       console.error("Error searching for data: ", error);
     }
   }
-
-  useEffect(() => {
-    if (data.length > 0 && svgRef.current) {
-      drawChart();
-    }
-  }, [data, selectedName]);
 
   const processDataForHeatMap = (): HeatMapData[] => {
     const heatMapData: HeatMapData[] = [];
@@ -425,6 +426,7 @@ export default function DataLineGraph() {
 
   const handleNameSelect = (name: string) => {
     setSelectedName(name);
+    setShouldFetch(true);
   };
 
   const handleStartDateChange = (date: Date) => {
@@ -433,6 +435,7 @@ export default function DataLineGraph() {
     const newEndDate = new Date(date);
     newEndDate.setDate(date.getDate() + 49); // 7 weeks = 49 days
     setEndDate(newEndDate);
+    setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
@@ -441,6 +444,7 @@ export default function DataLineGraph() {
     const newStartDate = new Date(date);
     newStartDate.setDate(date.getDate() - 49); // 7 weeks = 49 days
     setStartDate(newStartDate);
+    setShouldFetch(true);
   };
 
   return (
