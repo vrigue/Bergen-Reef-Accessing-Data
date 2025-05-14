@@ -63,7 +63,13 @@ export default function DataLineGraph() {
       fetchData();
       setShouldFetch(false);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, startDate, endDate, selectedNames]);
+
+  useEffect(() => {
+    if (data.length > 0 && svgRef.current) {
+      drawChart();
+    }
+  }, [data, selectedNames, startDate, endDate]);
 
   useEffect(() => {
     const today = new Date();
@@ -95,12 +101,6 @@ export default function DataLineGraph() {
       console.error("Error searching for data: ", error);
     }
   }
-
-  useEffect(() => {
-    if (data.length > 0 && svgRef.current) {
-      drawChart();
-    }
-  }, [data, zoom, step]);
 
   const drawChart = () => {
     if (selectedNames.length < 1) return;
@@ -291,6 +291,7 @@ export default function DataLineGraph() {
     const newSelectedNames = [...selectedNames];
     newSelectedNames[index] = name;
     setSelectedNames(newSelectedNames);
+    setShouldFetch(true);
   };
 
   const addPlot = () => {
@@ -382,10 +383,14 @@ export default function DataLineGraph() {
 
           <div className="flex justify-center pt-4">
             <button
-              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
+              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
               onClick={() => setShouldFetch(true)}
+              title="Graph button available for manual refresh when auto-update doesn't trigger"
             >
               Graph
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
+                Graph button available for manual refresh when auto-update doesn't trigger
+              </div>
             </button>
           </div>
         </div>
