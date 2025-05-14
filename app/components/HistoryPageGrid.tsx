@@ -9,6 +9,7 @@ import {
   CellClassParams,
   CellStyleModule,
   ClientSideRowModelModule,
+  ClientSideRowModelApiModule,
   PaginationModule,
   CustomFilterModule,
   DateFilterModule,
@@ -25,6 +26,10 @@ import {
   ITextFilterParams,
   SortIndicatorComp,
   ColumnApiModule,
+  RowApiModule,
+  RenderApiModule,
+  ScrollApiModule,
+  ExternalFilterModule,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -36,6 +41,7 @@ ModuleRegistry.registerModules([
   NumberEditorModule,
   TextEditorModule,
   ClientSideRowModelModule,
+  ClientSideRowModelApiModule,
   PaginationModule,
   CustomFilterModule,
   DateFilterModule,
@@ -46,11 +52,16 @@ ModuleRegistry.registerModules([
   ValidationModule,
   SelectEditorModule,
   ColumnApiModule,
+  RowApiModule,
+  RenderApiModule,
+  ScrollApiModule,
+  ExternalFilterModule,
 ]);
 
 import Dialog from "./HistoryPageDialog";
 import { dropdownValues } from 'src/dropdown-values';
 import { dropdownMap } from 'src/dropdown-mapping';
+import { is, ne } from "drizzle-orm";
 
 
 export default function HistoryPageGrid() {
@@ -73,6 +84,7 @@ export default function HistoryPageGrid() {
   const [rowData, setRowData] = useState<any[]>([]);
 
   const gridApiRef = useRef<any>(null);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editedRows, setEditedRows] = useState<Record<number, any>>({});
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
@@ -149,37 +161,50 @@ export default function HistoryPageGrid() {
   };
 
   const deleteSelectedRows = async () => {
-    const selectedRows = gridApiRef.current?.getSelectedRows();
-    if (!selectedRows || selectedRows.length === 0) return;
-  
-    const idsToDelete = selectedRows.map((row) => row.id);
-    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-  
-    try {
-      const response = await fetch(`/api/deleteData`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: idsToDelete, date: date }),
-      });
-  
-      if (!response.ok) throw new Error("Failed to delete rows");
-  
-      setRowData((prev) => prev.filter((row) => !idsToDelete.includes(row.id)));
+    const selectedRows = gridApiRef.current?.getSelectedRows() || [];
+    const selectedRowIds = selectedRows.map((row) => row.id);
 
-      setDialog({
-        isOpen: true,
-        title: "Success",
-        message: "The selected entries have been deleted.",
-        type: "success",
-        onConfirm: null
-      });
-      
-    } catch (error) {
-      console.error("Error deleting rows: ", error);
+    if (selectedRowIds.length > 0) {
+      const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    
+      try {
+        const response = await fetch(`/api/deleteData`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: selectedRowIds, date: date }),
+        });
+    
+        if (!response.ok) {
+          throw new Error("Failed to delete rows");
+        }
+    
+        setRowData((prev) => prev.filter((row) => !selectedRowIds.includes(row.id)));
+
+        setDialog({
+          isOpen: true,
+          title: "Success",
+          message: "The selected entries have been deleted.",
+          type: "success",
+          onConfirm: null
+        });
+        
+      } 
+      catch (error) {
+        console.error("Error deleting rows: ", error);
+        setDialog({
+          isOpen: true,
+          title: "Error",
+          message: "There was an error in deleting the selected entries.",
+          type: "error",
+          onConfirm: null
+        });
+      }
+    }
+    else {
       setDialog({
         isOpen: true,
         title: "Error",
-        message: "There was an error in deleting the selected entries.",
+        message: "There were no rows selected for deletion.",
         type: "error",
         onConfirm: null
       });
@@ -187,75 +212,73 @@ export default function HistoryPageGrid() {
   };  
 
 const handleCreateRow = async () => {
-  const unsavedNewRow = rowData.some((row) => row.id === 1);
-  
-  if (unsavedNewRow) {
-    setDialog({
-      isOpen: true,
-      title: "Notice",
-      message: "Please save the existing new row before creating another row.",
-      type: "notice",
-      onConfirm: null,
-    });
-    
-    return;
-  }
-  else {
-    const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+  const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
-    const newRow = {
-      id: 1, // Temporary ID, will be replaced by DB
-      datetime: date,
-      name: "",
-      unit: "",
-      value: 0,
-      isNewRow: true, // Add isNewRow attribute
-    };
+  const newRow = {
+    id: Date.now(), // Temporary ID, will be replaced by DB
+    datetime: date,
+    name: "",
+    unit: "",
+    value: 0,
+    isNewRow: true,
+  };
 
-    setRowData((prev) => {
-      return [newRow, ...prev.map((row) => ({ ...row }))];
-    });
+  setRowData((prev) => {
+    return [newRow, ...prev.map((row) => ({ ...row }))];
+  });
+
+  setTimeout(() => {
+    gridApiRef.current?.refreshClientSideRowModel("sort");
 
     setTimeout(() => {
-      gridApiRef.current?.startEditingCell({
-        rowIndex: 0,
-        colKey: "name",
-      });
-    }, 0);
-  }
-  
+      const displayedRowCount = gridApiRef.current?.getDisplayedRowCount() || 0;
+
+      for (let i = 0; i < displayedRowCount; i++) {
+        const rowNode = gridApiRef.current?.getDisplayedRowAtIndex(i);
+        if (rowNode?.data?.isNewRow) {
+          gridApiRef.current?.ensureIndexVisible(i, "top");
+          gridApiRef.current?.startEditingCell({
+            rowIndex: i,
+            colKey: "name",
+          });
+          break;
+        }
+      }
+    }, 50);
+  }, 0);
 };
   
 const saveChanges = async () => {
   try {
     const editedRowList = Object.values(editedRows);
-    const unsavedNewRow = rowData.some((row) => row.id === 1);
+    const unsavedNewRows = editedRowList.filter((row) => row.isNewRow);
+    const rowsToUpdate = editedRowList.filter((row) => !row.isNewRow);
     var error = null;
 
-    if (unsavedNewRow) {
-      const newRow = rowData.find((row) => row.id === 1);
-      const newRowData = { ...newRow };
+    if (unsavedNewRows.length > 0) {
+      for (let i = 0; i < unsavedNewRows.length; i++) {
+        const newRow = unsavedNewRows[i];
+        const newRowData = { ...newRow };
 
-      const createResponse = await fetch("/api/createData", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newRowData),
-      });
-
-      if (!createResponse.ok) {
-        error = new Error("Failed to create new row");
-      }
-      else {
-        const result = await createResponse.json();
-
-        setRowData((prev) =>
-          prev.map((row) =>
-            row.id === 1 ? { ...row, id: result.id } : row
-          )
-        );
+        const createResponse = await fetch("/api/createData", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newRowData),
+        });
+  
+        if (!createResponse.ok) {
+          error = new Error("Failed to create new row");
+        }
+        else {
+          const result = await createResponse.json();
+  
+          setRowData((prev) => [
+            { ...newRow, id: result.id },
+            ...prev,
+          ]);
+        }
       }
     }
-    const rowsToUpdate = editedRowList.filter((row) => !row.isNewRow);
 
     if (rowsToUpdate.length > 0) {
       const response = await fetch("/api/updateData", {
@@ -418,6 +441,25 @@ return (
                 ]
             });
             }}
+            postSortRows= {(params) => {
+              let rowNodes = params.nodes;
+              let nextInsertPos = 0;
+
+              for (let i = 0; i < rowNodes.length; i++) {
+                  const isNewRow = rowNodes[i].data.isNewRow;
+                  if (isNewRow) {
+                      rowNodes.splice(nextInsertPos, 0, rowNodes.splice(i, 1)[0]);
+                      nextInsertPos++;
+                  }
+              }
+            }}
+            isExternalFilterPresent={() => true}
+            doesExternalFilterPass={(node) => {
+              if (node.data?.isNewRow) {
+                return true;
+              }
+              return true;
+            }}
             components={{
               agDateInput: DTPicker,
             }}
@@ -504,13 +546,15 @@ return (
                   <button
                   onClick={handleCreateRow}
                   className={`bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-orange font-semibold px-4 py-2 rounded-xl shadow 
-                            ${(selectedRows.length > 0) || (rowData.find((row) => row.id === 1)) ? "opacity-50 cursor-not-allowed" : "hover:bg-light-orange"}`}
+                            ${(selectedRows.length > 0) ? "opacity-50 cursor-not-allowed" : "hover:bg-light-orange"}`}
+                  disabled={selectedRows.length > 0}
                   >Create
                   </button> 
 
                   <button
                   onClick={handleDeleteSelectedRows}
-                  className="bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-red-200"
+                  className={`bg-white outline outline-1 outline-red-500 drop-shadow-xl text-red-500 font-semibold px-4 py-2 rounded-xl shadow hover:bg-red-200
+                            ${(selectedRows.length === 0) ? "opacity-50 cursor-not-allowed" : "hover:bg-light-orange"}`}   
                   disabled={selectedRows.length === 0}
                   >Delete Selected
                   </button> 
