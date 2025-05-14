@@ -84,7 +84,7 @@ export default function HistoryPageGrid() {
   const [rowData, setRowData] = useState<any[]>([]);
 
   const gridApiRef = useRef<any>(null);
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editedRows, setEditedRows] = useState<Record<number, any>>({});
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
@@ -359,6 +359,7 @@ return (
           <AgGridReact
             rowData={rowData}
             rowSelection={"multiple" as any}
+            suppressRowClickSelection={true}
             onSelectionChanged={onSelectionChanged}
             columnDefs={useMemo(
               () => {
