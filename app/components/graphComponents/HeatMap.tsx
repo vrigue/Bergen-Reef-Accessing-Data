@@ -34,6 +34,12 @@ const units = {
   pH: "no unit",
 };
 
+// Helper to format date as YYYY-MM-DDTHH:mm:ss in local time
+function formatLocalDateTime(date: Date) {
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -89,10 +95,8 @@ export default function DataLineGraph() {
 
   async function fetchData() {
     try {
-      startDate.setHours(startDate.getHours() - 5);
-      endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedName}`
+        `/api/searchDataByDateType?startDate=${formatLocalDateTime(startDate)}&endDate=${formatLocalDateTime(endDate)}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -114,8 +118,8 @@ export default function DataLineGraph() {
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
 
-    // Create a map to store min/max values for each week/day combination
-    const valueMap = new Map<string, { min: number; max: number }>();
+    // Create a map to store values for each week/day combination
+    const valueMap = new Map<string, number[]>();
 
     // Group data by week and day
     nameData.forEach((d) => {
@@ -129,28 +133,29 @@ export default function DataLineGraph() {
         const key = `${week}-${day}`;
 
         if (!valueMap.has(key)) {
-          valueMap.set(key, { min: d.value, max: d.value });
+          valueMap.set(key, [d.value]);
         } else {
-          const current = valueMap.get(key)!;
-          valueMap.set(key, {
-            min: Math.min(current.min, d.value),
-            max: Math.max(current.max, d.value),
-          });
+          valueMap.get(key)!.push(d.value);
         }
       }
     });
 
-    // Convert map to array format
+    // Convert map to array format, calculating median for each cell
     valueMap.forEach((values, key) => {
       const [week, day] = key.split("-").map(Number);
-      const minValue = Number(values.min);
-      const maxValue = Number(values.max);
+      // Ensure all values are numbers
+      const numericValues = values.map(v => Number(v));
+      const sortedValues = [...numericValues].sort((a, b) => a - b);
+      const median = sortedValues.length % 2 === 0
+        ? (sortedValues[Math.floor(sortedValues.length / 2) - 1] + sortedValues[Math.floor(sortedValues.length / 2)]) / 2
+        : sortedValues[Math.floor(sortedValues.length / 2)];
+      
       heatMapData.push({
         week,
         day,
-        value: maxValue - minValue, // Use range (max-min) for coloring
-        minValue,
-        maxValue,
+        value: Number(median),
+        minValue: Number(Math.min(...numericValues)),
+        maxValue: Number(Math.max(...numericValues))
       });
     });
 
@@ -192,16 +197,17 @@ export default function DataLineGraph() {
     const heatMapData = processDataForHeatMap();
 
     // Calculate quartiles and IQR for outlier detection
-    const values = heatMapData.map((d) => d.value).sort((a, b) => a - b);
+    const values = heatMapData.map((d) => Number(d.value)).sort((a, b) => a - b);
     const q1 = d3.quantile(values, 0.25) || 0;
     const q3 = d3.quantile(values, 0.75) || 0;
     const iqr = q3 - q1;
     const upperBound = q3 + 1.5 * iqr;
+    const lowerBound = q1 - 1.5 * iqr;
 
     // Calculate the value range for color scaling, excluding outliers
     const valueRange: [number, number] = [
-      0,
-      Math.min(upperBound, d3.max(values) || 0),
+      Math.max(lowerBound, d3.min(values) || 0),
+      Math.min(upperBound, d3.max(values) || 0)
     ];
 
     // Create color scale that emphasizes variation
@@ -268,7 +274,9 @@ export default function DataLineGraph() {
       .attr("width", cellWidth)
       .attr("height", cellHeight)
       .attr("fill", (d) => {
-        return d.value > upperBound ? "#67000d" : colorScale(d.value);
+        return d.value > upperBound ? "#67000d" : 
+               d.value < lowerBound ? "#053061" : 
+               colorScale(d.value);
       })
       .attr("stroke", "white")
       .attr("stroke-width", 1)
@@ -280,10 +288,11 @@ export default function DataLineGraph() {
         tooltip
           .html(
             `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+          Median: ${d.value.toFixed(2)} ${units[selectedName]}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedName]}<br/>
-          Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}<br/>
-          Range: ${d.value.toFixed(2)} ${units[selectedName]}${
-              d.value > upperBound ? "<br/>(Outlier)" : ""
+          Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}${
+              d.value > upperBound ? "<br/>(High Outlier)" : 
+              d.value < lowerBound ? "<br/>(Low Outlier)" : ""
             }`
           )
           .style("left", event.pageX + 10 + "px")
@@ -374,7 +383,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(`Range`);
+      .text(`Median`);
 
     g.append("text")
       .attr("x", legendX)
@@ -398,9 +407,9 @@ export default function DataLineGraph() {
       .append("linearGradient")
       .attr("id", "color-gradient")
       .attr("x1", "0%")
-      .attr("y1", "0%")
+      .attr("y1", "100%")
       .attr("x2", "0%")
-      .attr("y2", "100%");
+      .attr("y2", "0%");
 
     gradient
       .selectAll("stop")
@@ -434,25 +443,48 @@ export default function DataLineGraph() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    setStartDate(date);
-    // Calculate end date based on numWeeks
-    const newEndDate = new Date(date);
-    newEndDate.setDate(date.getDate() + (numWeeks * 7));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let newStartDate = new Date(date);
+    let newEndDate = new Date(date);
+    newEndDate.setDate(newStartDate.getDate() + numWeeks * 7);
+    if (newEndDate > today) {
+      newEndDate = today;
+      newStartDate = new Date(today);
+      newStartDate.setDate(today.getDate() - numWeeks * 7);
+    }
+    setStartDate(newStartDate);
     setEndDate(newEndDate);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    setEndDate(date);
-    // Calculate start date based on numWeeks
-    const newStartDate = new Date(date);
-    newStartDate.setDate(date.getDate() - (numWeeks * 7));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let newEndDate = new Date(date);
+    if (newEndDate > today) {
+      newEndDate = today;
+    }
+    let newStartDate = new Date(newEndDate);
+    newStartDate.setDate(newEndDate.getDate() - numWeeks * 7);
+    setEndDate(newEndDate);
     setStartDate(newStartDate);
     setShouldFetch(true);
   };
 
   const handleWeeksChange = (weeks: number) => {
-    setNumWeeks(weeks);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let newNumWeeks = weeks;
+    let newEndDate = new Date(endDate);
+    if (newEndDate > today) {
+      newEndDate = today;
+    }
+    let newStartDate = new Date(newEndDate);
+    newStartDate.setDate(newEndDate.getDate() - newNumWeeks * 7);
+    setNumWeeks(newNumWeeks);
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
     setShouldFetch(true);
   };
 
