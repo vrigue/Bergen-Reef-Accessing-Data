@@ -453,6 +453,7 @@ export default function DataLineGraph() {
 
   const handleWeeksChange = (weeks: number) => {
     setNumWeeks(weeks);
+    setShouldFetch(true);
   };
 
   return (
