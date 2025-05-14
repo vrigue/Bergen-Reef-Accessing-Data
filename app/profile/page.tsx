@@ -45,7 +45,7 @@ export default function Page() {
         {user ? (
           <div>
             <h1 className="text-2xl font-semibold">{user.name}</h1>
-            <p className="text-sm">{user.email}</p>
+            <h3 className="text-sm">{user.email}</h3>
           </div>
         ) : (
           <div>
@@ -59,14 +59,14 @@ export default function Page() {
           {!user && (
             <a
             href="/api/auth/login"
-            className="bg-teal text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition text-center"
+            className="bg-teal text-white px-6 py-2 rounded-xl shadow-lg hover:bg-orange-600 transition text-center"
           >
              Login
           </a>
           )}
           <a
             href="/api/auth/logout"
-            className="bg-teal text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
+            className="bg-teal text-white px-6 py-2 rounded-xl shadow-lg hover:bg-orange-600 transition"
           >
             Logout
           </a>
@@ -84,11 +84,6 @@ export default function Page() {
         </div>
       </div>
       )}
-
-
-      <br></br>
-      <br></br>
-      <ProfileClient />
     </div>
   );
 }
