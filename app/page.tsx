@@ -120,7 +120,7 @@ export default function Page() {
         </div>
 
         {/*CHART*/}
-        <div className="w-3/5 rounded-lg p-3 mt-10 ml-1" style={{ position: "relative", zIndex: 1 }}>
+        <div className="w-3/5 rounded-lg p-3 ml-1" style={{ position: "relative", zIndex: 1 }}>
           <ResponsiveContainer width={"100%"} height={"auto"}>
             <HomePageGraph />
           </ResponsiveContainer>
