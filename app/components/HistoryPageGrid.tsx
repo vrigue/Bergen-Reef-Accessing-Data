@@ -163,44 +163,26 @@ export default function HistoryPageGrid() {
   const deleteSelectedRows = async () => {
     const selectedRows = gridApiRef.current?.getSelectedRows() || [];
     const selectedRowIds = selectedRows.map((row) => row.id);
-    var error = null;
 
     if (selectedRowIds.length > 0) {
       const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     
       try {
-        const deleteResponse = await fetch(`/api/deleteData`, {
+        await fetch(`/api/deleteData`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ids: selectedRowIds, date: date }),
         });
-    
-        if (!deleteResponse.ok) {
-          error = new Error("Failed to delete rows.");
-        }
-        else {
-          setRowData((prev) => prev.filter((row) => !selectedRowIds.includes(row.id)));
-        }
-
-        if (!error) {
-          setDialog({
-            isOpen: true,
-            title: "Success",
-            message: "The selected entries have been deleted.",
-            type: "success",
-            onConfirm: null
-          });
-        }
-        else {
-          console.error("Error deleting rows: ", error);
-          setDialog({
-            isOpen: true,
-            title: "Error",
-            message: "There was an error in deleting the selected entries.",
-            type: "error",
-            onConfirm: null
-          });
-        }
+      
+        setRowData((prev) => prev.filter((row) => !selectedRowIds.includes(row.id)));
+        
+        setDialog({
+          isOpen: true,
+          title: "Success",
+          message: "The selected entries have been deleted.",
+          type: "success",
+          onConfirm: null
+        });
 
         fetchData();
       } 
@@ -282,7 +264,7 @@ const saveChanges = async () => {
         });
   
         if (!createResponse.ok) {
-          error = new Error("Failed to create new row.s");
+          error = new Error("Failed to create new rows.");
         }
         else {
           const result = await createResponse.json();
@@ -296,14 +278,14 @@ const saveChanges = async () => {
     }
 
     if (rowsToUpdate.length > 0) {
-      const response = await fetch("/api/updateData", {
+      const updateResponse = await fetch("/api/updateData", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ updates: Object.values(rowsToUpdate) }),
       });
 
-      if (!response.ok) {
-        error = new Error("Failed to update database");
+      if (!updateResponse.ok) {
+        error = new Error("Failed to update rows in database.");
       }
     }
 
