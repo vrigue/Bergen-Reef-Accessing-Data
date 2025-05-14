@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface StepSliderProps {
   value: number;
@@ -7,18 +7,30 @@ interface StepSliderProps {
 
 const StepSlider: React.FC<StepSliderProps> = ({ value, onChange }) => {
   const [sliderValue, setSliderValue] = useState(value);
+
+  // Update local state when prop value changes
+  useEffect(() => {
+    setSliderValue(value);
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = Number(e.target.value);
+    setSliderValue(newValue);
+    onChange(newValue);
+  };
+
   return (
     <div className="w-full">
-          <div className="mt-[30px] ml-4 text-left text-m font-semibold">Step: {sliderValue}</div>
-        <input
-          type="range"
-          min="0"
-          max="20"
-          value={sliderValue}
-          onChange={(e) => setSliderValue(Number(e.target.value))}
-          className="ml-4 w-11/12 h-2 bg-gray-400 rounded-lg cursor-pointer accent-dark-orange"
-        />
-      </div>
+      <div className="mt-[30px] ml-4 text-left text-m font-semibold"># of Weeks Represented: {sliderValue}</div>
+      <input
+        type="range"
+        min="2"
+        max="12"
+        value={sliderValue}
+        onChange={handleChange}
+        className="ml-4 w-11/12 h-2 bg-gray-400 rounded-lg cursor-pointer accent-dark-orange"
+      />
+    </div>
   );
 };
 
