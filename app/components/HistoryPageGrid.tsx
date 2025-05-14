@@ -35,7 +35,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import { DTPicker } from "./DTPicker";
 import { format, toZonedTime } from "date-fns-tz";
-import { ArrowPathIcon, ChartBarIcon } from "@heroicons/react/24/solid";
+import { ArrowPathIcon, ChartBarIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 
 ModuleRegistry.registerModules([
   NumberEditorModule,
@@ -344,15 +344,21 @@ useEffect(() => {
   fetchData();
 }, []);
 
-const handleGraphClick = () => {
-  window.location.href = "/data";
+const handleGuideClick = () => {
+  setDialog({
+    isOpen: true,
+    title: "How to Use",
+    message: "",
+    type: "guide",
+    onConfirm: null
+  });
 };
 
 return (
-    <div className="flex gap-8 mt-6">
-      {/* Left Panel */}
+    <div className="relative flex gap-8 mt-6">
+      {/* Left Panel: Ag Grid */}
       <div className="flex-1 rounded-lg p-4 overflow-visible" style={{ marginRight: "35%" }}>
-        <div className="ag-theme-quartz" style={{ height: "400px" }}>
+        <div className="ag-theme-quartz" style={{ height: "600px" }}>
           <AgGridReact
             rowData={rowData}
             rowSelection={"multiple" as any}
@@ -465,40 +471,15 @@ return (
         </div>
       </div>
 
-      {/* Right Panel */}
-      <div
-        className="flex flex-col bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md"
-        style={{
-          width: "31%",
-          position: "fixed",
-          top: "8%",
-          height: "79%",
-          overflowY: "auto",
-          margin: "23px",
-          right: "23px",
-        }}
-      >
+      {/* Right Panel: Actions */}
+      <div className="fixed top-24 right-6 w-[28vw] max-w-[700px] min-w-[260px] bg-white drop-shadow-gray drop-shadow-lg rounded-lg shadow-md max-h-[80vh] overflow-y-auto mx-7 mt-6">
         <div className="flex flex-col h-full justify-start">
           <div className="bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
             <h2 className="flex justify-center text-xl text-white font-semibold">Actions</h2>
           </div>
           <div className="flex flex-col gap-4 p-6">
-            <div className="bg-light-teal p-4 rounded-lg">
-              <div className="text-sm text-neutral-700">
-                <p className="mb-2">To reorder a column, click on the column name.</p>
-                <p>To filter, click on the 3 horizontal lines icon for each column.</p>
-              </div>
-            </div>
-
             <button
-              onClick={() => gridApiRef.current?.setFilterModel(null)}
-              className="bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-medium px-4 py-2 rounded-xl hover:bg-medium-gray"
-            >
-              Clear Filters
-            </button>
-
-            <button
-              onClick={fetchData}
+              onClick={handleGuideClick}
               className="bg-medium-teal outline outline-1 outline-dark-teal drop-shadow-xl text-white font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-teal"
               style={{
                 padding: "8px 16px",
@@ -510,11 +491,19 @@ return (
                 justifyContent: "center",
               }}
             >
-              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
-              Refresh
+              <QuestionMarkCircleIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              How to Use
             </button>
+
             <button
-              onClick={handleGraphClick}
+              onClick={() => gridApiRef.current?.setFilterModel(null)}
+              className="bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-medium px-4 py-2 rounded-xl hover:bg-medium-gray"
+            >
+              Clear Filters
+            </button>
+
+            <button
+              onClick={fetchData}
               className="bg-orange text-white outline outline-1 outline-dark-orange drop-shadow-xl font-medium px-4 py-2 rounded-xl shadow hover:bg-dark-orange"
               style={{
               padding: "8px 16px",
@@ -526,9 +515,10 @@ return (
               justifyContent: "center",
               }}
             >
-              <ChartBarIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
-              Graphs
+              <ArrowPathIcon className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+              Refresh
             </button>
+
             {isAdmin && (
             <div className="w-full flex flex-col gap-2">
               <button

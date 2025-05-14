@@ -25,8 +25,8 @@ module.exports = {
       colors: {
         'light-teal': '#A2D9D9',
         'teal': '#68BFC6',
-        'medium-teal': '#009DA8',
-        'dark-teal': '#3B6769',
+        'medium-teal': '#58b0b8',
+        'dark-teal': '#4f8a8c',
         'light-orange': '#FCD98C',
         'medium-orange': '#FFCA57',
         'orange': '#FEB934',

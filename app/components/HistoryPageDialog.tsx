@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Description, Dialog, DialogPanel, DialogTitle, Transition } from '@headlessui/react'
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ArrowDownIcon, ArrowUpIcon, Bars3Icon, QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 
 const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) => {
     return (
@@ -34,6 +35,9 @@ const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) 
                 <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
                 <div className="grid grid-flow-col grid-rows-1 place-content-center gap-2 bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
                     <h2 className="text-xl text-white font-semibold">{title}</h2>
+                    {type === 'guide' && (
+                        <QuestionMarkCircleIcon className="w-6 h-6 text-white mt-1/2"/>
+                    )}
                     {(type === 'warning' || type === 'notice') && (
                         <ExclamationTriangleIcon className="w-6 h-6 text-white mt-1/2"/>
                     )}
@@ -45,7 +49,23 @@ const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) 
                     )}
                 </div>
                 <div className="flex flex-col gap-4 p-6">
-                    <p className="text-lg mt-2">{message}</p>
+                    {type === 'guide' && (
+                        <div className="text-lg mt-2">
+                            <p className="mb-4">
+                                To sort or reorder 
+                                (ascending <ArrowUpIcon className="inline w-4 h-4 text-gray-500 ml-1 align-text-bottom"/>, descending <ArrowDownIcon className="inline w-4 h-4 text-gray-500 ml-1 align-text-bottom"/>), 
+                                <p className="inline font-semibold"> click on the desired column name.</p>
+                            </p> 
+                            <p>
+                                To filter, click on the 3 horizontal lines icon 
+                                <Bars3Icon className="inline w-5 h-5 text-gray-500 ml-1 align-text-bottom"/>
+                                <p className="inline font-semibold"> next to the desired column name.</p>
+                            </p>
+                        </div>
+                    )}
+                    {type !== 'guide' && (
+                        <p className="text-lg mt-2">{message}</p>
+                    )}
                     {type === 'warning' ? (
                         <div className="grid grid-flow-col grid-rows-1 gap-4">
                             <button
