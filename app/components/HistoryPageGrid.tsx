@@ -163,31 +163,46 @@ export default function HistoryPageGrid() {
   const deleteSelectedRows = async () => {
     const selectedRows = gridApiRef.current?.getSelectedRows() || [];
     const selectedRowIds = selectedRows.map((row) => row.id);
+    var error = null;
 
     if (selectedRowIds.length > 0) {
       const date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     
       try {
-        const response = await fetch(`/api/deleteData`, {
+        const deleteResponse = await fetch(`/api/deleteData`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ids: selectedRowIds, date: date }),
         });
     
-        if (!response.ok) {
-          throw new Error("Failed to delete rows");
+        if (!deleteResponse.ok) {
+          error = new Error("Failed to delete rows.");
         }
-    
-        setRowData((prev) => prev.filter((row) => !selectedRowIds.includes(row.id)));
+        else {
+          setRowData((prev) => prev.filter((row) => !selectedRowIds.includes(row.id)));
+        }
 
-        setDialog({
-          isOpen: true,
-          title: "Success",
-          message: "The selected entries have been deleted.",
-          type: "success",
-          onConfirm: null
-        });
-        
+        if (!error) {
+          setDialog({
+            isOpen: true,
+            title: "Success",
+            message: "The selected entries have been deleted.",
+            type: "success",
+            onConfirm: null
+          });
+        }
+        else {
+          console.error("Error deleting rows: ", error);
+          setDialog({
+            isOpen: true,
+            title: "Error",
+            message: "There was an error in deleting the selected entries.",
+            type: "error",
+            onConfirm: null
+          });
+        }
+
+        fetchData();
       } 
       catch (error) {
         console.error("Error deleting rows: ", error);
@@ -267,7 +282,7 @@ const saveChanges = async () => {
         });
   
         if (!createResponse.ok) {
-          error = new Error("Failed to create new row");
+          error = new Error("Failed to create new row.s");
         }
         else {
           const result = await createResponse.json();

@@ -17,9 +17,9 @@ export default async function createData(data : Array<Record<string, any>>, date
     // Insert row into the database
     try {
         await db.insert(dataTable).values(entry);
-        console.log("Insertion successful:", entry);
-    } catch (error) {
-        console.error("Database Insertion Error:", error);
-        throw new Error(`Failed to insert data: ${error}`);
+    } 
+    catch (error) {
+        console.error("Error inserting data:", error);
+        throw new Error(`Error inserting data: ${error}`);
     }
 }
