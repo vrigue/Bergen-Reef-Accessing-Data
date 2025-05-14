@@ -7,9 +7,10 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface NavigationBarProps {
   defaultIndex: number;
+  username: string;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
+const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username }) => {
   const isDefaultIndexNegative = defaultIndex === -1;
   return (
     <div
@@ -27,6 +28,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
         </div>
       </a>
       <div className="flex items-right justify-between">
+      <h1 className = "text-xl text-dark-orange font-semibold pr-5 pt-2">Welcome {username}!</h1>
         <a href="/profile">
           <div className="pt-1.5 pr-8">
             <UserCircleIcon

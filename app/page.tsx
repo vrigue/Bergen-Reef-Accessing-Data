@@ -19,7 +19,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import ProfileClient from "./components/ProfileClient";
 import HomePageGraph from "./components/HomePageGraph";
 import HomePageElements from "./components/HomePageElements";
 import NavigationBar from "./components/NavigationBar";
@@ -77,6 +76,7 @@ const styles = {
 };
 
 export default function Page() {
+  const { user } = useUser();
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState(["pH"]);
@@ -108,7 +108,7 @@ export default function Page() {
 
   return (
     <div>
-      <NavigationBar defaultIndex={0} />
+      <NavigationBar defaultIndex={0} username={(user) ? user.name : "Guest"}/>
 
       <br></br>
 
@@ -128,7 +128,6 @@ export default function Page() {
           {/*TEXT AREA BELOW GRAPH*/}
         </div>
       </div>
-      <ProfileClient />
     </div>
   );
 }

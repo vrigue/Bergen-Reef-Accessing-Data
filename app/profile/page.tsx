@@ -35,7 +35,7 @@ export default function Page() {
 
   return (
     <div>
-      <NavigationBar defaultIndex={-1} />
+      <NavigationBar defaultIndex={-1} username={(user) ? user.name : "Guest"}/>
       <br></br>
       <br></br>
 
