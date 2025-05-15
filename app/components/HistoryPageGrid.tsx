@@ -97,8 +97,8 @@ export default function HistoryPageGrid() {
   }));
   
   const nameFilterParams: ITextFilterParams = {
-    defaultOption: "contains",
-    filterOptions: ["contains", ...nameFilterOptions],
+    defaultOption: "equals",
+    filterOptions: ["equals", ...nameFilterOptions],
   };
 
   const unitFilterOptions: IFilterOptionDef[] = (dropdownValues.unit).map((unit) => ({
@@ -109,8 +109,8 @@ export default function HistoryPageGrid() {
   }));
   
   const unitFilterParams: ITextFilterParams = {
-    defaultOption: "contains",
-    filterOptions: ["contains", ...unitFilterOptions],
+    defaultOption: "equals",
+    filterOptions: ["equals", ...unitFilterOptions],
   };
 
   const [dialog, setDialog] = useState({
