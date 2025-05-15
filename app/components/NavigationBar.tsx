@@ -77,7 +77,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                   <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
                 </MenuButton>
                 <MenuItems
-                  className="absolute z-50 right-0 mt-2 w-56 bg-light-gray shadow-lg ring-1 ring-black/5"
+                  className="absolute left-1/2 -translate-x-1/2 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black/5 z-50"
                   style={{ zIndex: 20 }}
                 >
                   <MenuItem>
@@ -166,7 +166,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                   <ChevronDownIcon className="-mr-1 size-5 text-gray-400" />
                 </MenuButton>
                 <MenuItems
-                  className="absolute z-50 right-0 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black/5 z-50"
+                  className="absolute left-1/2 -translate-x-1/2 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black/5 z-50"
                   style={{ zIndex: 20 }}
                 >
                   <MenuItem>
