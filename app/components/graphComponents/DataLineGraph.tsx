@@ -279,7 +279,8 @@ export default function DataLineGraph() {
 
       // Only add points if not using interpolation
       if (!useInterpolation) {
-        g.selectAll(`circle.series-${index}`)
+        const pointsGroup = g.append("g").attr("transform", `translate(${margin.left / 4},0)`);
+        pointsGroup.selectAll(`circle.series-${index}`)
           .data(nameData)
           .enter()
           .append("circle")
