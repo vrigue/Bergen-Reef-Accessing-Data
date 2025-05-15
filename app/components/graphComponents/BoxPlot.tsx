@@ -6,6 +6,7 @@ import "../../globals.css";
 import DateBoundElement from "../DateBoundElement";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 interface DataPoint {
   id: number;
@@ -35,13 +36,38 @@ const units = {
 };
 
 export default function BoxPlot() {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [now, setNow] = useState<Date | null>(null);
   const [data, setData] = useState<DataPoint[]>([]);
   const [selectedName, setSelectedName] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [rangeMode, setRangeMode] = useState<'day' | 'week' | 'twoWeeks'>('twoWeeks');
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  
+  // Add refs to track previous state
+  const prevParamsRef = useRef({
+    startDate: startDate?.toISOString() || "",
+    endDate: endDate?.toISOString() || "",
+    selectedName
+  });
+
+  const hasParamsChanged = () => {
+    const currentParams = {
+      startDate: startDate?.toISOString() || "",
+      endDate: endDate?.toISOString() || "",
+      selectedName
+    };
+
+    const hasChanged = JSON.stringify(currentParams) !== JSON.stringify(prevParamsRef.current);
+    
+    if (hasChanged) {
+      prevParamsRef.current = currentParams;
+    }
+    
+    return hasChanged;
+  };
 
   const availableNames = [
     "Salinity",
@@ -66,8 +92,11 @@ export default function BoxPlot() {
   }, []);
 
   useEffect(() => {
-    if (shouldFetch) {
+    if (shouldFetch && hasParamsChanged()) {
       fetchData();
+      setShouldFetch(false);
+    } else if (shouldFetch) {
+      // If parameters haven't changed, just reset the fetch flag
       setShouldFetch(false);
     }
   }, [shouldFetch, startDate, endDate, selectedName]);
@@ -84,15 +113,16 @@ export default function BoxPlot() {
     twoWeeksAgo.setDate(today.getDate() - 14);
     setStartDate(twoWeeksAgo);
     setEndDate(today);
+    setNow(today);
     setShouldFetch(true);
   }, []);
 
   async function fetchData() {
     try {
-      startDate.setHours(startDate.getHours() - 5);
-      endDate.setHours(endDate.getHours() - 5);
+      startDate?.setHours(startDate.getHours() - 5);
+      endDate?.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedName}`
+        `/api/searchDataByDateType?startDate=${startDate?.toISOString()}&endDate=${endDate?.toISOString()}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -130,7 +160,7 @@ export default function BoxPlot() {
       q3,
       max,
       outliers,
-      timeRange: `${d3.timeFormat("%Y-%m-%d")(startDate)} to ${d3.timeFormat("%Y-%m-%d")(endDate)}`
+      timeRange: `${d3.timeFormat("%Y-%m-%d")(startDate || new Date())} to ${d3.timeFormat("%Y-%m-%d")(endDate || new Date())}`
     };
   };
 
@@ -321,7 +351,7 @@ export default function BoxPlot() {
 
     // Add x-axis label with date range
     const formatDateTime = d3.timeFormat("%m/%d/%Y %H:%M:%S");
-    const dateLabel = `${formatDateTime(startDate)} - ${formatDateTime(endDate)}`;
+    const dateLabel = `${formatDateTime(startDate || new Date())} - ${formatDateTime(endDate || new Date())}`;
     
     g.append("text")
       .attr("fill", "black")
@@ -334,17 +364,97 @@ export default function BoxPlot() {
   };
 
   const handleNameSelect = (name: string) => {
+    if (name === selectedName) {
+      return; // Don't update if name hasn't changed
+    }
     setSelectedName(name);
     setShouldFetch(true);
   };
 
   const handleStartDateChange = (date: Date) => {
+    if (date.toISOString() === startDate?.toISOString()) {
+      return; // Don't update if date hasn't changed
+    }
     setStartDate(date);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
+    if (date.toISOString() === endDate?.toISOString()) {
+      return; // Don't update if date hasn't changed
+    }
     setEndDate(date);
+    setShouldFetch(true);
+  };
+
+  const adjustDateRange = (direction: 'forward' | 'backward') => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    const newStartDate = new Date(startDate || new Date());
+    const newEndDate = new Date(endDate || new Date());
+    
+    let daysToAdjust;
+    switch (rangeMode) {
+      case 'day':
+        daysToAdjust = 1;
+        break;
+      case 'week':
+        daysToAdjust = 7;
+        break;
+      case 'twoWeeks':
+        daysToAdjust = 14;
+        break;
+      default:
+        daysToAdjust = 1;
+    }
+    
+    if (direction === 'forward') {
+      // Check if moving forward would exceed today
+      if (newEndDate >= today) {
+        return; // Don't allow moving past today
+      }
+      newStartDate.setDate(newStartDate.getDate() + daysToAdjust);
+      newEndDate.setDate(newEndDate.getDate() + daysToAdjust);
+    } else {
+      newStartDate.setDate(newStartDate.getDate() - daysToAdjust);
+      newEndDate.setDate(newEndDate.getDate() - daysToAdjust);
+    }
+    
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+    setShouldFetch(true);
+  };
+
+  const setRangeModeWithDates = (mode: 'day' | 'week' | 'twoWeeks') => {
+    // Always update the date range and fetch, even if mode hasn't changed
+    setRangeMode(mode);
+    let newEndDate = new Date(endDate || new Date());
+    let newStartDate = new Date(endDate || new Date());
+
+    switch (mode) {
+      case 'day': {
+        // Set to the same day, start at 00:00:00, end at 23:59:59
+        newStartDate.setHours(0, 0, 0, 0);
+        newEndDate.setHours(23, 59, 59, 999);
+        break;
+      }
+      case 'week': {
+        newStartDate.setDate(newEndDate.getDate() - 6);
+        newStartDate.setHours(0, 0, 0, 0);
+        newEndDate.setHours(23, 59, 59, 999);
+        break;
+      }
+      case 'twoWeeks': {
+        newStartDate.setDate(newEndDate.getDate() - 13);
+        newStartDate.setHours(0, 0, 0, 0);
+        newEndDate.setHours(23, 59, 59, 999);
+        break;
+      }
+    }
+
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
     setShouldFetch(true);
   };
 
@@ -387,22 +497,70 @@ export default function BoxPlot() {
           <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
             Enter Date Constraints
           </div>
-          <div
-            className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
-          >
-            <DateBoundElement value={startDate} onChange={handleStartDateChange} />
+          <div className="flex items-center justify-center space-x-2 px-3">
+            <button
+              onClick={() => adjustDateRange('backward')}
+              className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+            >
+              <ChevronLeftIcon className="h-5 w-5 text-teal" />
+            </button>
+            <div
+              className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
+            >
+              <DateBoundElement value={startDate || new Date()} onChange={handleStartDateChange} />
 
-            <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
-              <span className="text-white font-semibold text-center">to</span>
+              <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
+                <span className="text-white font-semibold text-center">to</span>
+              </div>
+
+              <DateBoundElement value={endDate || new Date()} onChange={handleEndDateChange} />
             </div>
+            <button
+              onClick={() => adjustDateRange('forward')}
+              className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+              disabled={now && endDate && endDate >= now}
+            >
+              <ChevronRightIcon className="h-5 w-5 text-teal" />
+            </button>
+          </div>
 
-            <DateBoundElement value={endDate} onChange={handleEndDateChange} />
+          <div className="flex justify-center space-x-4 mt-4">
+            <button
+              onClick={() => setRangeModeWithDates('day')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                rangeMode === 'day'
+                  ? 'bg-teal text-white'
+                  : 'bg-white text-teal hover:bg-gray-100'
+              }`}
+            >
+              Day
+            </button>
+            <button
+              onClick={() => setRangeModeWithDates('week')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                rangeMode === 'week'
+                  ? 'bg-teal text-white'
+                  : 'bg-white text-teal hover:bg-gray-100'
+              }`}
+            >
+              Week
+            </button>
+            <button
+              onClick={() => setRangeModeWithDates('twoWeeks')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                rangeMode === 'twoWeeks'
+                  ? 'bg-teal text-white'
+                  : 'bg-white text-teal hover:bg-gray-100'
+              }`}
+            >
+              Two Weeks
+            </button>
           </div>
 
           <div className="flex justify-center pt-4">
             <button
               className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
-              onClick={() => setShouldFetch(true)}
+              onClick={() => hasParamsChanged() && setShouldFetch(true)}
               title="Graph button available for manual refresh when auto-update doesn't trigger"
             >
               Graph
