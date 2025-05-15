@@ -15,32 +15,37 @@ export async function DELETE(request: Request) {
         if (!admin) {
             return Response.json({ error: 'Unauthorized' }, { status: 400 });
         }
-
-        // Get the data (ids) within the request
-        const data = await request.json();
-        console.log(new Date(data.date));
-
-        // Pass ids to database helper function
-        if (data.id) {
-            await deleteData([data.id], new Date(data.date));
-        }
-        else if (data.ids && Array.isArray(data.ids)) {
-            await deleteData(data.ids, new Date(data.date));
-        } 
         else {
-            return NextResponse.json({
-                status: 400,
-                message: 'Missing or invalid data for deletion.',
-            });
-        }
+            // Get the data (ids) within the request
+            const data = await request.json();
+            console.log(new Date(data.date));
 
-        return NextResponse.json({
-            status: 200,
-            message: 'Data deleted successfully.',
-        });
-    } 
+            // Pass ids to database helper function
+            try {
+                if (data.id) {
+                    await deleteData([data.id], new Date(data.date));
+                }
+                else if (data.ids && Array.isArray(data.ids)) {
+                    await deleteData(data.ids, new Date(data.date));
+                }
+
+                return NextResponse.json({
+                    status: 200,
+                    message: 'Data deleted successfully.',
+                });
+            }
+            catch (error) {
+                return NextResponse.json({
+                    status: 400,
+                    message: 'Missing or invalid data for deletion.',
+                });
+            }
+        }
+    }
     catch (error) {
-        console.error('Error deleting data:', error);
-        return NextResponse.json({ status: 500, message: 'Error deleting data.' });
+        return NextResponse.json({ 
+            status: 500, 
+            message: 'Internal server error in deleting data.'
+        });
     }
 }

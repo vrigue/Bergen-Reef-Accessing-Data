@@ -17,6 +17,6 @@ export default async function deleteData(ids: number[], date : Date) {
     } 
     catch (error) {
         console.error('Error deleting data:', error);
-        throw new Error('Error deleting data.');
+        throw new Error(`Error deleting data: ${error}`);
     }
 }

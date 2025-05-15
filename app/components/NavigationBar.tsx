@@ -7,9 +7,10 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface NavigationBarProps {
   defaultIndex: number;
+  username: string;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
+const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username }) => {
   const isDefaultIndexNegative = defaultIndex === -1;
   return (
     <div
@@ -17,16 +18,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex }) => {
       style={{ position: "relative", zIndex: 10 }}
     >
       <a href="/">
-        <div className="flex items-left text-2xl">
-          <img
-            src="/images/coral-reef-logo.png"
-            style={{ width: "5%", height: "auto" }}
-            alt="Coral Reef Logo"
-          />
-          <h1 className = "text-dark-orange font-semibold pl-3 pt-1">Coral Reeve</h1>
-        </div>
+      <div className="flex items-center gap-3 min-w-0">
+        <img
+          src="/images/coral-reef-logo.png"
+          className="w-8 sm:w-10 md:w-12 h-auto"
+          alt="Coral Reef Logo"
+        />
+        <h1 className="text-dark-orange font-semibold text-base sm:text-xl md:text-2xl whitespace-nowrap truncate min-w-0">
+          Bergen Reef Accessing Data
+        </h1>
+      </div>
       </a>
       <div className="flex items-right justify-between">
+      <h1 className="text-base sm:text-lg md:text-xl text-dark-orange font-semibold pr-5 pt-2 whitespace-nowrap">Welcome {username}!</h1>
         <a href="/profile">
           <div className="pt-1.5 pr-8">
             <UserCircleIcon

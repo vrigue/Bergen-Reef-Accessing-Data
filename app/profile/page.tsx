@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { GetServerSideProps } from "next";
 import "../globals.css";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { ArrowUpRightIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserProvider, useUser } from "@auth0/nextjs-auth0/client";
 import ProfileClient from "../components/ProfileClient";
 import NavigationBar from "../components/NavigationBar";
@@ -35,7 +35,7 @@ export default function Page() {
 
   return (
     <div>
-      <NavigationBar defaultIndex={-1} />
+      <NavigationBar defaultIndex={-1} username={(user) ? user.name : "Guest"}/>
       <br></br>
       <br></br>
 
@@ -45,7 +45,7 @@ export default function Page() {
         {user ? (
           <div>
             <h1 className="text-2xl font-semibold">{user.name}</h1>
-            <p className="text-sm">{user.email}</p>
+            <h3 className="text-sm">{user.email}</h3>
           </div>
         ) : (
           <div>
@@ -59,14 +59,14 @@ export default function Page() {
           {!user && (
             <a
             href="/api/auth/login"
-            className="bg-teal text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition text-center"
+            className="bg-teal text-white px-6 py-2 rounded-xl shadow-lg hover:bg-orange-600 transition text-center"
           >
              Login
           </a>
           )}
           <a
             href="/api/auth/logout"
-            className="bg-teal text-white px-6 py-2 rounded-full shadow-lg hover:bg-orange-600 transition"
+            className="bg-teal text-white px-6 py-2 rounded-xl shadow-lg hover:bg-orange-600 transition"
           >
             Logout
           </a>
@@ -77,18 +77,21 @@ export default function Page() {
 
       {isAdmin && (
         <div className="flex justify-center">
-        <div className="rounded-md justify-content-center w-2/3 bg-gray-100 p-4" style={{height:400}}>
-          <ResponsiveContainer>
-            <UserList/>
-          </ResponsiveContainer>
+          <div className="rounded-md justify-content-center w-2/3 bg-gray-100 p-4" style={{height:400}}>
+            <ResponsiveContainer>
+              <UserList/>
+            </ResponsiveContainer>
+          </div>
+
+          <a
+            target="_blank"
+            href="https://docs.google.com/spreadsheets/d/1BF5JBYV3v2brBQQaRBo6X_J-uPCdDtzE4UUCDKtLPJA/edit?usp=sharing"
+            className="bg-teal text-white px-6 py-2 mt-5 rounded-xl shadow-lg hover:bg-medium-teal transition"
+          >
+            View Data Backup Spreadsheet <ArrowUpRightIcon className="inline w-4 h-4 text-white ml-1 align-text-bottom"/>
+          </a>
         </div>
-      </div>
       )}
-
-
-      <br></br>
-      <br></br>
-      <ProfileClient />
     </div>
   );
 }

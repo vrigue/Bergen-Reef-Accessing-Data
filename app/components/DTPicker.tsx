@@ -1,7 +1,7 @@
 import type { IDateComp, IDateParams } from "ag-grid-community";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
-import "flatpickr/dist/themes/material_blue.css";
+import "flatpickr/dist/themes/confetti.css";
 
 export class DTPicker implements IDateComp {
   params!: IDateParams;

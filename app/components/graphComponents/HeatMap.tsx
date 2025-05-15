@@ -31,7 +31,14 @@ const units = {
   Temperature: "°C",
   Alkalinity: "dKH",
   Calcium: "ppm",
+  pH: "no unit",
 };
+
+// Helper to format date as YYYY-MM-DDTHH:mm:ss in local time
+function formatLocalDateTime(date: Date) {
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
 
 export default function DataLineGraph() {
   const [startDate, setStartDate] = useState(new Date());
@@ -39,6 +46,7 @@ export default function DataLineGraph() {
   const [data, setData] = useState<DataPoint[]>([]);
   const [selectedName, setSelectedName] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [numWeeks, setNumWeeks] = useState(7);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
@@ -63,27 +71,32 @@ export default function DataLineGraph() {
   }, []);
 
   useEffect(() => {
+    const today = new Date();
+    const weeksAgo = new Date();
+    weeksAgo.setDate(today.getDate() - (7 * 7));
+    setStartDate(weeksAgo);
+    setEndDate(today);
+    setNumWeeks(7);
+    setShouldFetch(true);
+  }, []);
+
+  useEffect(() => {
     if (shouldFetch) {
       fetchData();
       setShouldFetch(false);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, startDate, endDate, selectedName]);
 
   useEffect(() => {
-    const today = new Date();
-    const sevenWeeksAgo = new Date();
-    sevenWeeksAgo.setDate(today.getDate() - 49); // 7 weeks = 49 days
-    setStartDate(sevenWeeksAgo);
-    setEndDate(today);
-    setShouldFetch(true);
-  }, []);
+    if (data.length > 0 && svgRef.current) {
+      drawChart();
+    }
+  }, [data, selectedName, startDate, endDate, shouldFetch]);
 
   async function fetchData() {
     try {
-      startDate.setHours(startDate.getHours() - 5);
-      endDate.setHours(endDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedName}`
+        `/api/searchDataByDateType?startDate=${formatLocalDateTime(startDate)}&endDate=${formatLocalDateTime(endDate)}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -97,12 +110,6 @@ export default function DataLineGraph() {
     }
   }
 
-  useEffect(() => {
-    if (data.length > 0 && svgRef.current) {
-      drawChart();
-    }
-  }, [data, selectedName]);
-
   const processDataForHeatMap = (): HeatMapData[] => {
     const heatMapData: HeatMapData[] = [];
     const nameData = data.filter((d) => d.name === selectedName);
@@ -111,8 +118,8 @@ export default function DataLineGraph() {
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
 
-    // Create a map to store min/max values for each week/day combination
-    const valueMap = new Map<string, { min: number; max: number }>();
+    // Create a map to store values for each week/day combination
+    const valueMap = new Map<string, number[]>();
 
     // Group data by week and day
     nameData.forEach((d) => {
@@ -120,31 +127,35 @@ export default function DataLineGraph() {
       const week = Math.floor(
         (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
       );
-      const day = date.getDay();
-      const key = `${week}-${day}`;
+      // Only process data for the selected number of weeks
+      if (week >= 0 && week < numWeeks) {
+        const day = date.getDay();
+        const key = `${week}-${day}`;
 
-      if (!valueMap.has(key)) {
-        valueMap.set(key, { min: d.value, max: d.value });
-      } else {
-        const current = valueMap.get(key)!;
-        valueMap.set(key, {
-          min: Math.min(current.min, d.value),
-          max: Math.max(current.max, d.value),
-        });
+        if (!valueMap.has(key)) {
+          valueMap.set(key, [d.value]);
+        } else {
+          valueMap.get(key)!.push(d.value);
+        }
       }
     });
 
-    // Convert map to array format
+    // Convert map to array format, calculating median for each cell
     valueMap.forEach((values, key) => {
       const [week, day] = key.split("-").map(Number);
-      const minValue = Number(values.min);
-      const maxValue = Number(values.max);
+      // Ensure all values are numbers
+      const numericValues = values.map(v => Number(v));
+      const sortedValues = [...numericValues].sort((a, b) => a - b);
+      const median = sortedValues.length % 2 === 0
+        ? (sortedValues[Math.floor(sortedValues.length / 2) - 1] + sortedValues[Math.floor(sortedValues.length / 2)]) / 2
+        : sortedValues[Math.floor(sortedValues.length / 2)];
+      
       heatMapData.push({
         week,
         day,
-        value: maxValue - minValue, // Use range (max-min) for coloring
-        minValue,
-        maxValue,
+        value: Number(median),
+        minValue: Number(Math.min(...numericValues)),
+        maxValue: Number(Math.max(...numericValues))
       });
     });
 
@@ -160,7 +171,7 @@ export default function DataLineGraph() {
     // Remove any existing tooltips
     d3.selectAll(".tooltip").remove();
 
-    const margin = { top: 30, right: 120, bottom: 60, left: 90 };
+    const margin = { top: 30, right: 150, bottom: 60, left: 70 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
@@ -186,27 +197,28 @@ export default function DataLineGraph() {
     const heatMapData = processDataForHeatMap();
 
     // Calculate quartiles and IQR for outlier detection
-    const values = heatMapData.map((d) => d.value).sort((a, b) => a - b);
+    const values = heatMapData.map((d) => Number(d.value)).sort((a, b) => a - b);
     const q1 = d3.quantile(values, 0.25) || 0;
     const q3 = d3.quantile(values, 0.75) || 0;
     const iqr = q3 - q1;
     const upperBound = q3 + 1.5 * iqr;
+    const lowerBound = q1 - 1.5 * iqr;
 
     // Calculate the value range for color scaling, excluding outliers
     const valueRange: [number, number] = [
-      0,
-      Math.min(upperBound, d3.max(values) || 0),
+      Math.max(lowerBound, d3.min(values) || 0),
+      Math.min(upperBound, d3.max(values) || 0)
     ];
 
-    // Create color scale that emphasizes variation // currently buggy
+    // Create color scale that emphasizes variation
     const colorScale = d3
       .scaleSequential()
       .domain([valueRange[0], valueRange[1]])
       .interpolator(d3.interpolateRdYlBu)
-      .clamp(true); // Clamp values outside the domain
+      .clamp(true);
 
     // Create the heat map grid
-    const cellWidth = width / 7;
+    const cellWidth = width / numWeeks;
     const cellHeight = height / 7;
 
     // Define days array
@@ -214,7 +226,7 @@ export default function DataLineGraph() {
 
     // Create all possible week-day combinations
     const allCells = [];
-    for (let week = 0; week < 7; week++) {
+    for (let week = 0; week < numWeeks; week++) {
       for (let day = 0; day < 7; day++) {
         allCells.push({ week, day });
       }
@@ -230,7 +242,7 @@ export default function DataLineGraph() {
       .attr("y", (d) => d.day * cellHeight)
       .attr("width", cellWidth)
       .attr("height", cellHeight)
-      .attr("fill", "#f0f0f0") // Light gray background
+      .attr("fill", "#f0f0f0")
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
@@ -253,7 +265,7 @@ export default function DataLineGraph() {
 
     // Add cells with data
     g.selectAll(".data-cell")
-      .data(heatMapData.filter((d) => d.week < 7))
+      .data(heatMapData.filter((d) => d.week < numWeeks))
       .enter()
       .append("rect")
       .attr("class", "data-cell")
@@ -262,8 +274,9 @@ export default function DataLineGraph() {
       .attr("width", cellWidth)
       .attr("height", cellHeight)
       .attr("fill", (d) => {
-        // If value is above upperBound, it's an outlier - color it red
-        return d.value > upperBound ? "#67000d" : colorScale(d.value);
+        return d.value > upperBound ? "#67000d" : 
+               d.value < lowerBound ? "#053061" : 
+               colorScale(d.value);
       })
       .attr("stroke", "white")
       .attr("stroke-width", 1)
@@ -275,10 +288,11 @@ export default function DataLineGraph() {
         tooltip
           .html(
             `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+          Median: ${d.value.toFixed(2)} ${units[selectedName]}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedName]}<br/>
-          Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}<br/>
-          Range: ${d.value.toFixed(2)} ${units[selectedName]}${
-              d.value > upperBound ? "<br/>(Outlier)" : ""
+          Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}${
+              d.value > upperBound ? "<br/>(High Outlier)" : 
+              d.value < lowerBound ? "<br/>(Low Outlier)" : ""
             }`
           )
           .style("left", event.pageX + 10 + "px")
@@ -298,7 +312,7 @@ export default function DataLineGraph() {
       .text("Gray cells = No data");
 
     // Add week labels with actual dates
-    const weekLabels = d3.range(7).map((week) => {
+    const weekLabels = d3.range(numWeeks).map((week) => {
       const weekStart = new Date(startDate);
       weekStart.setDate(startDate.getDate() + week * 7);
       return d3.timeFormat("%m-%d")(weekStart);
@@ -369,7 +383,7 @@ export default function DataLineGraph() {
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .style("font-weight", "bold")
-      .text(`Range`);
+      .text(`Median`);
 
     g.append("text")
       .attr("x", legendX)
@@ -385,7 +399,7 @@ export default function DataLineGraph() {
         offset: `${(100 * i) / (numTicks - 1)}%`,
         color: colorScale(t),
       })),
-      { offset: "100%", color: "#67000d" }, // Add outlier color at the top
+      { offset: "100%", color: "#67000d" },
     ];
 
     const gradient = g
@@ -393,9 +407,9 @@ export default function DataLineGraph() {
       .append("linearGradient")
       .attr("id", "color-gradient")
       .attr("x1", "0%")
-      .attr("y1", "0%")
+      .attr("y1", "100%")
       .attr("x2", "0%")
-      .attr("y2", "100%");
+      .attr("y2", "0%");
 
     gradient
       .selectAll("stop")
@@ -425,27 +439,58 @@ export default function DataLineGraph() {
 
   const handleNameSelect = (name: string) => {
     setSelectedName(name);
+    setShouldFetch(true);
   };
 
   const handleStartDateChange = (date: Date) => {
-    setStartDate(date);
-    // Calculate end date as 7 weeks from start date
-    const newEndDate = new Date(date);
-    newEndDate.setDate(date.getDate() + 49); // 7 weeks = 49 days
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let newStartDate = new Date(date);
+    let newEndDate = new Date(date);
+    newEndDate.setDate(newStartDate.getDate() + numWeeks * 7);
+    if (newEndDate > today) {
+      newEndDate = today;
+      newStartDate = new Date(today);
+      newStartDate.setDate(today.getDate() - numWeeks * 7);
+    }
+    setStartDate(newStartDate);
     setEndDate(newEndDate);
+    setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    setEndDate(date);
-    // Calculate start date as 7 weeks before end date
-    const newStartDate = new Date(date);
-    newStartDate.setDate(date.getDate() - 49); // 7 weeks = 49 days
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let newEndDate = new Date(date);
+    if (newEndDate > today) {
+      newEndDate = today;
+    }
+    let newStartDate = new Date(newEndDate);
+    newStartDate.setDate(newEndDate.getDate() - numWeeks * 7);
+    setEndDate(newEndDate);
     setStartDate(newStartDate);
+    setShouldFetch(true);
+  };
+
+  const handleWeeksChange = (weeks: number) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let newNumWeeks = weeks;
+    let newEndDate = new Date(endDate);
+    if (newEndDate > today) {
+      newEndDate = today;
+    }
+    let newStartDate = new Date(newEndDate);
+    newStartDate.setDate(newEndDate.getDate() - newNumWeeks * 7);
+    setNumWeeks(newNumWeeks);
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+    setShouldFetch(true);
   };
 
   return (
-    <div className="grid grid-cols-3 gap-7 pt-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg h-[800px]">
+    <div className="grid grid-cols-3 gap-7 h-full p-5">
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
         <svg ref={svgRef} width="100%" height="100%"></svg>
       </div>
 
@@ -477,8 +522,11 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center group relative">
             Enter Date Constraints
+            <div className="absolute left-1/2 top-full z-10 mt-2 w-[260px] -translate-x-1/2 bg-white p-3 rounded-lg shadow-sm text-center text-sm text-neutral-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              Note: The date range will always be the weeks represented
+            </div>
           </div>
           <div
             className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
@@ -495,18 +543,20 @@ export default function DataLineGraph() {
             <DateBoundElement value={endDate} onChange={handleEndDateChange} />
           </div>
 
-          <div className="flex justify-center mb-4">
-            <div className="bg-white p-3 rounded-lg shadow-sm text-center text-sm text-neutral-700">
-              Note: The date range will always be 7 weeks
-            </div>
+          <div className="flex flex-col items-center justify-center">
+            <StepSlider value={numWeeks} onChange={handleWeeksChange} />
           </div>
 
           <div className="flex justify-center pt-4">
             <button
-              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange"
+              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
               onClick={() => setShouldFetch(true)}
+              title="Graph button available for manual refresh when auto-update doesn't trigger"
             >
               Graph
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
+                Graph button available for manual refresh when auto-update doesn't trigger
+              </div>
             </button>
           </div>
         </div>

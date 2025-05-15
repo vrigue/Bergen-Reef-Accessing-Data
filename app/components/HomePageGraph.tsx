@@ -1,7 +1,7 @@
 "use client";
 import { string } from "prop-types"; // not used
 import React, { useEffect, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import "../globals.css";
 
 const infoContent = {
@@ -71,18 +71,13 @@ export default function HomePageGraph() {
 
   return (
     <>
-    <div className="flex flex-col">
-      <select //dropdown selecting element for graph
-            style={{
-              float: "right",
-              width: "815px",
-              height: "30px",
-              textAlign: "center",
-              marginTop: -47
-            }} // could also use "left" here for og HELLO substring(0, 4)
+      <div className="flex flex-col items-center w-full px-4">
+        {/* Dropdown */}
+        <div className="w-full max-w-screen-2xl min-w-[750px] mb-4">
+          <select
             onChange={handleChange}
             value={selectedType}
-            className="mb-6 z-10 w-3/4 origin-top-right rounded-md bg-teal text-white font-semibold ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+            className="w-full h-10 text-center rounded-md bg-teal md:text-lg text-white font-semibold ring-1 ring-black/5 transition focus:outline-none"
           >
             <option value="pH">PH</option>
             <option value="Salinity">Salinity</option>
@@ -93,30 +88,41 @@ export default function HomePageGraph() {
             <option value="Nitrate">Nitrate</option>
             <option value="Phosphate">Phosphate</option>
             <option value="Nitrite">Nitrite</option>
-      </select>
+          </select>
+        </div>
 
-      <div className="bg-white rounded-lg p-5 pl-1">
-        <LineChart width={790} height={410} data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="datetime" tickFormatter={(tick) => tick.split("/")[0] + "/" + tick.split("/")[1]} stroke="#000000" />
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(tick) => tick.toString().split(".")[0]} stroke="#000000" />
-          <Tooltip />
-          <Line type="monotone" dataKey="value" stroke="#feb934" dot={false} strokeWidth='2.5'/>
-        </LineChart>
+        {/* Chart */}
+        <div className="bg-white rounded-lg p-4 w-full max-w-screen-2xl min-w-[750px]">
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="datetime"
+                tickFormatter={(tick) => tick.split("/")[0] + "/" + tick.split("/")[1]}
+                stroke="#000000"
+              />
+              <YAxis
+                domain={['dataMin - 1', 'dataMax + 1']}
+                tickFormatter={(tick) => tick.toString().split(".")[0]}
+                stroke="#000000"
+              />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#feb934"
+                dot={false}
+                strokeWidth={2.5}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Text Area */}
+        <div className="mt-6 w-full max-w-screen-2xl min-w-[750px] p-4 bg-white drop-shadow-orange rounded-lg text-base md:text-lg text-gray-800">
+          {selectedInfo}
+        </div>
       </div>
-
-
-      <div //Text Area for the element information
-
-        className="mt-6 p-6 bg-white drop-shadow-orange rounded-lg"
-        style={{
-          fontSize: "16px",
-          fontWeight: "normal",
-          color: "#333",
-        }}
-      >
-        {selectedInfo}
-      </div>
-    </div></>
+    </>
   );
 }

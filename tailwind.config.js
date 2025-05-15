@@ -6,18 +6,6 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    fontSize: {
-      'xs': '0.75rem',     
-      'sm': '0.975rem',    
-      'base': '1rem',      
-      'lg': '1.125rem',    
-      'xl': '1.25rem',     
-      '2xl': '1.5rem',     
-      '3xl': '1.875rem',  
-      '4xl': '2.25rem',    
-      '5xl': '2.75rem',    
-      '6xl': '3rem',       
-    },
     fontFamily: {
       'sans': ['"Montserrat"', 'ui-sans-serif', 'system-ui']
     },
@@ -25,8 +13,8 @@ module.exports = {
       colors: {
         'light-teal': '#A2D9D9',
         'teal': '#68BFC6',
-        'medium-teal': '#009DA8',
-        'dark-teal': '#3B6769',
+        'medium-teal': '#58b0b8',
+        'dark-teal': '#4f8a8c',
         'light-orange': '#FCD98C',
         'medium-orange': '#FFCA57',
         'orange': '#FEB934',
