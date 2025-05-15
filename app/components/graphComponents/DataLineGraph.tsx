@@ -395,7 +395,7 @@ export default function DataLineGraph() {
           <div
             className={`flex items-center ${
               true ? "flex-col" : "space-x-4" // Can change this to make it horizontal using isSmallScreen
-            } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
+            } justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
           >
             <DateBoundElement value={startDate} onChange={setStartDate} />
 

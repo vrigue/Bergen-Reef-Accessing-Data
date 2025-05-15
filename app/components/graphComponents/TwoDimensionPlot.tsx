@@ -329,7 +329,7 @@ export default function DataLineGraph() {
             Enter Date Constraints
           </div>
           <div
-            className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
+            className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
           >
             <DateBoundElement value={startDate} onChange={handleStartDateChange} />
 
