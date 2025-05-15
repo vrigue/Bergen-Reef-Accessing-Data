@@ -318,6 +318,19 @@ export default function BoxPlot() {
       .style("font-size", "24px")
       .style("font-weight", "bold")
       .text(`${selectedName} (${units[selectedName]})`);
+
+    // Add x-axis label with date range
+    const formatDateTime = d3.timeFormat("%m/%d/%Y %H:%M:%S");
+    const dateLabel = `${formatDateTime(startDate)} - ${formatDateTime(endDate)}`;
+    
+    g.append("text")
+      .attr("fill", "black")
+      .attr("x", width / 2 + margin.left/2)  // Adjust x position to match box plot centering
+      .attr("y", height + margin.bottom - 5)
+      .attr("text-anchor", "middle")
+      .style("font-size", "20px")
+      .style("font-weight", "bold")
+      .text(dateLabel);
   };
 
   const handleNameSelect = (name: string) => {
