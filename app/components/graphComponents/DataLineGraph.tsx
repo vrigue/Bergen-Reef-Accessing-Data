@@ -37,6 +37,7 @@ export default function DataLineGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [useInterpolation, setUseInterpolation] = useState(true);
+  const [lastFetchedRange, setLastFetchedRange] = useState<{ start: Date; end: Date } | null>(null);
 
   const availableNames = [
     "Salinity",
@@ -59,6 +60,23 @@ export default function DataLineGraph() {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (!lastFetchedRange) {
+      setShouldFetch(true);
+      setLastFetchedRange({ start: startDate, end: endDate });
+      return;
+    }
+
+    const rangeExtended = 
+      startDate < lastFetchedRange.start || 
+      endDate > lastFetchedRange.end;
+
+    if (rangeExtended) {
+      setShouldFetch(true);
+      setLastFetchedRange({ start: startDate, end: endDate });
+    }
+  }, [startDate, endDate]);
 
   useEffect(() => {
     if (shouldFetch) {
@@ -170,11 +188,40 @@ export default function DataLineGraph() {
       }
     }
 
-    // Adjust x-axis ticks based on the number of days in the range
+    // Calculate number of ticks based on data range
+    const timeRange = endDate.getTime() - startDate.getTime();
+    const threeWeeksInMs = 21 * 24 * 60 * 60 * 1000; // 3 weeks in milliseconds
+    const minTickCount = 10;
+    const tickInterval = timeRange / (minTickCount - 1);
+    const tickDates = [];
+    
+    // Only apply 10+ ticks for ranges longer than 3 weeks
+    if (timeRange > threeWeeksInMs) {
+      for (let i = 0; i < minTickCount; i++) {
+        tickDates.push(new Date(startDate.getTime() + i * tickInterval));
+      }
+    }
+
+    // Create a function to format dates and handle duplicates
+    const formatDate = (() => {
+      const seen = new Set();
+      return (date: Date) => {
+        const formatted = d3.timeFormat("%m-%d")(date);
+        if (seen.has(formatted)) {
+          // If we've seen this date format before, add the year
+          return d3.timeFormat("%m-%d-%y")(date);
+        }
+        seen.add(formatted);
+        return formatted;
+      };
+    })();
+
+    // Use either the calculated tick dates (if we want 10 or more) or default to 5 ticks
     const xAxis = d3
       .axisBottom(x)
-      .ticks(5)  // Limit to 5 ticks
-      .tickFormat(d3.timeFormat("%m-%d"));  // Show only month-day
+      .tickValues(tickDates.length >= 10 ? tickDates : undefined)
+      .ticks(tickDates.length >= 10 ? undefined : 5)
+      .tickFormat((d: Date) => formatDate(d));  // Use our custom formatter
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
