@@ -191,7 +191,7 @@ export default function DataLineGraph() {
     // Calculate number of ticks based on data range
     const timeRange = endDate.getTime() - startDate.getTime();
     const threeWeeksInMs = 21 * 24 * 60 * 60 * 1000; // 3 weeks in milliseconds
-    const minTickCount = 10;
+    const minTickCount = 12;
     const tickInterval = timeRange / (minTickCount - 1);
     const tickDates = [];
     
@@ -468,13 +468,13 @@ export default function DataLineGraph() {
               true ? "flex-col" : "space-x-4" // Can change this to make it horizontal using isSmallScreen
             } justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={setStartDate}/>
+            <DateBoundElement value={startDate} onChange={(date) => { setStartDate(date); setShouldFetch(true); }} />
 
             <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
 
-            <DateBoundElement value={endDate} onChange={setEndDate} />
+            <DateBoundElement value={endDate} onChange={(date) => { setEndDate(date); setShouldFetch(true); }} />
           </div>
 
           <div className="flex justify-center pt-4">
