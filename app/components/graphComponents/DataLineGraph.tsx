@@ -419,14 +419,14 @@ export default function DataLineGraph() {
           </div>
 
           <div className="flex items-center justify-center mt-4 mx-3">
-            <label className="flex items-center space-x-2 cursor-pointer">
+            <label className="flex items-center bg-teal rounded-lg m-1 p-3 space-x-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={!useInterpolation}
                 onChange={(e) => setUseInterpolation(!e.target.checked)}
                 className="form-checkbox h-5 w-5 text-teal rounded border-gray-300 focus:ring-teal"
               />
-              <span className="text-gray-700 font-medium">Display Discrete Points</span>
+              <span className="text-white font-medium">Display Discrete Points</span>
             </label>
           </div>
         </div>

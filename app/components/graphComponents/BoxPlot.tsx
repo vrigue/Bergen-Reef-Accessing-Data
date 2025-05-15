@@ -472,18 +472,18 @@ export default function BoxPlot() {
         </h1>
         <div className="flex flex-col">
           <Menu as="div" className="relative inline-block text-left m-3">
-            <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
-              <span style={{ color: colorScale(0) }}>
+            <MenuButton className="inline-flex w-full justify-center outline outline-1 outline-medium-blue rounded-xl bg-light-blue px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
+              <span className="text-blue font-semibold">
                 {selectedName || "Select Name"}
               </span>
-              <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
+              <ChevronDownIcon className="-mr-1 size-6 text-blue" />
             </MenuButton>
-            <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
+            <MenuItems className="w-full z-50 right-1/2 transform mt-2 w-56 bg-light-blue rounded-xl shadow-lg ring-1 ring-black/5">
               {availableNames.map((name) => (
                 <MenuItem key={name}>
                   <button
                     onClick={() => handleNameSelect(name)}
-                    className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
                   >
                     {name}
                   </button>
@@ -494,7 +494,7 @@ export default function BoxPlot() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-left">
             Enter Date Constraints
           </div>
           <div className="flex items-center justify-center space-x-2 px-3">
@@ -509,7 +509,7 @@ export default function BoxPlot() {
             >
               <DateBoundElement value={startDate || new Date()} onChange={handleStartDateChange} />
 
-              <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
+              <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
                 <span className="text-white font-semibold text-center">to</span>
               </div>
 

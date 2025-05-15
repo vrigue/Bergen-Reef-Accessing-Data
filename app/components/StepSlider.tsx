@@ -20,8 +20,8 @@ const StepSlider: React.FC<StepSliderProps> = ({ value, onChange }) => {
   };
 
   return (
-    <div className="w-full">
-      <div className="mt-[30px] ml-4 text-left text-m font-semibold"># of Weeks Represented: {sliderValue}</div>
+    <div className="w-full bg-teal rounded-xl text-white p-2 m-1 mt-2">
+      <div className="ml-4 text-left text-m font-semibold"># of Weeks Represented: {sliderValue}</div>
       <input
         type="range"
         min="2"
