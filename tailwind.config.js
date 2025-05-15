@@ -22,7 +22,10 @@ module.exports = {
         'light-gray': '#F8F8F9',
         'medium-gray': '#B1B1B4',
         'gray': '#757575',
-        'dark-gray': '#5E5E5E'
+        'dark-gray': '#5E5E5E',
+        'blue': '#1f77b4',
+        'medium-blue': '#3290D2',
+        'light-blue': '#ECF6FF',
       },
       dropShadow: {
         'orange': '0 5px 5px #ffb734',

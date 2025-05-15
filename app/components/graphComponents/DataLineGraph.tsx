@@ -323,20 +323,20 @@ export default function DataLineGraph() {
               key={index}
               className="relative inline-block text-left m-3"
             >
-              <MenuButton className="inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
-                <span style={{ color: colorScale(index) }}>
+              <MenuButton className="inline-flex w-full justify-center outline outline-1 outline-medium-blue rounded-xl bg-light-blue px-3 py-2 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
+                <span className="text-blue font-semibold">
                   {name || "Select Name"}
                 </span>
-                <ChevronDownIcon className="-mr-1 size-6 text-sky-700" />
+                <ChevronDownIcon className="-mr-1 size-6 text-blue" />
               </MenuButton>
-              <MenuItems className="z-50 right-1/2 transform translate-x-1/2 mt-2 w-56 bg-white shadow-lg ring-1 ring-black/5">
+              <MenuItems className="w-full z-50 right-1/2 transform mt-2 w-56 bg-light-blue rounded-xl shadow-lg ring-1 ring-black/5">
                 {availableNames
                   .filter((n) => !selectedNames.includes(n))
                   .map((n) => (
                     <MenuItem key={n}>
                       <button
                         onClick={() => handleNameSelect(index, n)}
-                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
                       >
                         {n}
                       </button>
@@ -364,7 +364,7 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center">
+          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-left">
             Enter Date Constraints
           </div>
           <div
@@ -372,9 +372,9 @@ export default function DataLineGraph() {
               true ? "flex-col" : "space-x-4" // Can change this to make it horizontal using isSmallScreen
             } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={setStartDate} />
+            <DateBoundElement value={startDate} onChange={setStartDate}/>
 
-            <div className="bg-teal p-1 pl-2 pr-2 rounded-lg">
+            <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
 
@@ -385,11 +385,10 @@ export default function DataLineGraph() {
             <button
               className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
               onClick={() => setShouldFetch(true)}
-              title="Graph button available for manual refresh when auto-update doesn't trigger"
             >
               Graph
               <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
-                Graph button available for manual refresh when auto-update doesn't trigger
+                Graph button available for manual refresh when auto-update doesn't trigger.
               </div>
             </button>
           </div>

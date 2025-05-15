@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import flatpickr from "flatpickr";
-import "flatpickr/dist/themes/material_blue.css";
+import "flatpickr/dist/themes/confetti.css";
 
 const DateBoundElement = ({ value, onChange }: { value: Date | null; onChange: (date: Date | null) => void }) => {
   const ref = React.useRef<HTMLInputElement>(null);
