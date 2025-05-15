@@ -32,7 +32,7 @@ const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) 
                 leaveFrom="scale-100 opacity-100"
                 leaveTo="scale-95 opacity-0"
             >
-                <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+                <div className={(type === 'guide') ? "bg-white rounded-lg shadow-lg max-w-3xl w-full" : "bg-white rounded-lg shadow-lg max-w-md w-full"}>
                 <div className="grid grid-flow-col grid-rows-1 place-content-center gap-2 bg-teal drop-shadow-gray drop-shadow-lg rounded-lg p-4">
                     <h2 className="text-xl text-white font-semibold">{title}</h2>
                     {type === 'guide' && (
@@ -51,15 +51,36 @@ const HistoryPageDialog = ({ isOpen, title, message, type, onClose, onConfirm}) 
                 <div className="flex flex-col gap-4 p-6">
                     {type === 'guide' && (
                         <div className="text-lg mt-2">
-                            <p className="mb-4">
+                            <p className="mb-3">
                                 To sort or reorder 
                                 (ascending <ArrowUpIcon className="inline w-4 h-4 text-gray-500 ml-1 align-text-bottom"/>, descending <ArrowDownIcon className="inline w-4 h-4 text-gray-500 ml-1 align-text-bottom"/>), 
-                                <p className="inline font-semibold"> click on the desired column name.</p>
+                                <b> click on the desired column name.</b>
                             </p> 
-                            <p>
+                            <p className="mb-3">
                                 To filter, click on the 3 horizontal lines icon 
                                 <Bars3Icon className="inline w-5 h-5 text-gray-500 ml-1 align-text-bottom"/>
-                                <p className="inline font-semibold"> next to the desired column name.</p>
+                                <b> next to the desired column name.</b>
+                            </p>
+                            <p className="mb-3">
+                                To clear all existing filters, click on the <b>Clear Filters</b> button.
+                            </p>
+                            <p className="mb-3">
+                                To refresh the table and view the latest updates, click on the <b>Refresh</b> button.
+                            </p>
+                            <p className="font-semibold underline mb-3">
+                                For Administrators:
+                            </p>
+                            <p className="mb-3">
+                                Click on the <b>Enter Edit Mode</b> button to create, delete, and edit data.
+                            </p>
+                            <p className="mb-3">
+                                To create data entries, click on the <b>Create</b> button. Click on the dropdown menu to select an element and double click on the cell in the <b>Value</b> column to type in the measurement.
+                            </p>
+                            <p className="mb-3">
+                                To delete data entries, select the desired entries using the <b>checkboxes</b> on the leftmost table column and click on the <b>Delete Selected</b> button.
+                            </p>
+                            <p>
+                                To edit data entries, double click on the cell in the <b>Value</b> column of the desired entry. You may only edit the value or measurement of existing rows.
                             </p>
                         </div>
                     )}
