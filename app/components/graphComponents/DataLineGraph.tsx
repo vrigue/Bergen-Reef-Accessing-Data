@@ -316,6 +316,7 @@ export default function DataLineGraph() {
       const nameData = data.filter((d) => d.name === name);
       const lineFunction = createLine(index === 1);
       
+      // Draw the main data line
       g.append("path")
         .datum(nameData)
         .attr("fill", "none")
@@ -323,6 +324,29 @@ export default function DataLineGraph() {
         .attr("stroke-width", 1.5)
         .attr("d", lineFunction)
         .attr("transform", `translate(${margin.left / 4},0)`);
+
+      // Draw dotted line for gaps in data
+      const gapsLineFunction = createLine(index === 1).defined((d) => true);
+      g.append("path")
+        .datum(nameData)
+        .attr("fill", "none")
+        .attr("stroke", "#999") // gray color
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "3,3") // creates dotted line
+        .attr("d", gapsLineFunction)
+        .attr("opacity", 0.5)
+        .attr("transform", `translate(${margin.left / 4},0)`)
+        .style("display", (d) => {
+          // Only show if there are gaps in the data
+          const hasGaps = d.some((_, i) => {
+            if (i === 0) return false;
+            const curr = new Date(d[i].datetime);
+            const prev = new Date(d[i-1].datetime);
+            const diffHours = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60);
+            return diffHours > 2; // Consider gaps larger than 2 hours
+          });
+          return hasGaps ? null : "none";
+        });
 
       // Only add points if not using interpolation
       if (!useInterpolation) {
@@ -455,11 +479,11 @@ export default function DataLineGraph() {
 
           <div className="flex justify-center pt-4">
             <button
-              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
+              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative inline-block group w-full mx-3"
               onClick={() => setShouldFetch(true)}
             >
               Graph
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
+              <div className="absolute pointer-events-none top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 hover:opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
                 Graph button available for manual refresh when auto-update doesn't trigger.
               </div>
             </button>
