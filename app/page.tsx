@@ -79,7 +79,7 @@ export default function Page() {
   const { user } = useUser();
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState(["pH"]);
+  const [selectedType, setSelectedType] = useState("Salinity");
 
   useEffect(() => {
     async function fetchData() {
@@ -116,13 +116,13 @@ export default function Page() {
       <div style={styles.container}>
         {/*ELEMENTS*/}
         <div style={{ position: "relative", zIndex: 1 } }>
-          <HomePageElements />
+          <HomePageElements selectedType={selectedType} onTypeSelectAction={setSelectedType} />
         </div>
 
         {/*CHART*/}
         <div className="w-3/5 rounded-lg p-3 ml-1" style={{ position: "relative", zIndex: 1 }}>
           <ResponsiveContainer width={"100%"} height={"auto"}>
-            <HomePageGraph />
+            <HomePageGraph selectedType={selectedType} onTypeSelectAction={setSelectedType} />
           </ResponsiveContainer>
 
           {/*TEXT AREA BELOW GRAPH*/}

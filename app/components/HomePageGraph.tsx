@@ -16,24 +16,45 @@ const infoContent = {
   Phosphate: 'Phosphate presence is necessary for coral tissue growth, but too much can actually reduce growth and bring algae to the tank which will compete with the corals for nutrients. Regular water changes and proper filtration allow reef keepers to regulate these levels.',
 };
 
+interface HomePageGraphProps {
+  selectedType: string;
+  onTypeSelectAction: (type: string) => void;
+}
 
-export default function HomePageGraph() {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  label?: string;
+  selectedType?: string;
+}
+
+const CustomTooltip = ({ active, payload, label, selectedType }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    // Parse the datetime string and add 6 hours
+    const date = new Date(label);
+    date.setHours(date.getHours() + 6);
+    
+    return (
+      <div className="bg-white p-2 border border-gray-200 rounded shadow">
+        <p className="text-sm">{date.toLocaleString()}</p>
+        <p className="text-sm font-semibold">{`${selectedType}: ${payload[0].value}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export default function HomePageGraph({ selectedType, onTypeSelectAction }: HomePageGraphProps) {
   const [chartData, setChartData] = useState([]);
-  const [selectedType, setSelectedTypes] = useState<string | undefined>("Salinity");
-  const [selectedInfo, setSelectedInfo] = React.useState(infoContent.Salinity);
-
-  //setSelectedTypes("pH");
+  const [selectedInfo, setSelectedInfo] = React.useState(infoContent[selectedType]);
 
   const handleChange = (e) => {
-    setSelectedTypes(e.target.value);
-    setSelectedInfo(infoContent[e.target.value])
+    onTypeSelectAction(e.target.value);
+    setSelectedInfo(infoContent[e.target.value]);
   };
   
-  //getting chart data for the graph from the api
   useEffect(() => {
     async function fetchData() {
-      if (selectedType.length === 0) return; // Prevent empty API calls
-
       try {
         const response = await fetch(
           `/api/getMostRecentData?type=${selectedType}`
@@ -49,11 +70,16 @@ export default function HomePageGraph() {
 
         // Filter and format data
         const filteredData = result
-          .filter((item) => selectedType.includes(item.name)) // Fix comparison
-          .map((item) => ({
-            ...item,
-            datetime: new Date(item.datetime).toLocaleString(), // Fix datetime format
-          }));
+          .filter((item) => selectedType.includes(item.name))
+          .map((item) => {
+            const date = new Date(item.datetime);
+            date.setHours(date.getHours() - 2);
+            
+            return {
+              ...item,
+              datetime: date.toLocaleString(),
+            };
+          });
 
         console.log("Filtered data:", filteredData);
         const reversedData = filteredData.reverse();
@@ -64,15 +90,17 @@ export default function HomePageGraph() {
     }
 
     fetchData();
-    const interval = setInterval(fetchData, 300000); // Fetch every 5 minutes (300,000 ms) (10,000)
-    console.log("fetched the data pooks");
+    const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
-  }, [selectedType]); // Runs when selectedType changes
+  }, [selectedType]);
+
+  useEffect(() => {
+    setSelectedInfo(infoContent[selectedType]);
+  }, [selectedType]);
 
   return (
     <>
       <div className="flex flex-col items-center w-full px-4">
-        {/* Dropdown */}
         <div className="w-full max-w-screen-2xl min-w-[750px] mb-4">
           <select
             onChange={handleChange}
@@ -91,7 +119,6 @@ export default function HomePageGraph() {
           </select>
         </div>
 
-        {/* Chart */}
         <div className="bg-white rounded-lg p-4 w-full max-w-screen-2xl min-w-[750px]">
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={chartData}>
@@ -106,7 +133,7 @@ export default function HomePageGraph() {
                 tickFormatter={(tick) => tick.toString().split(".")[0]}
                 stroke="#000000"
               />
-              <Tooltip />
+              <Tooltip content={(props) => <CustomTooltip {...props} selectedType={selectedType} />} />
               <Line
                 type="monotone"
                 dataKey="value"
@@ -118,7 +145,6 @@ export default function HomePageGraph() {
           </ResponsiveContainer>
         </div>
 
-        {/* Text Area */}
         <div className="mt-6 w-full max-w-screen-2xl min-w-[750px] p-4 bg-white drop-shadow-orange rounded-lg text-base md:text-lg text-gray-800">
           {selectedInfo}
         </div>
