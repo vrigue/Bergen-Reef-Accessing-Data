@@ -94,7 +94,7 @@ export default function Page() {
           href="https://docs.google.com/spreadsheets/d/1BF5JBYV3v2brBQQaRBo6X_J-uPCdDtzE4UUCDKtLPJA/edit?usp=sharing"
           className="bg-teal text-white px-6 py-2 rounded-xl shadow-lg hover:bg-medium-teal transition"
         >
-          View Data Backup Spreadsheet in New Tab <ArrowUpRightIcon className="inline w-4 h-4 text-white ml-1 align-text-bottom"/>
+          View Data Backup Spreadsheet <ArrowUpRightIcon className="inline w-4 h-4 text-white ml-1 align-text-bottom"/>
         </a>
       </div>
       
