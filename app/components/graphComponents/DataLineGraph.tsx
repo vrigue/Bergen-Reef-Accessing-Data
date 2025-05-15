@@ -393,11 +393,13 @@ export default function DataLineGraph() {
   const addPlot = () => {
     if (selectedNames.length < 5) {
       setSelectedNames([...selectedNames, ""]);
+      setShouldFetch(true);
     }
   };
 
   useEffect(() => {
     setZoom(100); // Set default zoom to 100%
+    setShouldFetch(true);
   }, []);
 
   return (
@@ -477,24 +479,15 @@ export default function DataLineGraph() {
             <DateBoundElement value={endDate} onChange={(date) => { setEndDate(date); setShouldFetch(true); }} />
           </div>
 
-          <div className="flex justify-center pt-4">
-            <button
-              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative inline-block group w-full mx-3"
-              onClick={() => setShouldFetch(true)}
-            >
-              Graph
-              <div className="absolute pointer-events-none top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 hover:opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
-                Graph button available for manual refresh when auto-update doesn't trigger.
-              </div>
-            </button>
-          </div>
-
           <div className="flex items-center justify-center mt-4 mx-3">
             <label className="flex items-center bg-teal rounded-lg m-1 p-3 space-x-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={!useInterpolation}
-                onChange={(e) => setUseInterpolation(!e.target.checked)}
+                onChange={(e) => {
+                  setUseInterpolation(!e.target.checked);
+                  setShouldFetch(true);
+                }}
                 className="form-checkbox h-5 w-5 text-teal rounded border-gray-300 focus:ring-teal"
               />
               <span className="text-white font-medium">Display Discrete Points</span>
@@ -506,8 +499,8 @@ export default function DataLineGraph() {
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
         >
-          <ZoomSlider value={zoom} onChange={setZoom} />
-          <StepSlider value={step} onChange={setStep} />
+          <ZoomSlider value={zoom} onChange={(value) => { setZoom(value); setShouldFetch(true); }} />
+          <StepSlider value={step} onChange={(value) => { setStep(value); setShouldFetch(true); }} />
         </div>
       </div>
     </div>

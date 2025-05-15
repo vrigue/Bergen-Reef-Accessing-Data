@@ -248,11 +248,13 @@ export default function DataLineGraph() {
   const addPlot = () => {
     if (selectedNames.length < 5) {
       setSelectedNames([...selectedNames, ""]);
+      setShouldFetch(true);
     }
   };
 
   useEffect(() => {
     setZoom(100); // Set default zoom to 100%
+    setShouldFetch(true);
   }, []);
 
   const handleStartDateChange = (date: Date) => {
@@ -339,27 +341,14 @@ export default function DataLineGraph() {
 
             <DateBoundElement value={endDate} onChange={handleEndDateChange} />
           </div>
-
-          <div className="flex justify-center pt-4">
-            <button
-              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
-              onClick={() => setShouldFetch(true)}
-              title="Graph button available for manual refresh when auto-update doesn't trigger"
-            >
-              Graph
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
-                Graph button available for manual refresh when auto-update doesn't trigger
-              </div>
-            </button>
-          </div>
         </div>
 
         <div
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
         >
-          <ZoomSlider value={zoom} onChange={setZoom} />
-          <StepSlider value={step} onChange={setStep} />
+          <ZoomSlider value={zoom} onChange={(value) => { setZoom(value); setShouldFetch(true); }} />
+          <StepSlider value={step} onChange={(value) => { setStep(value); setShouldFetch(true); }} />
         </div>
       </div>
     </div>

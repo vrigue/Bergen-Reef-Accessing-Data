@@ -36,8 +36,12 @@ const units = {
 
 // Helper to format date as YYYY-MM-DDTHH:mm:ss in local time
 function formatLocalDateTime(date: Date) {
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate()
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+    date.getSeconds()
+  )}`;
 }
 
 export default function DataLineGraph() {
@@ -49,6 +53,9 @@ export default function DataLineGraph() {
   const [numWeeks, setNumWeeks] = useState(7);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  const [zoom, setZoom] = useState(1);
+  const [step, setStep] = useState(1);
 
   const availableNames = [
     "Salinity",
@@ -73,7 +80,7 @@ export default function DataLineGraph() {
   useEffect(() => {
     const today = new Date();
     const weeksAgo = new Date();
-    weeksAgo.setDate(today.getDate() - (7 * 7));
+    weeksAgo.setDate(today.getDate() - 7 * 7);
     setStartDate(weeksAgo);
     setEndDate(today);
     setNumWeeks(7);
@@ -96,7 +103,9 @@ export default function DataLineGraph() {
   async function fetchData() {
     try {
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${formatLocalDateTime(startDate)}&endDate=${formatLocalDateTime(endDate)}&names=${selectedName}`
+        `/api/searchDataByDateType?startDate=${formatLocalDateTime(
+          startDate
+        )}&endDate=${formatLocalDateTime(endDate)}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -144,18 +153,21 @@ export default function DataLineGraph() {
     valueMap.forEach((values, key) => {
       const [week, day] = key.split("-").map(Number);
       // Ensure all values are numbers
-      const numericValues = values.map(v => Number(v));
+      const numericValues = values.map((v) => Number(v));
       const sortedValues = [...numericValues].sort((a, b) => a - b);
-      const median = sortedValues.length % 2 === 0
-        ? (sortedValues[Math.floor(sortedValues.length / 2) - 1] + sortedValues[Math.floor(sortedValues.length / 2)]) / 2
-        : sortedValues[Math.floor(sortedValues.length / 2)];
-      
+      const median =
+        sortedValues.length % 2 === 0
+          ? (sortedValues[Math.floor(sortedValues.length / 2) - 1] +
+              sortedValues[Math.floor(sortedValues.length / 2)]) /
+            2
+          : sortedValues[Math.floor(sortedValues.length / 2)];
+
       heatMapData.push({
         week,
         day,
         value: Number(median),
         minValue: Number(Math.min(...numericValues)),
-        maxValue: Number(Math.max(...numericValues))
+        maxValue: Number(Math.max(...numericValues)),
       });
     });
 
@@ -197,7 +209,9 @@ export default function DataLineGraph() {
     const heatMapData = processDataForHeatMap();
 
     // Calculate quartiles and IQR for outlier detection
-    const values = heatMapData.map((d) => Number(d.value)).sort((a, b) => a - b);
+    const values = heatMapData
+      .map((d) => Number(d.value))
+      .sort((a, b) => a - b);
     const q1 = d3.quantile(values, 0.25) || 0;
     const q3 = d3.quantile(values, 0.75) || 0;
     const iqr = q3 - q1;
@@ -207,7 +221,7 @@ export default function DataLineGraph() {
     // Calculate the value range for color scaling, excluding outliers
     const valueRange: [number, number] = [
       Math.max(lowerBound, d3.min(values) || 0),
-      Math.min(upperBound, d3.max(values) || 0)
+      Math.min(upperBound, d3.max(values) || 0),
     ];
 
     // Create color scale that emphasizes variation
@@ -274,9 +288,11 @@ export default function DataLineGraph() {
       .attr("width", cellWidth)
       .attr("height", cellHeight)
       .attr("fill", (d) => {
-        return d.value > upperBound ? "#67000d" : 
-               d.value < lowerBound ? "#053061" : 
-               colorScale(d.value);
+        return d.value > upperBound
+          ? "#67000d"
+          : d.value < lowerBound
+          ? "#053061"
+          : colorScale(d.value);
       })
       .attr("stroke", "white")
       .attr("stroke-width", 1)
@@ -291,8 +307,11 @@ export default function DataLineGraph() {
           Median: ${d.value.toFixed(2)} ${units[selectedName]}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedName]}<br/>
           Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}${
-              d.value > upperBound ? "<br/>(High Outlier)" : 
-              d.value < lowerBound ? "<br/>(Low Outlier)" : ""
+              d.value > upperBound
+                ? "<br/>(High Outlier)"
+                : d.value < lowerBound
+                ? "<br/>(Low Outlier)"
+                : ""
             }`
           )
           .style("left", event.pageX + 10 + "px")
@@ -444,31 +463,17 @@ export default function DataLineGraph() {
 
   const handleStartDateChange = (date: Date) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let newStartDate = new Date(date);
-    let newEndDate = new Date(date);
-    newEndDate.setDate(newStartDate.getDate() + numWeeks * 7);
-    if (newEndDate > today) {
-      newEndDate = today;
-      newStartDate = new Date(today);
-      newStartDate.setDate(today.getDate() - numWeeks * 7);
-    }
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+    setStartDate(date);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let newEndDate = new Date(date);
-    if (newEndDate > today) {
-      newEndDate = today;
-    }
-    let newStartDate = new Date(newEndDate);
-    newStartDate.setDate(newEndDate.getDate() - numWeeks * 7);
-    setEndDate(newEndDate);
-    setStartDate(newStartDate);
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+    setEndDate(date);
     setShouldFetch(true);
   };
 
@@ -546,19 +551,26 @@ export default function DataLineGraph() {
           <div className="flex flex-col items-center justify-center ml-3 mr-3">
             <StepSlider value={numWeeks} onChange={handleWeeksChange} />
           </div>
+        </div>
 
-          <div className="flex justify-center pt-4">
-            <button
-              className="bg-white outline outline-1 outline-dark-orange drop-shadow-xl text-dark-orange font-semibold py-2 px-4 rounded-xl shadow hover:bg-light-orange relative group w-full mx-3"
-              onClick={() => setShouldFetch(true)}
-              title="Graph button available for manual refresh when auto-update doesn't trigger"
-            >
-              Graph
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-600 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full text-center shadow-md">
-                Graph button available for manual refresh when auto-update doesn't trigger
-              </div>
-            </button>
-          </div>
+        <div
+          className="flex flex-col items-center justify-center mt-auto"
+          style={{ visibility: "hidden" }}
+        >
+          <ZoomSlider
+            value={zoom}
+            onChange={(value) => {
+              setZoom(value);
+              setShouldFetch(true);
+            }}
+          />
+          <StepSlider
+            value={step}
+            onChange={(value) => {
+              setStep(value);
+              setShouldFetch(true);
+            }}
+          />
         </div>
       </div>
     </div>
