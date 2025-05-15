@@ -42,7 +42,7 @@ export default function BoxPlot() {
   const [data, setData] = useState<DataPoint[]>([]);
   const [selectedName, setSelectedName] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
-  const [rangeMode, setRangeMode] = useState<'day' | 'week' | 'twoWeeks'>('twoWeeks');
+  const [rangeMode, setRangeMode] = useState<'day' | 'week' | 'twoWeeks' | 'custom'>('twoWeeks');
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   
@@ -376,6 +376,7 @@ export default function BoxPlot() {
       return; // Don't update if date hasn't changed
     }
     setStartDate(date);
+    setRangeMode('custom'); // Set to custom when manually changing dates
     setShouldFetch(true);
   };
 
@@ -384,6 +385,7 @@ export default function BoxPlot() {
       return; // Don't update if date hasn't changed
     }
     setEndDate(date);
+    setRangeMode('custom'); // Set to custom when manually changing dates
     setShouldFetch(true);
   };
 
