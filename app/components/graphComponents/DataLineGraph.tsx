@@ -268,14 +268,14 @@ export default function DataLineGraph() {
     selectedNames.forEach((name, index) => {
       const nameData = data.filter((d) => d.name === name);
       const lineFunction = createLine(index === 1);
-
-      // Draw the line
+      
       g.append("path")
         .datum(nameData)
         .attr("fill", "none")
         .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
-        .attr("d", lineFunction);
+        .attr("d", lineFunction)
+        .attr("transform", `translate(${margin.left / 4},0)`);
 
       // Only add points if not using interpolation
       if (!useInterpolation) {
