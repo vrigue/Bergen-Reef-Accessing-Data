@@ -33,8 +33,10 @@ export default function DataLineGraph() {
   const [zoom, setZoom] = useState(50);
   const [step, setStep] = useState(50);
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [lastFetchParams, setLastFetchParams] = useState<string>("");
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [useInterpolation, setUseInterpolation] = useState(true);
 
   const availableNames = [
     "Salinity",
@@ -69,7 +71,7 @@ export default function DataLineGraph() {
     if (data.length > 0 && svgRef.current) {
       drawChart();
     }
-  }, [data, selectedNames, startDate, endDate]);
+  }, [data, selectedNames, startDate, endDate, useInterpolation]);
 
   useEffect(() => {
     const today = new Date();
@@ -83,20 +85,32 @@ export default function DataLineGraph() {
 
   async function fetchData() {
     try {
-      startDate.setHours(startDate.getHours() - 5);
-      endDate.setHours(endDate.getHours() - 5);
-      const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedNames.join(
-          ","
-        )}`
-      );
+      // Create a copy of the dates for timezone adjustment
+      const adjustedStartDate = new Date(startDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
+      adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
+
+      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(",")}`;
+      
+      // Check if we're fetching the same data again
+      if (queryString === lastFetchParams) {
+        return; // Skip fetch if parameters haven't changed
+      }
+      
+      const response = await fetch(`/api/searchDataByDateType?${queryString}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result: DataPoint[] = await response.json();
-      setData(result);
+      
+      // Update last fetch parameters
+      setLastFetchParams(queryString);
+      
+      // Clear existing data and set new data
+      setData([...result]);
     } catch (error: any) {
       console.error("Error searching for data: ", error);
     }
@@ -218,11 +232,24 @@ export default function DataLineGraph() {
         .text(`${selectedNames[1]} (${units[selectedNames[1]]})`);
     }
 
-    const line = d3
-      .line<DataPoint>()
-      .defined((d) => !isNaN(d.value) && d.value !== null)
-      .x((d) => x(new Date(d.datetime)))
-      .y((d) => y(d.value));
+    // Create line generators
+    const createLine = (useRightAxis = false) => {
+      const yScale = useRightAxis ? yRight : y;
+      if (useInterpolation) {
+        return d3
+          .line<DataPoint>()
+          .defined((d) => !isNaN(d.value) && d.value !== null)
+          .x((d) => x(new Date(d.datetime)))
+          .y((d) => yScale!(d.value))
+          .curve(d3.curveBasis); // Use basis interpolation for smooth curves
+      } else {
+        return d3
+          .line<DataPoint>()
+          .defined((d) => !isNaN(d.value) && d.value !== null)
+          .x((d) => x(new Date(d.datetime)))
+          .y((d) => yScale!(d.value));
+      }
+    };
 
     // Add tooltip div
     const tooltip = d3
@@ -237,53 +264,51 @@ export default function DataLineGraph() {
       .style("border-radius", "4px")
       .style("box-shadow", "0 0 5px rgba(0, 0, 0, 0.3)");
 
-    // Add circles for each data point and tooltip interaction
+    // Add lines and points for each data series
     selectedNames.forEach((name, index) => {
       const nameData = data.filter((d) => d.name === name);
-      const lineFunction =
-        index === 0
-          ? line
-          : d3
-              .line<DataPoint>()
-              .defined((d) => !isNaN(d.value) && d.value !== null)
-              .x((d) => x(new Date(d.datetime)))
-              .y((d) => (yRight ? yRight(d.value) : y(d.value)));
-
+      const lineFunction = createLine(index === 1);
+      
       g.append("path")
         .datum(nameData)
         .attr("fill", "none")
         .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
-        .attr("d", lineFunction);
+        .attr("d", lineFunction)
+        .attr("transform", `translate(${margin.left / 4},0)`);
 
-      g.selectAll(`circle.series-${index}`)
-        .data(nameData)
-        .enter()
-        .append("circle")
-        .attr("class", `series-${index}`)
-        .attr("cx", (d) => x(new Date(d.datetime)))
-        .attr("cy", (d) =>
-          index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value)
-        )
-        .attr("r", 4)
-        .attr("fill", d3.schemeCategory10[index])
-        .on("mouseover", (event, d) => {
-          tooltip
-            .style("visibility", "visible")
-            .html(
-              `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
-                new Date(d.datetime)
-              )}<br>Name: ${d.name}<br>Unit: ${d.unit}<br>Value: ${d.value}`
-            );
-        })
-        .on("mousemove", (event) => {
-          tooltip
-            .style("top", `${event.pageY - 10}px`)
-            .style("left", `${event.pageX + 10}px`);
-        })
-        .on("mouseout", () => {
-          tooltip.style("visibility", "hidden");
-        });
+      // Only add points if not using interpolation
+      if (!useInterpolation) {
+        const pointsGroup = g.append("g").attr("transform", `translate(${margin.left / 4},0)`);
+        pointsGroup.selectAll(`circle.series-${index}`)
+          .data(nameData)
+          .enter()
+          .append("circle")
+          .attr("class", `series-${index}`)
+          .attr("cx", (d) => x(new Date(d.datetime)))
+          .attr("cy", (d) =>
+            index === 0 ? y(d.value) : yRight ? yRight(d.value) : y(d.value)
+          )
+          .attr("r", 4)
+          .attr("fill", d3.schemeCategory10[index])
+          .on("mouseover", (event, d) => {
+            tooltip
+              .style("visibility", "visible")
+              .html(
+                `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
+                  new Date(d.datetime)
+                )}<br>Name: ${d.name}<br>Unit: ${d.unit}<br>Value: ${d.value}`
+              );
+          })
+          .on("mousemove", (event) => {
+            tooltip
+              .style("top", `${event.pageY - 10}px`)
+              .style("left", `${event.pageX + 10}px`);
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+          });
+      }
     });
   };
 
@@ -370,7 +395,7 @@ export default function DataLineGraph() {
           <div
             className={`flex items-center ${
               true ? "flex-col" : "space-x-4" // Can change this to make it horizontal using isSmallScreen
-            } justify-center rounded-lg pt-2 m-3 mt-1 text-sm text-neutral-700`}
+            } justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
           >
             <DateBoundElement value={startDate} onChange={setStartDate}/>
 
@@ -391,6 +416,18 @@ export default function DataLineGraph() {
                 Graph button available for manual refresh when auto-update doesn't trigger.
               </div>
             </button>
+          </div>
+
+          <div className="flex items-center justify-center mt-4 mx-3">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!useInterpolation}
+                onChange={(e) => setUseInterpolation(!e.target.checked)}
+                className="form-checkbox h-5 w-5 text-teal rounded border-gray-300 focus:ring-teal"
+              />
+              <span className="text-gray-700 font-medium">Display Discrete Points</span>
+            </label>
           </div>
         </div>
 

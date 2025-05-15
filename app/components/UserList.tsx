@@ -81,7 +81,7 @@ const UserList = () => {
         }
       });
 
-      alert('YOO U CLICKED HTE BUTTONNN')
+      alert('Succesfully deleted User!')
     } catch (err) {
       console.error('Failed to delete user :(', err);
       alert('Failed to delete user!')
