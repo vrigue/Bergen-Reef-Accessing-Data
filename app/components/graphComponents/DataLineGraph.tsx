@@ -37,7 +37,10 @@ export default function DataLineGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [useInterpolation, setUseInterpolation] = useState(true);
-  const [lastFetchedRange, setLastFetchedRange] = useState<{ start: Date; end: Date } | null>(null);
+  const [lastFetchedRange, setLastFetchedRange] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
 
   const availableNames = [
     "Salinity",
@@ -68,9 +71,8 @@ export default function DataLineGraph() {
       return;
     }
 
-    const rangeExtended = 
-      startDate < lastFetchedRange.start || 
-      endDate > lastFetchedRange.end;
+    const rangeExtended =
+      startDate < lastFetchedRange.start || endDate > lastFetchedRange.end;
 
     if (rangeExtended) {
       setShouldFetch(true);
@@ -109,13 +111,15 @@ export default function DataLineGraph() {
       adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
       adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
 
-      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(",")}`;
-      
+      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(
+        ","
+      )}`;
+
       // Check if we're fetching the same data again
       if (queryString === lastFetchParams) {
         return; // Skip fetch if parameters haven't changed
       }
-      
+
       const response = await fetch(`/api/searchDataByDateType?${queryString}`);
 
       if (!response.ok) {
@@ -123,10 +127,10 @@ export default function DataLineGraph() {
       }
 
       const result: DataPoint[] = await response.json();
-      
+
       // Update last fetch parameters
       setLastFetchParams(queryString);
-      
+
       // Clear existing data and set new data
       setData([...result]);
     } catch (error: any) {
@@ -194,7 +198,7 @@ export default function DataLineGraph() {
     const minTickCount = 12;
     const tickInterval = timeRange / (minTickCount - 1);
     const tickDates = [];
-    
+
     // Only apply 10+ ticks for ranges longer than 3 weeks
     if (timeRange > threeWeeksInMs) {
       for (let i = 0; i < minTickCount; i++) {
@@ -221,14 +225,14 @@ export default function DataLineGraph() {
       .axisBottom(x)
       .tickValues(tickDates.length >= 10 ? tickDates : undefined)
       .ticks(tickDates.length >= 10 ? undefined : 5)
-      .tickFormat((d: Date) => formatDate(d));  // Use our custom formatter
+      .tickFormat((d: Date) => formatDate(d)); // Use our custom formatter
 
     g.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
       .selectAll("text")
       .style("font-size", "18px")
-      .attr("text-anchor", "middle");  // Center align the text
+      .attr("text-anchor", "middle"); // Center align the text
 
     // Add x-axis label
     g.append("text")
@@ -315,7 +319,7 @@ export default function DataLineGraph() {
     selectedNames.forEach((name, index) => {
       const nameData = data.filter((d) => d.name === name);
       const lineFunction = createLine(index === 1);
-      
+
       // Draw the main data line
       g.append("path")
         .datum(nameData)
@@ -341,8 +345,9 @@ export default function DataLineGraph() {
           const hasGaps = d.some((_, i) => {
             if (i === 0) return false;
             const curr = new Date(d[i].datetime);
-            const prev = new Date(d[i-1].datetime);
-            const diffHours = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60);
+            const prev = new Date(d[i - 1].datetime);
+            const diffHours =
+              (curr.getTime() - prev.getTime()) / (1000 * 60 * 60);
             return diffHours > 2; // Consider gaps larger than 2 hours
           });
           return hasGaps ? null : "none";
@@ -350,8 +355,11 @@ export default function DataLineGraph() {
 
       // Only add points if not using interpolation
       if (!useInterpolation) {
-        const pointsGroup = g.append("g").attr("transform", `translate(${margin.left / 4},0)`);
-        pointsGroup.selectAll(`circle.series-${index}`)
+        const pointsGroup = g
+          .append("g")
+          .attr("transform", `translate(${margin.left / 4},0)`);
+        pointsGroup
+          .selectAll(`circle.series-${index}`)
           .data(nameData)
           .enter()
           .append("circle")
@@ -406,7 +414,12 @@ export default function DataLineGraph() {
     <div className="grid grid-cols-4 gap-7 h-full p-5">
       <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
         <div className="w-full h-full">
-          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+          <svg
+            ref={svgRef}
+            width="100%"
+            height="100%"
+            className="overflow-visible"
+          ></svg>
         </div>
       </div>
 
@@ -470,13 +483,25 @@ export default function DataLineGraph() {
               true ? "flex-col" : "space-x-4" // Can change this to make it horizontal using isSmallScreen
             } justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={(date) => { setStartDate(date); setShouldFetch(true); }} />
+            <DateBoundElement
+              value={startDate}
+              onChange={(date) => {
+                setStartDate(date);
+                setShouldFetch(true);
+              }}
+            />
 
             <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
             </div>
 
-            <DateBoundElement value={endDate} onChange={(date) => { setEndDate(date); setShouldFetch(true); }} />
+            <DateBoundElement
+              value={endDate}
+              onChange={(date) => {
+                setEndDate(date);
+                setShouldFetch(true);
+              }}
+            />
           </div>
 
           <div className="flex items-center justify-center mt-4 mx-3">
@@ -490,7 +515,9 @@ export default function DataLineGraph() {
                 }}
                 className="form-checkbox h-5 w-5 text-teal rounded border-gray-300 focus:ring-teal"
               />
-              <span className="text-white font-medium">Display Discrete Points</span>
+              <span className="text-white font-medium">
+                Display Discrete Points
+              </span>
             </label>
           </div>
         </div>
@@ -499,8 +526,20 @@ export default function DataLineGraph() {
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
         >
-          <ZoomSlider value={zoom} onChange={(value) => { setZoom(value); setShouldFetch(true); }} />
-          <StepSlider value={step} onChange={(value) => { setStep(value); setShouldFetch(true); }} />
+          <ZoomSlider
+            value={zoom}
+            onChange={(value) => {
+              setZoom(value);
+              setShouldFetch(true);
+            }}
+          />
+          <StepSlider
+            value={step}
+            onChange={(value) => {
+              setStep(value);
+              setShouldFetch(true);
+            }}
+          />
         </div>
       </div>
     </div>

@@ -107,7 +107,7 @@ export default function DataLineGraph() {
       }
 
       const result: RawDataPoint[] = await response.json();
-      
+
       // Group data points by datetime
       const groupedByTime = result.reduce((acc, point) => {
         if (!acc[point.datetime]) {
@@ -119,16 +119,17 @@ export default function DataLineGraph() {
 
       // Create paired data points
       const pairedData = Object.entries(groupedByTime)
-        .filter(([_, values]) => 
-          values[selectedNames[0]] !== undefined && 
-          values[selectedNames[1]] !== undefined
+        .filter(
+          ([_, values]) =>
+            values[selectedNames[0]] !== undefined &&
+            values[selectedNames[1]] !== undefined
         )
         .map(([datetime, values]) => ({
           datetime,
           x: values[selectedNames[0]],
           y: values[selectedNames[1]],
           name1: selectedNames[0],
-          name2: selectedNames[1]
+          name2: selectedNames[1],
         }));
 
       setData(pairedData);
@@ -138,7 +139,8 @@ export default function DataLineGraph() {
   }
 
   const drawChart = () => {
-    if (selectedNames.length < 2 || selectedNames[0] === selectedNames[1]) return; // Not plottable with this sparse data
+    if (selectedNames.length < 2 || selectedNames[0] === selectedNames[1])
+      return; // Not plottable with this sparse data
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -154,11 +156,11 @@ export default function DataLineGraph() {
 
     const x = d3
       .scaleLinear()
-      .domain(d3.extent(data, d => d.x) as [number, number])
+      .domain(d3.extent(data, (d) => d.x) as [number, number])
       .range([0, width]);
     const y = d3
       .scaleLinear()
-      .domain(d3.extent(data, d => d.y) as [number, number])
+      .domain(d3.extent(data, (d) => d.y) as [number, number])
       .range([height, 0]);
 
     // X axis
@@ -192,18 +194,16 @@ export default function DataLineGraph() {
       .data(data)
       .enter()
       .append("circle")
-      .attr("cx", d => x(d.x))
-      .attr("cy", d => y(d.y))
+      .attr("cx", (d) => x(d.x))
+      .attr("cy", (d) => y(d.y))
       .attr("r", 4)
       .attr("fill", "steelblue")
       .on("mouseover", (event, d) => {
-        tooltip
-          .style("visibility", "visible")
-          .html(
-            `Time: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>
+        tooltip.style("visibility", "visible").html(
+          `Time: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>
              ${d.name1}: ${d.x} ${units[d.name1]}<br>
              ${d.name2}: ${d.y} ${units[d.name2]}`
-          );
+        );
       })
       .on("mousemove", (event) => {
         tooltip
@@ -271,7 +271,12 @@ export default function DataLineGraph() {
     <div className="grid grid-cols-4 gap-7 h-full p-5">
       <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
         <div className="w-full h-full">
-          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+          <svg
+            ref={svgRef}
+            width="100%"
+            height="100%"
+            className="overflow-visible"
+          ></svg>
         </div>
       </div>
 
@@ -333,7 +338,10 @@ export default function DataLineGraph() {
           <div
             className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
           >
-            <DateBoundElement value={startDate} onChange={handleStartDateChange} />
+            <DateBoundElement
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
 
             <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
               <span className="text-white font-semibold text-center">to</span>
@@ -347,8 +355,20 @@ export default function DataLineGraph() {
           className="flex flex-col items-center justify-center mt-auto"
           style={{ visibility: "hidden" }}
         >
-          <ZoomSlider value={zoom} onChange={(value) => { setZoom(value); setShouldFetch(true); }} />
-          <StepSlider value={step} onChange={(value) => { setStep(value); setShouldFetch(true); }} />
+          <ZoomSlider
+            value={zoom}
+            onChange={(value) => {
+              setZoom(value);
+              setShouldFetch(true);
+            }}
+          />
+          <StepSlider
+            value={step}
+            onChange={(value) => {
+              setStep(value);
+              setShouldFetch(true);
+            }}
+          />
         </div>
       </div>
     </div>

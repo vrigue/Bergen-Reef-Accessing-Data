@@ -42,30 +42,33 @@ export default function BoxPlot() {
   const [data, setData] = useState<DataPoint[]>([]);
   const [selectedName, setSelectedName] = useState<string>("Salinity");
   const [shouldFetch, setShouldFetch] = useState(false);
-  const [rangeMode, setRangeMode] = useState<'day' | 'week' | 'twoWeeks' | 'custom'>('twoWeeks');
+  const [rangeMode, setRangeMode] = useState<
+    "day" | "week" | "twoWeeks" | "custom"
+  >("twoWeeks");
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  
+
   // Add refs to track previous state
   const prevParamsRef = useRef({
     startDate: startDate?.toISOString() || "",
     endDate: endDate?.toISOString() || "",
-    selectedName
+    selectedName,
   });
 
   const hasParamsChanged = () => {
     const currentParams = {
       startDate: startDate?.toISOString() || "",
       endDate: endDate?.toISOString() || "",
-      selectedName
+      selectedName,
     };
 
-    const hasChanged = JSON.stringify(currentParams) !== JSON.stringify(prevParamsRef.current);
-    
+    const hasChanged =
+      JSON.stringify(currentParams) !== JSON.stringify(prevParamsRef.current);
+
     if (hasChanged) {
       prevParamsRef.current = currentParams;
     }
-    
+
     return hasChanged;
   };
 
@@ -137,22 +140,22 @@ export default function BoxPlot() {
   }
 
   const calculateBoxPlotData = (data: DataPoint[]): BoxPlotData => {
-    const sortedData = [...data].map(d => d.value).sort((a, b) => a - b);
+    const sortedData = [...data].map((d) => d.value).sort((a, b) => a - b);
     const q1Index = Math.floor(sortedData.length * 0.25);
     const q3Index = Math.floor(sortedData.length * 0.75);
-    
+
     const min = sortedData[0];
     const q1 = sortedData[q1Index];
     const median = sortedData[Math.floor(sortedData.length * 0.5)];
     const q3 = sortedData[q3Index];
     const max = sortedData[sortedData.length - 1];
-    
+
     // Calculate outliers (values beyond 1.5 * IQR)
     const iqr = q3 - q1;
     const lowerBound = q1 - 1.5 * iqr;
     const upperBound = q3 + 1.5 * iqr;
-    const outliers = sortedData.filter(d => d < lowerBound || d > upperBound);
-    
+    const outliers = sortedData.filter((d) => d < lowerBound || d > upperBound);
+
     return {
       min,
       q1,
@@ -160,7 +163,9 @@ export default function BoxPlot() {
       q3,
       max,
       outliers,
-      timeRange: `${d3.timeFormat("%Y-%m-%d")(startDate || new Date())} to ${d3.timeFormat("%Y-%m-%d")(endDate || new Date())}`
+      timeRange: `${d3.timeFormat("%Y-%m-%d")(
+        startDate || new Date()
+      )} to ${d3.timeFormat("%Y-%m-%d")(endDate || new Date())}`,
     };
   };
 
@@ -175,7 +180,8 @@ export default function BoxPlot() {
     const height = svgRef.current.clientHeight - margin.top - margin.bottom;
 
     // Add tooltip div
-    const tooltip = d3.select("body")
+    const tooltip = d3
+      .select("body")
       .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
@@ -191,27 +197,26 @@ export default function BoxPlot() {
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const boxPlotData = calculateBoxPlotData(data);
-    
-    // Create scales
-    const x = d3.scaleLinear()
-      .domain([-0.5, 0.5])
-      .range([0, width]);
 
-    const y = d3.scaleLinear()
+    // Create scales
+    const x = d3.scaleLinear().domain([-0.5, 0.5]).range([0, width]);
+
+    const y = d3
+      .scaleLinear()
       .domain([
         d3.min([boxPlotData.min, ...boxPlotData.outliers]) || 0,
-        d3.max([boxPlotData.max, ...boxPlotData.outliers]) || 0
+        d3.max([boxPlotData.max, ...boxPlotData.outliers]) || 0,
       ])
       .range([height, 0])
       .nice();
 
     // Draw box
     const boxWidth = width * 0.1; // Reduced width for better centering
-    const centerX = width/2 + margin.left/2; // Account for y-axis offset
-    
+    const centerX = width / 2 + margin.left / 2; // Account for y-axis offset
+
     // Draw box
     g.append("rect")
-      .attr("x", centerX - boxWidth/2) // Center the box horizontally with y-axis offset
+      .attr("x", centerX - boxWidth / 2) // Center the box horizontally with y-axis offset
       .attr("y", y(boxPlotData.q3))
       .attr("width", boxWidth)
       .attr("height", y(boxPlotData.q1) - y(boxPlotData.q3))
@@ -221,12 +226,18 @@ export default function BoxPlot() {
       .on("mouseover", (event) => {
         tooltip
           .style("visibility", "visible")
-          .html(`Q1: ${Number(boxPlotData.q1).toFixed(2)}<br/>Q3: ${Number(boxPlotData.q3).toFixed(2)}<br/>IQR: ${Number(boxPlotData.q3 - boxPlotData.q1).toFixed(2)}`);
+          .html(
+            `Q1: ${Number(boxPlotData.q1).toFixed(2)}<br/>Q3: ${Number(
+              boxPlotData.q3
+            ).toFixed(2)}<br/>IQR: ${Number(
+              boxPlotData.q3 - boxPlotData.q1
+            ).toFixed(2)}`
+          );
       })
       .on("mousemove", (event) => {
         tooltip
-          .style("top", (event.pageY - 10) + "px")
-          .style("left", (event.pageX + 10) + "px");
+          .style("top", event.pageY - 10 + "px")
+          .style("left", event.pageX + 10 + "px");
       })
       .on("mouseout", () => {
         tooltip.style("visibility", "hidden");
@@ -234,8 +245,8 @@ export default function BoxPlot() {
 
     // Draw median line
     g.append("line")
-      .attr("x1", centerX - boxWidth/2)
-      .attr("x2", centerX + boxWidth/2)
+      .attr("x1", centerX - boxWidth / 2)
+      .attr("x2", centerX + boxWidth / 2)
       .attr("y1", y(boxPlotData.median))
       .attr("y2", y(boxPlotData.median))
       .attr("stroke", "black")
@@ -248,8 +259,8 @@ export default function BoxPlot() {
       })
       .on("mousemove", (event) => {
         tooltip
-          .style("top", (event.pageY - 10) + "px")
-          .style("left", (event.pageX + 10) + "px");
+          .style("top", event.pageY - 10 + "px")
+          .style("left", event.pageX + 10 + "px");
       })
       .on("mouseout", () => {
         tooltip.style("visibility", "hidden");
@@ -272,8 +283,8 @@ export default function BoxPlot() {
         })
         .on("mousemove", (event) => {
           tooltip
-            .style("top", (event.pageY - 10) + "px")
-            .style("left", (event.pageX + 10) + "px");
+            .style("top", event.pageY - 10 + "px")
+            .style("left", event.pageX + 10 + "px");
         })
         .on("mouseout", () => {
           tooltip.style("visibility", "hidden");
@@ -285,23 +296,23 @@ export default function BoxPlot() {
 
     // Draw whisker caps
     g.append("line")
-      .attr("x1", centerX - boxWidth/2)
-      .attr("x2", centerX + boxWidth/2)
+      .attr("x1", centerX - boxWidth / 2)
+      .attr("x2", centerX + boxWidth / 2)
       .attr("y1", y(boxPlotData.max))
       .attr("y2", y(boxPlotData.max))
       .attr("stroke", "black")
       .attr("stroke-width", 1);
 
     g.append("line")
-      .attr("x1", centerX - boxWidth/2)
-      .attr("x2", centerX + boxWidth/2)
+      .attr("x1", centerX - boxWidth / 2)
+      .attr("x2", centerX + boxWidth / 2)
       .attr("y1", y(boxPlotData.min))
       .attr("y2", y(boxPlotData.min))
       .attr("stroke", "black")
       .attr("stroke-width", 1);
 
     // Draw outliers
-    boxPlotData.outliers.forEach(outlier => {
+    boxPlotData.outliers.forEach((outlier) => {
       g.append("circle")
         .attr("cx", centerX)
         .attr("cy", y(outlier))
@@ -316,16 +327,18 @@ export default function BoxPlot() {
           tooltip
             .style("visibility", "visible")
             .html(
-              `<strong>Outlier Value:</strong> ${Number(outlier).toFixed(2)}<br/><br/>` +
-              `<strong>Expected Range:</strong><br/>` +
-              `Lower bound: ${lowerBound.toFixed(2)}<br/>` +
-              `Upper bound: ${upperBound.toFixed(2)}<br/>`
+              `<strong>Outlier Value:</strong> ${Number(outlier).toFixed(
+                2
+              )}<br/><br/>` +
+                `<strong>Expected Range:</strong><br/>` +
+                `Lower bound: ${lowerBound.toFixed(2)}<br/>` +
+                `Upper bound: ${upperBound.toFixed(2)}<br/>`
             );
         })
         .on("mousemove", (event) => {
           tooltip
-            .style("top", (event.pageY - 10) + "px")
-            .style("left", (event.pageX + 10) + "px");
+            .style("top", event.pageY - 10 + "px")
+            .style("left", event.pageX + 10 + "px");
         })
         .on("mouseout", () => {
           tooltip.style("visibility", "hidden");
@@ -351,11 +364,13 @@ export default function BoxPlot() {
 
     // Add x-axis label with date range
     const formatDateTime = d3.timeFormat("%m/%d/%Y %H:%M:%S");
-    const dateLabel = `${formatDateTime(startDate || new Date())} - ${formatDateTime(endDate || new Date())}`;
-    
+    const dateLabel = `${formatDateTime(
+      startDate || new Date()
+    )} - ${formatDateTime(endDate || new Date())}`;
+
     g.append("text")
       .attr("fill", "black")
-      .attr("x", width / 2 + margin.left/2)  // Adjust x position to match box plot centering
+      .attr("x", width / 2 + margin.left / 2) // Adjust x position to match box plot centering
       .attr("y", height + margin.bottom - 5)
       .attr("text-anchor", "middle")
       .style("font-size", "20px")
@@ -376,7 +391,7 @@ export default function BoxPlot() {
       return; // Don't update if date hasn't changed
     }
     setStartDate(date);
-    setRangeMode('custom'); // Set to custom when manually changing dates
+    setRangeMode("custom"); // Set to custom when manually changing dates
     setShouldFetch(true);
   };
 
@@ -385,33 +400,33 @@ export default function BoxPlot() {
       return; // Don't update if date hasn't changed
     }
     setEndDate(date);
-    setRangeMode('custom'); // Set to custom when manually changing dates
+    setRangeMode("custom"); // Set to custom when manually changing dates
     setShouldFetch(true);
   };
 
-  const adjustDateRange = (direction: 'forward' | 'backward') => {
+  const adjustDateRange = (direction: "forward" | "backward") => {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
-    
+
     const newStartDate = new Date(startDate || new Date());
     const newEndDate = new Date(endDate || new Date());
-    
+
     let daysToAdjust;
     switch (rangeMode) {
-      case 'day':
+      case "day":
         daysToAdjust = 1;
         break;
-      case 'week':
+      case "week":
         daysToAdjust = 7;
         break;
-      case 'twoWeeks':
+      case "twoWeeks":
         daysToAdjust = 14;
         break;
       default:
         daysToAdjust = 1;
     }
-    
-    if (direction === 'forward') {
+
+    if (direction === "forward") {
       // Check if moving forward would exceed today
       if (newEndDate >= today) {
         return; // Don't allow moving past today
@@ -422,32 +437,32 @@ export default function BoxPlot() {
       newStartDate.setDate(newStartDate.getDate() - daysToAdjust);
       newEndDate.setDate(newEndDate.getDate() - daysToAdjust);
     }
-    
+
     setStartDate(newStartDate);
     setEndDate(newEndDate);
     setShouldFetch(true);
   };
 
-  const setRangeModeWithDates = (mode: 'day' | 'week' | 'twoWeeks') => {
+  const setRangeModeWithDates = (mode: "day" | "week" | "twoWeeks") => {
     // Always update the date range and fetch, even if mode hasn't changed
     setRangeMode(mode);
     let newEndDate = new Date(endDate || new Date());
     let newStartDate = new Date(endDate || new Date());
 
     switch (mode) {
-      case 'day': {
+      case "day": {
         // Set to the same day, start at 00:00:00, end at 23:59:59
         newStartDate.setHours(0, 0, 0, 0);
         newEndDate.setHours(23, 59, 59, 999);
         break;
       }
-      case 'week': {
+      case "week": {
         newStartDate.setDate(newEndDate.getDate() - 6);
         newStartDate.setHours(0, 0, 0, 0);
         newEndDate.setHours(23, 59, 59, 999);
         break;
       }
-      case 'twoWeeks': {
+      case "twoWeeks": {
         newStartDate.setDate(newEndDate.getDate() - 13);
         newStartDate.setHours(0, 0, 0, 0);
         newEndDate.setHours(23, 59, 59, 999);
@@ -464,7 +479,12 @@ export default function BoxPlot() {
     <div className="grid grid-cols-3 gap-7 h-full p-5">
       <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
         <div className="w-full h-full">
-          <svg ref={svgRef} width="100%" height="100%" className="overflow-visible"></svg>
+          <svg
+            ref={svgRef}
+            width="100%"
+            height="100%"
+            className="overflow-visible"
+          ></svg>
         </div>
       </div>
 
@@ -501,7 +521,7 @@ export default function BoxPlot() {
           </div>
           <div className="flex items-center justify-center space-x-2 px-3">
             <button
-              onClick={() => adjustDateRange('backward')}
+              onClick={() => adjustDateRange("backward")}
               className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
             >
               <ChevronLeftIcon className="h-5 w-5 text-teal" />
@@ -509,16 +529,22 @@ export default function BoxPlot() {
             <div
               className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
             >
-              <DateBoundElement value={startDate || new Date()} onChange={handleStartDateChange} />
+              <DateBoundElement
+                value={startDate || new Date()}
+                onChange={handleStartDateChange}
+              />
 
               <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
                 <span className="text-white font-semibold text-center">to</span>
               </div>
 
-              <DateBoundElement value={endDate || new Date()} onChange={handleEndDateChange} />
+              <DateBoundElement
+                value={endDate || new Date()}
+                onChange={handleEndDateChange}
+              />
             </div>
             <button
-              onClick={() => adjustDateRange('forward')}
+              onClick={() => adjustDateRange("forward")}
               className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
               disabled={now && endDate && endDate >= now}
             >
@@ -528,31 +554,31 @@ export default function BoxPlot() {
 
           <div className="flex justify-center space-x-4 mt-4">
             <button
-              onClick={() => setRangeModeWithDates('day')}
+              onClick={() => setRangeModeWithDates("day")}
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                rangeMode === 'day'
-                  ? 'bg-teal text-white'
-                  : 'bg-white text-teal hover:bg-gray-100'
+                rangeMode === "day"
+                  ? "bg-teal text-white"
+                  : "bg-white text-teal hover:bg-gray-100"
               }`}
             >
               Day
             </button>
             <button
-              onClick={() => setRangeModeWithDates('week')}
+              onClick={() => setRangeModeWithDates("week")}
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                rangeMode === 'week'
-                  ? 'bg-teal text-white'
-                  : 'bg-white text-teal hover:bg-gray-100'
+                rangeMode === "week"
+                  ? "bg-teal text-white"
+                  : "bg-white text-teal hover:bg-gray-100"
               }`}
             >
               Week
             </button>
             <button
-              onClick={() => setRangeModeWithDates('twoWeeks')}
+              onClick={() => setRangeModeWithDates("twoWeeks")}
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                rangeMode === 'twoWeeks'
-                  ? 'bg-teal text-white'
-                  : 'bg-white text-teal hover:bg-gray-100'
+                rangeMode === "twoWeeks"
+                  ? "bg-teal text-white"
+                  : "bg-white text-teal hover:bg-gray-100"
               }`}
             >
               Two Weeks
@@ -562,4 +588,4 @@ export default function BoxPlot() {
       </div>
     </div>
   );
-} 
+}
