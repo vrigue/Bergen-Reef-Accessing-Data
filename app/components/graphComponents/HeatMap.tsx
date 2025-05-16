@@ -516,7 +516,7 @@ export default function DataLineGraph() {
                 <MenuItem key={name}>
                   <button
                     onClick={() => handleNameSelect(name)}
-                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
+                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-medium-orange"
                   >
                     {name}
                   </button>

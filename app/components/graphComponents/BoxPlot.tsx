@@ -505,7 +505,7 @@ export default function BoxPlot() {
                 <MenuItem key={name}>
                   <button
                     onClick={() => handleNameSelect(name)}
-                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
+                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-medium-orange"
                   >
                     {name}
                   </button>
@@ -522,9 +522,9 @@ export default function BoxPlot() {
           <div className="flex items-center justify-center space-x-2 px-3">
             <button
               onClick={() => adjustDateRange("backward")}
-              className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+              className="bg-white p-2 rounded-lg hover:bg-medium-teal disabled:opacity-50"
             >
-              <ChevronLeftIcon className="h-5 w-5 text-teal" />
+              <ChevronLeftIcon className="h-5 w-5 text-teal hover:text-white" />
             </button>
             <div
               className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
@@ -545,10 +545,10 @@ export default function BoxPlot() {
             </div>
             <button
               onClick={() => adjustDateRange("forward")}
-              className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+              className="bg-white p-2 rounded-lg hover:bg-medium-teal disabled:opacity-50"
               disabled={now && endDate && endDate >= now}
             >
-              <ChevronRightIcon className="h-5 w-5 text-teal" />
+              <ChevronRightIcon className="h-5 w-5 text-teal hover:text-white" />
             </button>
           </div>
 
@@ -558,7 +558,7 @@ export default function BoxPlot() {
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 rangeMode === "day"
                   ? "bg-teal text-white"
-                  : "bg-white text-teal hover:bg-gray-100"
+                  : "bg-white text-teal hover:bg-medium-teal hover:text-white"
               }`}
             >
               Day
@@ -568,7 +568,7 @@ export default function BoxPlot() {
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 rangeMode === "week"
                   ? "bg-teal text-white"
-                  : "bg-white text-teal hover:bg-gray-100"
+                  : "bg-white text-teal hover:bg-medium-teal hover:text-white"
               }`}
             >
               Week
@@ -578,7 +578,7 @@ export default function BoxPlot() {
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 rangeMode === "twoWeeks"
                   ? "bg-teal text-white"
-                  : "bg-white text-teal hover:bg-gray-100"
+                  : "bg-white text-teal hover:bg-medium-teal hover:text-white"
               }`}
             >
               Two Weeks

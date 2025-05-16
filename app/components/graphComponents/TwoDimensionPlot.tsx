@@ -291,21 +291,26 @@ export default function DataLineGraph() {
               key={index}
               className="relative inline-block text-left m-3"
             >
-              <MenuButton className="inline-flex w-full justify-center outline outline-1 outline-medium-blue rounded-xl bg-light-blue px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
+              <MenuButton className={(index === 0) 
+                                    ? "outline-medium-blue bg-light-blue inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2" 
+                                    : "outline-medium-red-orange bg-light-red-orange inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2"}>
                 <span style={{ color: colorScale(index) }}>
                   {name || "Select Name"}
                 </span>
-                <ChevronDownIcon className="-mr-1 size-6 text-blue" />
+                <ChevronDownIcon className="-mr-1 size-6" style={{ color: colorScale(index) }}/>
               </MenuButton>
-              <MenuItems className="w-full z-50 right-1/2 transform mt-2 w-56 bg-light-blue rounded-xl shadow-lg ring-1 ring-black/5">
+              <MenuItems className={(index === 0) 
+                                    ? "bg-light-blue w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5" 
+                                    : "bg-light-red-orange w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"}>
                 {availableNames
                   .filter((n) => !selectedNames.includes(n))
                   .map((n) => (
                     <MenuItem key={n}>
                       <button
                         onClick={() => handleNameSelect(index, n)}
-                        className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
-                      >
+                        className={(index === 0) 
+                                    ? "text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                                    : "text-red-orange block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"}>
                         {n}
                       </button>
                     </MenuItem>
