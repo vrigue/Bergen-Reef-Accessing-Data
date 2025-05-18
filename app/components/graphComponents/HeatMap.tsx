@@ -69,13 +69,33 @@ export default function DataLineGraph() {
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 1220);
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
     };
 
+    // Initial resize
     handleResize();
+
+    // Add event listener for window resize
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    // Add ResizeObserver to handle container size changes
+    const resizeObserver = new ResizeObserver(() => {
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
+    });
+
+    if (svgRef.current) {
+      resizeObserver.observe(svgRef.current.parentElement!);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
+    };
+  }, [data]);
 
   useEffect(() => {
     const today = new Date();
@@ -180,12 +200,23 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Get the current dimensions of the container
+    const containerWidth = parseInt(d3.select(svgRef.current.parentElement).style("width"), 10);
+    const containerHeight = parseInt(d3.select(svgRef.current.parentElement).style("height"), 10);
+
+    // Set the SVG dimensions to match the container independently
+    svg
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .attr("preserveAspectRatio", "none"); // Remove aspect ratio constraint
+
     // Remove any existing tooltips
     d3.selectAll(".tooltip").remove();
 
     const margin = { top: 30, right: 150, bottom: 60, left: 70 };
-    const width = svgRef.current.clientWidth - margin.left - margin.right;
-    const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
 
     const g = svg
       .append("g")
@@ -495,8 +526,14 @@ export default function DataLineGraph() {
 
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
-        <svg ref={svgRef} width="100%" height="100%"></svg>
+      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
+        <div className="w-full h-full relative">
+          <svg
+            ref={svgRef}
+            className="overflow-visible absolute top-0 left-0"
+            style={{ width: '100%', height: '100%' }}
+          ></svg>
+        </div>
       </div>
 
       <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
