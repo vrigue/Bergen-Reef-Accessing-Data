@@ -37,6 +37,7 @@ export default function DataLineGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [useInterpolation, setUseInterpolation] = useState(true);
+  const [windowHeight, setWindowHeight] = useState(0);
   const [lastFetchedRange, setLastFetchedRange] = useState<{
     start: Date;
     end: Date;
@@ -122,6 +123,18 @@ export default function DataLineGraph() {
     setSelectedNames(["Salinity"]);
     setShouldFetch(true);
   }, []);
+
+  // Add window height calculation
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+
+  const availableHeight = windowHeight - 120
 
   async function fetchData() {
     try {
@@ -443,7 +456,7 @@ export default function DataLineGraph() {
 
   return (
     <div className="grid grid-cols-4 gap-7 h-full p-5">
-      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
+      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center" style={{ maxHeight: `${availableHeight}px` }}>
         <div className="w-full h-full relative overflow-hidden"> 
           <svg
             ref={svgRef}
@@ -453,7 +466,7 @@ export default function DataLineGraph() {
         </div>
       </div>
 
-      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg" style={{ maxHeight: `${availableHeight}px` }}>
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Line Plot
         </h1>
