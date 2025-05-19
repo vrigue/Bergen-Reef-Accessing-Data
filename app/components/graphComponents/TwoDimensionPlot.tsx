@@ -175,7 +175,7 @@ export default function DataLineGraph() {
       .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
       .attr("preserveAspectRatio", "none"); // Remove aspect ratio constraint
 
-    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    const margin = { top: 20, right: 20, bottom: 60, left: 80 };
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
@@ -258,7 +258,7 @@ export default function DataLineGraph() {
       .attr("fill", "black")
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
-      .attr("y", -margin.left + 20)
+      .attr("y", -margin.left + 15)
       .attr("text-anchor", "middle")
       .style("font-size", "18px")
       .style("font-weight", "bold")
@@ -299,11 +299,11 @@ export default function DataLineGraph() {
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
       <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
-        <div className="w-full h-full relative">
+        <div className="w-full h-full relative overflow-hidden">
           <svg
             ref={svgRef}
-            className="overflow-visible absolute top-0 left-0"
-            style={{ width: '100%', height: '100%' }}
+            className="w-full h-full"
+            style={{ position: 'absolute', top: 0, left: 0 }}
           ></svg>
         </div>
       </div>
