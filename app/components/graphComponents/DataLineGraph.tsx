@@ -455,12 +455,11 @@ export default function DataLineGraph() {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 gap-7 h-full p-5">
-      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center" style={{ maxHeight: `${availableHeight}px` }}>
+    <div className="grid grid-cols-4 gap-7 p-5">
+      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg justify-center items-center" style={{ maxHeight: `${availableHeight}px` }}>
         <div className="w-full h-full relative overflow-hidden"> 
           <svg
             ref={svgRef}
-            className="w-full h-full"
             style={{ position: 'absolute', top: 0, left: 0 }}
           ></svg>
         </div>
