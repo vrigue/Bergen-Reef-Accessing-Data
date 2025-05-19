@@ -320,7 +320,7 @@ export default function DataLineGraph() {
         .attr("fill", d3.schemeCategory10[1])
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", width + margin.right + 10)
+        .attr("y", width + margin.right - 10)
         .attr("text-anchor", "middle")
         .style("font-size", "24px")
         .style("font-weight", "bold")
@@ -455,12 +455,12 @@ export default function DataLineGraph() {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 gap-7 p-5">
-      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg justify-center items-center" style={{ maxHeight: `${availableHeight}px` }}>
-        <div className="w-full h-full relative overflow-hidden"> 
+    <div className="grid grid-cols-4 gap-4 p-4 h-full">
+      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg justify-center items-center" style={{ height: `${availableHeight}px` }}>
+        <div className="w-full h-full relative"> 
           <svg
             ref={svgRef}
-            style={{ position: 'absolute', top: 0, left: 0 }}
+            style={{ width: '100%', height: '100%' }}
           ></svg>
         </div>
       </div>
