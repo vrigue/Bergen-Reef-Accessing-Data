@@ -413,7 +413,8 @@ export default function DataLineGraph() {
   return (
     <div className="grid grid-cols-4 gap-7 h-full p-5">
       <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
-        <div className="w-full h-full">
+        {/* for kimby: FIX HERE */}
+        <div className="w-full h-full"> 
           <svg
             ref={svgRef}
             width="100%"
