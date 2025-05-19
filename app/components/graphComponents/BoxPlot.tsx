@@ -47,6 +47,7 @@ export default function BoxPlot() {
   >("twoWeeks");
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(0);
 
   // Add refs to track previous state
   const prevParamsRef = useRef({
@@ -140,6 +141,18 @@ export default function BoxPlot() {
     setShouldFetch(true);
   }, []);
 
+  // Add window height calculation
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  const availableHeight = windowHeight - 120;
+
   async function fetchData() {
     try {
       startDate?.setHours(startDate.getHours() - 5);
@@ -196,8 +209,14 @@ export default function BoxPlot() {
     svg.selectAll("*").remove();
 
     // Get the current dimensions of the container
-    const containerWidth = parseInt(d3.select(svgRef.current.parentElement).style("width"), 10);
-    const containerHeight = parseInt(d3.select(svgRef.current.parentElement).style("height"), 10);
+    const containerWidth = parseInt(
+      d3.select(svgRef.current.parentElement).style("width"),
+      10
+    );
+    const containerHeight = parseInt(
+      d3.select(svgRef.current.parentElement).style("height"),
+      10
+    );
 
     // Set the SVG dimensions to match the container independently
     svg
@@ -508,17 +527,23 @@ export default function BoxPlot() {
 
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
+      <div
+        className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center"
+        style={{ height: `${availableHeight}px` }}
+      >
         <div className="w-full h-full relative overflow-hidden">
           <svg
             ref={svgRef}
             className="w-full h-full"
-            style={{ position: 'absolute', top: 0, left: 0 }}
+            style={{ position: "absolute", top: 0, left: 0 }}
           ></svg>
         </div>
       </div>
 
-      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+      <div
+        className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg"
+        style={{ height: `${availableHeight}px` }}
+      >
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Box Plot
         </h1>

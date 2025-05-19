@@ -46,6 +46,7 @@ export default function DataLineGraph() {
   const [shouldFetch, setShouldFetch] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(0);
 
   const availableNames = [
     "Salinity",
@@ -112,6 +113,18 @@ export default function DataLineGraph() {
     setShouldFetch(true);
   }, []);
 
+  // Add window height calculation
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  const availableHeight = windowHeight - 120;
+
   async function fetchData() {
     try {
       startDate.setHours(startDate.getHours() - 5);
@@ -165,8 +178,14 @@ export default function DataLineGraph() {
     svg.selectAll("*").remove();
 
     // Get the current dimensions of the container
-    const containerWidth = parseInt(d3.select(svgRef.current.parentElement).style("width"), 10);
-    const containerHeight = parseInt(d3.select(svgRef.current.parentElement).style("height"), 10);
+    const containerWidth = parseInt(
+      d3.select(svgRef.current.parentElement).style("width"),
+      10
+    );
+    const containerHeight = parseInt(
+      d3.select(svgRef.current.parentElement).style("height"),
+      10
+    );
 
     // Set the SVG dimensions to match the container independently
     svg
@@ -298,17 +317,23 @@ export default function DataLineGraph() {
 
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
+      <div
+        className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center"
+        style={{ height: `${availableHeight}px` }}
+      >
         <div className="w-full h-full relative overflow-hidden">
           <svg
             ref={svgRef}
             className="w-full h-full"
-            style={{ position: 'absolute', top: 0, left: 0 }}
+            style={{ position: "absolute", top: 0, left: 0 }}
           ></svg>
         </div>
       </div>
 
-      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+      <div
+        className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg"
+        style={{ height: `${availableHeight}px` }}
+      >
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Two Dimensional Plot
         </h1>
@@ -319,26 +344,40 @@ export default function DataLineGraph() {
               key={index}
               className="relative inline-block text-left m-3"
             >
-              <MenuButton className={(index === 0) 
-                                    ? "outline-medium-blue bg-light-blue inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2" 
-                                    : "outline-medium-red-orange bg-light-red-orange inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2"}>
+              <MenuButton
+                className={
+                  index === 0
+                    ? "outline-medium-blue bg-light-blue inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2"
+                    : "outline-medium-red-orange bg-light-red-orange inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2"
+                }
+              >
                 <span style={{ color: colorScale(index) }}>
                   {name || "Select Name"}
                 </span>
-                <ChevronDownIcon className="-mr-1 size-6" style={{ color: colorScale(index) }}/>
+                <ChevronDownIcon
+                  className="-mr-1 size-6"
+                  style={{ color: colorScale(index) }}
+                />
               </MenuButton>
-              <MenuItems className={(index === 0) 
-                                    ? "bg-light-blue w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5" 
-                                    : "bg-light-red-orange w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"}>
+              <MenuItems
+                className={
+                  index === 0
+                    ? "bg-light-blue w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"
+                    : "bg-light-red-orange w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"
+                }
+              >
                 {availableNames
                   .filter((n) => !selectedNames.includes(n))
                   .map((n) => (
                     <MenuItem key={n}>
                       <button
                         onClick={() => handleNameSelect(index, n)}
-                        className={(index === 0) 
-                                    ? "text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
-                                    : "text-red-orange block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"}>
+                        className={
+                          index === 0
+                            ? "text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                            : "text-red-orange block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                        }
+                      >
                         {n}
                       </button>
                     </MenuItem>
