@@ -485,8 +485,8 @@ export default function DataLineGraph() {
                 <ChevronDownIcon className="-mr-1 size-6" style={{ color: colorScale(index) }}/>
               </MenuButton>
               <MenuItems className={(index === 0) 
-                                    ? "bg-light-blue w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5" 
-                                    : "bg-light-red-orange w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"}>
+                                    ? "absolute left-1/2 -translate-x-1/2 bg-light-blue w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5" 
+                                    : "absolute left-1/2 -translate-x-1/2 bg-light-red-orange w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"}>
                 {availableNames
                   .filter((n) => !selectedNames.includes(n))
                   .map((n) => (
@@ -523,7 +523,7 @@ export default function DataLineGraph() {
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
           <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-left">
-            Enter Date Constraints
+            Date Constraints
           </div>
           <div
             className={`flex items-center ${
