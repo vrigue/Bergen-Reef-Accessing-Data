@@ -9,7 +9,7 @@ const infoContent = {
   Calcium: 'Calcium is a crucial component for coral skeletons and is one of the most abundant ions in seawater. Without enough calcium, stony corals cannot grow or strengthen their foundations, so dosing this supplement is a key part of maintaining a healthy reef tank.',
   Alkalinity: 'Alkalinity prevents drastic swings in pH and provides carbonate for coral growth. Since corals use alkalinity very often, it has to be regularly supplemented in the reef tank and balanced with calcium to provide sufficient calcium carbonate for coral skeletons.',
   ORP: 'ORP provides reef-keepers with a way to monitor water quality and stability, with the most drastic changes being seen when decaying organic matter is present in the tank. This level is maintained through additional filtration such as UV sterilizers or activated carbon.',
-  Temperature: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae from their tissue, causing them to turn white and die quickly.',
+  Temperature: 'Temperature is one of the most prominent concerns in coral reefs, causing many massive bleaching events from global temperature rise. A substantial increase in temperature can cause corals to expel zooxanthellae, causing them to turn white and die quickly.',
   Salinity: 'Salt provides the necessary minerals to maintain the environment in a reef tank. Keeping a desirable salinity level and selecting a high-quality reef salt mix provides an opportunity to replicate seawater conditions.',
   Nitrate: 'Nitrate results in a reef tank from the breakdown of organic matter. It is an important nutrient due to its use by zooxanthellae, a microscopic algae housed in coral polyps which has a symbiotic relationship with coral. Too much nitrate can result in algae blooms and cause corals to lose their vibrant colors.',
   Nitrite: 'Nitrite is harmful to many of the organisms in a reef tank and needs to be managed so that its levels stay almost undetectable. This is done by establishing beneficial bacteria in the tank through a dark cycle before any animals are placed in it.',
@@ -100,7 +100,8 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
 
   return (
     <>
-      <div className="flex flex-col items-center w-full px-4">
+      <div className="flex flex-col items-center w-full min-h-screen px-4">
+        {/* DROPDOWN MENU */}
         <div className="w-full max-w-screen-2xl min-w-[750px] mb-4">
           <select
             onChange={handleChange}
@@ -119,33 +120,37 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
           </select>
         </div>
 
-        <div className="bg-white rounded-lg p-4 w-full max-w-screen-2xl min-w-[750px]">
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="datetime"
-                tickFormatter={(tick) => tick.split("/")[0] + "/" + tick.split("/")[1]}
-                stroke="#000000"
-              />
-              <YAxis
-                domain={['dataMin - 1', 'dataMax + 1']}
-                tickFormatter={(tick) => tick.toString().split(".")[0]}
-                stroke="#000000"
-              />
-              <Tooltip content={(props) => <CustomTooltip {...props} selectedType={selectedType} />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#feb934"
-                dot={false}
-                strokeWidth={2.5}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        {/* GRAPH CONTAINER */}
+        <div className="w-full max-w-screen-2xl min-w-[750px] h-[65vh] 2xl:h-[73vh] bg-white rounded-lg p-3 overflow-hidden">
+          <div className="w-full h-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="datetime"
+                  tickFormatter={(tick) => tick.split("/")[0] + "/" + tick.split("/")[1]}
+                  stroke="#000000"
+                />
+                <YAxis
+                  domain={['dataMin - 1', 'dataMax + 1']}
+                  tickFormatter={(tick) => tick.toString().split(".")[0]}
+                  stroke="#000000"
+                />
+                <Tooltip content={(props) => <CustomTooltip {...props} selectedType={selectedType} />} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#feb934"
+                  dot={false}
+                  strokeWidth={2.5}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div className="mt-6 w-full max-w-screen-2xl min-w-[750px] p-4 bg-white drop-shadow-orange rounded-lg text-base md:text-lg text-gray-800">
+        {/* TEXT AREA */}
+        <div className="mt-4 w-full max-w-screen-2xl min-w-[750px] p-4 bg-white drop-shadow-orange rounded-lg text-base md:text-lg">
           {selectedInfo}
         </div>
       </div>
