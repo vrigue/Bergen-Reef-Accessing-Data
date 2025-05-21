@@ -3,6 +3,8 @@ import { string } from "prop-types"; // not used
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import "../globals.css";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const infoContent = {
   pH: 'PH measures the acidity or alkalinity of the water. An ideal, stable pH promotes coral growth, allows them to expand their skeletons, and assists in nutrient availability.',
@@ -103,21 +105,86 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
       <div className="flex flex-col items-center w-full min-h-screen px-4">
         {/* DROPDOWN MENU */}
         <div className="w-full max-w-screen-2xl min-w-[750px] mb-4">
-          <select
-            onChange={handleChange}
-            value={selectedType}
-            className="w-full h-10 text-center rounded-md bg-teal md:text-lg text-white font-semibold ring-1 ring-black/5 transition focus:outline-none"
-          >
-            <option value="pH">PH</option>
-            <option value="Salinity">Salinity</option>
-            <option value="Temperature">Temperature</option>
-            <option value="ORP">Oxidation Reduction Potential (ORP)</option>
-            <option value="Alkalinity">Alkalinity</option>
-            <option value="Calcium">Calcium</option>
-            <option value="Nitrate">Nitrate</option>
-            <option value="Phosphate">Phosphate</option>
-            <option value="Nitrite">Nitrite</option>
-          </select>
+          <Menu as="div" className="relative inline-block text-left w-full">
+            <MenuButton className="w-full h-10 text-center rounded-md bg-teal md:text-lg text-white font-semibold ring-1 ring-black/5 transition focus:outline-none flex items-center justify-center">
+              <span>{selectedType}</span>
+              <ChevronDownIcon className="-mr-1 size-6 text-white ml-2" />
+            </MenuButton>
+            <MenuItems className="absolute left-1/2 -translate-x-1/2 mt-2 w-full bg-light-blue rounded-xl shadow-lg ring-1 ring-black/5 z-50">
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "pH" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  PH
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Salinity" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Salinity
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Temperature" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Temperature
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "ORP" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Oxidation Reduction Potential (ORP)
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Alkalinity" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Alkalinity
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Calcium" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Calcium
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Nitrate" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Nitrate
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Phosphate" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Phosphate
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleChange({ target: { value: "Nitrite" } })}
+                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                >
+                  Nitrite
+                </button>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
         </div>
 
         {/* GRAPH CONTAINER */}
