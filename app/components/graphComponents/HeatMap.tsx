@@ -36,11 +36,16 @@ const units = {
 
 // Helper to format date as YYYY-MM-DDTHH:mm:ss in local time
 function formatLocalDateTime(date: Date) {
+  // Create a new date object to avoid modifying the original
+  const adjustedDate = new Date(date);
+  // Add 5 hours
+  adjustedDate.setHours(adjustedDate.getHours() + 5);
+  
   const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-    date.getDate()
-  )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-    date.getSeconds()
+  return `${adjustedDate.getFullYear()}-${pad(adjustedDate.getMonth() + 1)}-${pad(
+    adjustedDate.getDate()
+  )}T${pad(adjustedDate.getHours())}:${pad(adjustedDate.getMinutes())}:${pad(
+    adjustedDate.getSeconds()
   )}`;
 }
 
@@ -159,6 +164,8 @@ export default function DataLineGraph() {
     // Calculate the start of the first week
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
+    // Add 5 hours to align with the display
+    firstWeekStart.setHours(firstWeekStart.getHours() + 5);
 
     // Create a map to store values for each week/day combination
     const valueMap = new Map<string, number[]>();
@@ -166,6 +173,9 @@ export default function DataLineGraph() {
     // Group data by week and day
     nameData.forEach((d) => {
       const date = new Date(d.datetime);
+      // Add 5 hours to the date for proper day calculation
+      date.setHours(date.getHours() + 5);
+      
       const week = Math.floor(
         (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
       );
@@ -296,6 +306,16 @@ export default function DataLineGraph() {
       }
     }
 
+    // Calculate the day index of the startDate (0=Sun, 1=Mon, ...)
+    const startDayIndex = startDate.getDay();
+
+    // Calculate the actual day labels for the y-axis (starting from startDate's day)
+    const yAxisDays = d3.range(7).map((i) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      return d3.timeFormat("%a")(date); // Short day name
+    });
+
     // Add background cells for all positions
     g.selectAll(".background-cell")
       .data(allCells)
@@ -310,15 +330,16 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        const weekStart = new Date(startDate);
-        weekStart.setDate(startDate.getDate() + d.week * 7);
-        const dayName = days[d.day];
+        // Calculate the exact date for this cell
+        const cellDate = new Date(startDate);
+        cellDate.setDate(startDate.getDate() + d.week * 7 + (d.day - startDayIndex));
+        cellDate.setHours(0, 0, 0, 0);
+        cellDate.setHours(cellDate.getHours() + 5);
+        const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
-            `${dayName}, Week of ${d3.timeFormat("%m-%d")(
-              weekStart
-            )}<br/>No data available`
+            `${formattedDate}<br/>No data available`
           )
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
@@ -347,13 +368,16 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        const weekStart = new Date(startDate);
-        weekStart.setDate(startDate.getDate() + d.week * 7);
-        const dayName = days[d.day];
+        // Calculate the exact date for this cell
+        const cellDate = new Date(startDate);
+        cellDate.setDate(startDate.getDate() + d.week * 7 + (d.day - startDayIndex));
+        cellDate.setHours(0, 0, 0, 0);
+        cellDate.setHours(cellDate.getHours() + 5);
+        const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
-            `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+            `${formattedDate}<br/>
           Median: ${d.value.toFixed(2)} ${units[selectedName]}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedName]}<br/>
           Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}${
@@ -380,11 +404,13 @@ export default function DataLineGraph() {
       .style("fill", "#666")
       .text("Gray cells = No data");
 
-    // Add week labels with actual dates
+    // Add week labels with actual dates (top cell of each column)
     const weekLabels = d3.range(numWeeks).map((week) => {
-      const weekStart = new Date(startDate);
-      weekStart.setDate(startDate.getDate() + week * 7);
-      return d3.timeFormat("%m-%d")(weekStart);
+      const topCellDate = new Date(startDate);
+      topCellDate.setDate(startDate.getDate() + week * 7);
+      topCellDate.setHours(0, 0, 0, 0);
+      topCellDate.setHours(topCellDate.getHours() + 5);
+      return d3.timeFormat("%m-%d")(topCellDate);
     });
 
     // Filter week labels if needed
@@ -398,7 +424,6 @@ export default function DataLineGraph() {
       .append("text")
       .attr("class", "week-label")
       .attr("x", (d, i) => {
-        // Calculate the correct x position based on whether we're showing every other week
         const weekIndex = isSmallScreen && numWeeks > 7 ? i * 2 : i;
         return weekIndex * cellWidth + cellWidth / 2;
       })
@@ -407,14 +432,14 @@ export default function DataLineGraph() {
       .style("font-size", "18px")
       .text((d) => d);
 
-    // Add day labels
+    // Add day labels (y-axis), starting from startDate's day
     g.selectAll(".day-label")
-      .data(days)
+      .data(yAxisDays)
       .enter()
       .append("text")
       .attr("class", "day-label")
       .attr("x", -5)
-      .attr("y", (d) => days.indexOf(d) * cellHeight + cellHeight / 2)
+      .attr("y", (d, i) => i * cellHeight + cellHeight / 2)
       .attr("text-anchor", "end")
       .style("font-size", "18px")
       .text((d) => d);
@@ -521,18 +546,18 @@ export default function DataLineGraph() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - 7);
-    setStartDate(date);
+    // Set time to 00:00:00
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    setStartDate(newDate);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - 7);
-    setEndDate(date);
+    // Set time to 23:59:59
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    setEndDate(newDate);
     setShouldFetch(true);
   };
 
