@@ -199,7 +199,13 @@ export default function DataLineGraph() {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
+    // Create adjusted dates for display
+    const displayStartDate = new Date(startDate);
+    const displayEndDate = new Date(endDate);
+    displayStartDate.setHours(displayStartDate.getHours() + 5);
+    displayEndDate.setHours(displayEndDate.getHours() + 5);
+
+    const x = d3.scaleTime().domain([displayStartDate, displayEndDate]).range([0, width]);
 
     // Calculate y-axis for the first selected name
     const yDomain = d3.extent(
@@ -223,13 +229,13 @@ export default function DataLineGraph() {
       : null;
 
     const dayCount = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (displayEndDate.getTime() - displayStartDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     // Calculate tick values with a staggered approach
     const tickValues = [];
     for (let i = 0; i < dayCount; i++) {
-      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      const date = new Date(displayStartDate.getTime() + i * 24 * 60 * 60 * 1000);
       if (i % 2 === 0) {
         // Stagger: only add every other day
         tickValues.push(date);
@@ -237,7 +243,7 @@ export default function DataLineGraph() {
     }
 
     // Calculate number of ticks based on data range
-    const timeRange = endDate.getTime() - startDate.getTime();
+    const timeRange = displayEndDate.getTime() - displayStartDate.getTime();
     const threeWeeksInMs = 21 * 24 * 60 * 60 * 1000; // 3 weeks in milliseconds
     const minTickCount = 12;
     const tickInterval = timeRange / (minTickCount - 1);
@@ -246,7 +252,7 @@ export default function DataLineGraph() {
     // Only apply 10+ ticks for ranges longer than 3 weeks
     if (timeRange > threeWeeksInMs) {
       for (let i = 0; i < minTickCount; i++) {
-        tickDates.push(new Date(startDate.getTime() + i * tickInterval));
+        tickDates.push(new Date(displayStartDate.getTime() + i * tickInterval));
       }
     }
 
@@ -371,7 +377,7 @@ export default function DataLineGraph() {
         .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
         .attr("d", lineFunction)
-        .attr("transform", `translate(${margin.left / 4},0)`);
+        .attr("transform", `translate(${margin.left / 2 + 5},0)`);
 
       // Draw dotted line for gaps in data
       const gapsLineFunction = createLine(index === 1).defined((d) => true);
@@ -383,7 +389,7 @@ export default function DataLineGraph() {
         .attr("stroke-dasharray", "3,3") // creates dotted line
         .attr("d", gapsLineFunction)
         .attr("opacity", 0.5)
-        .attr("transform", `translate(${margin.left / 4},0)`)
+        .attr("transform", `translate(${margin.left / 2 + 5},0)`)
         .style("display", (d) => {
           // Only show if there are gaps in the data
           const hasGaps = d.some((_, i) => {
@@ -401,7 +407,7 @@ export default function DataLineGraph() {
       if (!useInterpolation) {
         const pointsGroup = g
           .append("g")
-          .attr("transform", `translate(${margin.left / 4},0)`);
+          .attr("transform", `translate(${margin.left / 2 + 5},0)`);
         pointsGroup
           .selectAll(`circle.series-${index}`)
           .data(nameData)
@@ -415,11 +421,14 @@ export default function DataLineGraph() {
           .attr("r", 4)
           .attr("fill", d3.schemeCategory10[index])
           .on("mouseover", (event, d) => {
+            // Add 5 hours to the displayed datetime
+            const displayDate = new Date(d.datetime);
+            displayDate.setHours(displayDate.getHours() + 5);
             tooltip
               .style("visibility", "visible")
               .html(
                 `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
-                  new Date(d.datetime)
+                  displayDate
                 )}<br>Name: ${d.name}<br>Unit: ${d.unit}<br>Value: ${d.value}`
               );
           })
