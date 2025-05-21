@@ -28,7 +28,7 @@ interface RawDataPoint {
 const units = {
   Salinity: "ppt",
   ORP: "mV",
-  Temperature: "°C",
+  Temperature: "°F",
   Alkalinity: "dKH",
   Calcium: "ppm",
 };

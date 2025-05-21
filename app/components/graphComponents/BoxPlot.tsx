@@ -29,7 +29,7 @@ interface BoxPlotData {
 const units = {
   Salinity: "ppt",
   ORP: "mV",
-  Temperature: "°C",
+  Temperature: "°F",
   Alkalinity: "dKH",
   Calcium: "ppm",
   pH: "no unit",
