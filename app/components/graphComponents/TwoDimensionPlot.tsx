@@ -248,8 +248,10 @@ export default function DataLineGraph() {
       .attr("r", 4)
       .attr("fill", "steelblue")
       .on("mouseover", (event, d) => {
+        const displayDate = new Date(d.datetime);
+        displayDate.setHours(displayDate.getHours() + 4);
         tooltip.style("visibility", "visible").html(
-          `Time: ${d3.timeFormat("%Y-%m-%d %H:%M")(new Date(d.datetime))}<br>
+          `Time: ${d3.timeFormat("%Y-%m-%d %H:%M")(displayDate)}<br>
              ${d.name1}: ${d.x} ${units[d.name1]}<br>
              ${d.name2}: ${d.y} ${units[d.name2]}`
         );
