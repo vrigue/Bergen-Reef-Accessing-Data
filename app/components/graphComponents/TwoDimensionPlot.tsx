@@ -107,6 +107,8 @@ export default function DataLineGraph() {
     const today = new Date();
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
+    today.setHours(today.getHours() + 7);
+    lastWeek.setHours(lastWeek.getHours() + 7);
     setStartDate(lastWeek);
     setEndDate(today);
     setSelectedNames(["Temperature", "ORP"]);
@@ -127,8 +129,8 @@ export default function DataLineGraph() {
 
   async function fetchData() {
     try {
-      startDate.setHours(startDate.getHours() - 5);
-      endDate.setHours(endDate.getHours() - 5);
+      startDate.setHours(startDate.getHours() + 7);
+      endDate.setHours(endDate.getHours() + 7);
       const response = await fetch(
         `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedNames.join(
           ","
