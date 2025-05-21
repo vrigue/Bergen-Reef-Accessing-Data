@@ -107,8 +107,6 @@ export default function DataLineGraph() {
     const today = new Date();
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
-    today.setHours(today.getHours() + 7);
-    lastWeek.setHours(lastWeek.getHours() + 7);
     setStartDate(lastWeek);
     setEndDate(today);
     setSelectedNames(["Temperature", "ORP"]);
@@ -129,12 +127,13 @@ export default function DataLineGraph() {
 
   async function fetchData() {
     try {
-      startDate.setHours(startDate.getHours() + 7);
-      endDate.setHours(endDate.getHours() + 7);
+      // Only adjust for local time offset here
+      const adjustedStartDate = new Date(startDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
+      adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedNames.join(
-          ","
-        )}`
+        `/api/searchDataByDateType?startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(",")}`
       );
 
       if (!response.ok) {
@@ -308,12 +307,16 @@ export default function DataLineGraph() {
   }, []);
 
   const handleStartDateChange = (date: Date) => {
-    setStartDate(date);
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    setStartDate(newDate);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    setEndDate(date);
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    setEndDate(newDate);
     setShouldFetch(true);
   };
 

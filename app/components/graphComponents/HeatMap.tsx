@@ -38,9 +38,8 @@ const units = {
 function formatLocalDateTime(date: Date) {
   // Create a new date object to avoid modifying the original
   const adjustedDate = new Date(date);
-  // Add 5 hours
+  // Add 5 hours for local time offset
   adjustedDate.setHours(adjustedDate.getHours() + 5);
-  
   const pad = (n: number) => n.toString().padStart(2, "0");
   return `${adjustedDate.getFullYear()}-${pad(adjustedDate.getMonth() + 1)}-${pad(
     adjustedDate.getDate()
@@ -160,30 +159,22 @@ export default function DataLineGraph() {
   const processDataForHeatMap = (): HeatMapData[] => {
     const heatMapData: HeatMapData[] = [];
     const nameData = data.filter((d) => d.name === selectedName);
-
     // Calculate the start of the first week
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
-    // Add 5 hours to align with the display
-    firstWeekStart.setHours(firstWeekStart.getHours() + 5);
-
+    // No +5 hours here
     // Create a map to store values for each week/day combination
     const valueMap = new Map<string, number[]>();
-
     // Group data by week and day
     nameData.forEach((d) => {
       const date = new Date(d.datetime);
-      // Add 5 hours to the date for proper day calculation
-      date.setHours(date.getHours() + 5);
-      
+      // No +5 hours here
       const week = Math.floor(
         (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
       );
-      // Only process data for the selected number of weeks
       if (week >= 0 && week < numWeeks) {
         const day = date.getDay();
         const key = `${week}-${day}`;
-
         if (!valueMap.has(key)) {
           valueMap.set(key, [d.value]);
         } else {
@@ -330,11 +321,9 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        // Calculate the exact date for this cell
         const cellDate = new Date(startDate);
         cellDate.setDate(startDate.getDate() + d.week * 7 + (d.day - startDayIndex));
         cellDate.setHours(0, 0, 0, 0);
-        cellDate.setHours(cellDate.getHours() + 5);
         const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
@@ -368,11 +357,9 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        // Calculate the exact date for this cell
         const cellDate = new Date(startDate);
         cellDate.setDate(startDate.getDate() + d.week * 7 + (d.day - startDayIndex));
         cellDate.setHours(0, 0, 0, 0);
-        cellDate.setHours(cellDate.getHours() + 5);
         const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
@@ -409,7 +396,6 @@ export default function DataLineGraph() {
       const topCellDate = new Date(startDate);
       topCellDate.setDate(startDate.getDate() + week * 7);
       topCellDate.setHours(0, 0, 0, 0);
-      topCellDate.setHours(topCellDate.getHours() + 5);
       return d3.timeFormat("%m-%d")(topCellDate);
     });
 

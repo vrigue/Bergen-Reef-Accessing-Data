@@ -138,15 +138,12 @@ export default function DataLineGraph() {
 
   async function fetchData() {
     try {
-      // Create a copy of the dates for timezone adjustment
+      // Only adjust for local time offset here
       const adjustedStartDate = new Date(startDate);
       const adjustedEndDate = new Date(endDate);
       adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
       adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
-
-      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(
-        ","
-      )}`;
+      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(",")}`;
 
       // Check if we're fetching the same data again
       if (queryString === lastFetchParams) {
@@ -463,6 +460,20 @@ export default function DataLineGraph() {
     setShouldFetch(true);
   }, []);
 
+  const handleStartDateChange = (date: Date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    setStartDate(newDate);
+    setShouldFetch(true);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    setEndDate(newDate);
+    setShouldFetch(true);
+  };
+
   return (
     <div className="grid grid-cols-4 gap-4 p-4 h-full">
       <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg justify-center items-center" style={{ height: `${availableHeight}px` }}>
@@ -541,10 +552,7 @@ export default function DataLineGraph() {
           >
             <DateBoundElement
               value={startDate}
-              onChange={(date) => {
-                setStartDate(date);
-                setShouldFetch(true);
-              }}
+              onChange={handleStartDateChange}
             />
 
             <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
@@ -553,10 +561,7 @@ export default function DataLineGraph() {
 
             <DateBoundElement
               value={endDate}
-              onChange={(date) => {
-                setEndDate(date);
-                setShouldFetch(true);
-              }}
+              onChange={handleEndDateChange}
             />
           </div>
 

@@ -155,10 +155,13 @@ export default function BoxPlot() {
 
   async function fetchData() {
     try {
-      startDate?.setHours(startDate.getHours() - 5);
-      endDate?.setHours(endDate.getHours() - 5);
+      // Only adjust for local time offset here
+      const adjustedStartDate = startDate ? new Date(startDate) : null;
+      const adjustedEndDate = endDate ? new Date(endDate) : null;
+      if (adjustedStartDate) adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
+      if (adjustedEndDate) adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate?.toISOString()}&endDate=${endDate?.toISOString()}&names=${selectedName}`
+        `/api/searchDataByDateType?startDate=${adjustedStartDate?.toISOString()}&endDate=${adjustedEndDate?.toISOString()}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -437,20 +440,18 @@ export default function BoxPlot() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    if (date.toISOString() === startDate?.toISOString()) {
-      return; // Don't update if date hasn't changed
-    }
-    setStartDate(date);
-    setRangeMode("custom"); // Set to custom when manually changing dates
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    setStartDate(newDate);
+    setRangeMode("custom");
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    if (date.toISOString() === endDate?.toISOString()) {
-      return; // Don't update if date hasn't changed
-    }
-    setEndDate(date);
-    setRangeMode("custom"); // Set to custom when manually changing dates
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    setEndDate(newDate);
+    setRangeMode("custom");
     setShouldFetch(true);
   };
 
