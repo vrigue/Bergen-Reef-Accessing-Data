@@ -336,6 +336,7 @@ async function fetchData() {
         "UTC",
         "yyyy-MM-dd HH:mm:ss"
       ),
+      value: Number(item.value)
     }))
   );
 }
@@ -407,11 +408,18 @@ return (
                   {
                     field: "value",
                     filter: "agNumberColumnFilter",
+                    filterParams: {
+                      buttons: ["apply", "clear", "reset"],
+                      defaultOption: "equals"
+                    },
                     editable: (params) => params.data?.isNewRow || isCellEditable,
                     onCellValueChanged: handleCellValueChanged,
                     valueParser: (data) => {
                       const newValue = parseFloat(data.newValue);
-                      return newValue;
+                      return isNaN(newValue) ? 0 : newValue;
+                    },
+                    valueFormatter: (params) => {
+                      return params.value != null ? Number(params.value).toString() : '';
                     }
                   }
                 ];
