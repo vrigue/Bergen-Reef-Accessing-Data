@@ -110,11 +110,11 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <span>{selectedType}</span>
               <ChevronDownIcon className="-mr-1 size-6 text-white ml-2" />
             </MenuButton>
-            <MenuItems className="absolute left-1/2 -translate-x-1/2 mt-2 w-full bg-light-blue rounded-xl shadow-lg ring-1 ring-black/5 z-50">
+            <MenuItems className="absolute left-1/2 -translate-x-1/2 mt-2 w-full bg-lightest-teal rounded-xl shadow-lg ring-1 ring-black/5 z-50">
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "pH" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   PH
                 </button>
@@ -122,7 +122,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Salinity" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Salinity
                 </button>
@@ -130,7 +130,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Temperature" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Temperature
                 </button>
@@ -138,7 +138,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "ORP" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Oxidation Reduction Potential (ORP)
                 </button>
@@ -146,7 +146,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Alkalinity" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Alkalinity
                 </button>
@@ -154,7 +154,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Calcium" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Calcium
                 </button>
@@ -162,7 +162,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Nitrate" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Nitrate
                 </button>
@@ -170,7 +170,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Phosphate" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Phosphate
                 </button>
@@ -178,7 +178,7 @@ export default function HomePageGraph({ selectedType, onTypeSelectAction }: Home
               <MenuItem>
                 <button
                   onClick={() => handleChange({ target: { value: "Nitrite" } })}
-                  className="text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                  className="text-medium-teal block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
                 >
                   Nitrite
                 </button>
