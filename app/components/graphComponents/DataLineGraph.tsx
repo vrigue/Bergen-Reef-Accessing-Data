@@ -138,12 +138,7 @@ export default function DataLineGraph() {
 
   async function fetchData() {
     try {
-      // Only adjust for local time offset here
-      const adjustedStartDate = new Date(startDate);
-      const adjustedEndDate = new Date(endDate);
-      adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
-      adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
-      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(",")}`;
+      const queryString = `startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedNames.join(",")}`;
 
       // Check if we're fetching the same data again
       if (queryString === lastFetchParams) {
@@ -196,13 +191,8 @@ export default function DataLineGraph() {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Create adjusted dates for display
-    const displayStartDate = new Date(startDate);
-    const displayEndDate = new Date(endDate);
-    displayStartDate.setHours(displayStartDate.getHours() + 5);
-    displayEndDate.setHours(displayEndDate.getHours() + 5);
-
-    const x = d3.scaleTime().domain([displayStartDate, displayEndDate]).range([0, width]);
+    // Use raw start and end dates for axis and plotting
+    const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
 
     // Calculate y-axis for the first selected name
     const yDomain = d3.extent(
@@ -226,13 +216,13 @@ export default function DataLineGraph() {
       : null;
 
     const dayCount = Math.ceil(
-      (displayEndDate.getTime() - displayStartDate.getTime()) / (1000 * 60 * 60 * 24)
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     // Calculate tick values with a staggered approach
     const tickValues = [];
     for (let i = 0; i < dayCount; i++) {
-      const date = new Date(displayStartDate.getTime() + i * 24 * 60 * 60 * 1000);
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
       if (i % 2 === 0) {
         // Stagger: only add every other day
         tickValues.push(date);
@@ -240,7 +230,7 @@ export default function DataLineGraph() {
     }
 
     // Calculate number of ticks based on data range
-    const timeRange = displayEndDate.getTime() - displayStartDate.getTime();
+    const timeRange = endDate.getTime() - startDate.getTime();
     const threeWeeksInMs = 21 * 24 * 60 * 60 * 1000; // 3 weeks in milliseconds
     const minTickCount = 12;
     const tickInterval = timeRange / (minTickCount - 1);
@@ -249,7 +239,7 @@ export default function DataLineGraph() {
     // Only apply 10+ ticks for ranges longer than 3 weeks
     if (timeRange > threeWeeksInMs) {
       for (let i = 0; i < minTickCount; i++) {
-        tickDates.push(new Date(displayStartDate.getTime() + i * tickInterval));
+        tickDates.push(new Date(startDate.getTime() + i * tickInterval));
       }
     }
 
@@ -373,8 +363,7 @@ export default function DataLineGraph() {
         .attr("fill", "none")
         .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
-        .attr("d", lineFunction)
-        .attr("transform", `translate(${margin.left / 2 + 5},0)`);
+        .attr("d", lineFunction);
 
       // Draw dotted line for gaps in data
       const gapsLineFunction = createLine(index === 1).defined((d) => true);
@@ -386,7 +375,6 @@ export default function DataLineGraph() {
         .attr("stroke-dasharray", "3,3") // creates dotted line
         .attr("d", gapsLineFunction)
         .attr("opacity", 0.5)
-        .attr("transform", `translate(${margin.left / 2 + 5},0)`)
         .style("display", (d) => {
           // Only show if there are gaps in the data
           const hasGaps = d.some((_, i) => {
@@ -403,8 +391,7 @@ export default function DataLineGraph() {
       // Only add points if not using interpolation
       if (!useInterpolation) {
         const pointsGroup = g
-          .append("g")
-          .attr("transform", `translate(${margin.left / 2 + 5},0)`);
+          .append("g");
         pointsGroup
           .selectAll(`circle.series-${index}`)
           .data(nameData)
@@ -418,9 +405,9 @@ export default function DataLineGraph() {
           .attr("r", 4)
           .attr("fill", d3.schemeCategory10[index])
           .on("mouseover", (event, d) => {
-            // Add 5 hours to the displayed datetime
+            // Tooltip can show shifted time if desired
             const displayDate = new Date(d.datetime);
-            displayDate.setHours(displayDate.getHours() + 5);
+            displayDate.setHours(displayDate.getHours() + 5); // Only for display
             tooltip
               .style("visibility", "visible")
               .html(
