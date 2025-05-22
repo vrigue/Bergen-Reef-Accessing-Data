@@ -309,16 +309,12 @@ export default function DataLineGraph() {
   }, []);
 
   const handleStartDateChange = (date: Date) => {
-    const newDate = new Date(date);
-    newDate.setHours(0, 0, 0, 0);
-    setStartDate(newDate);
+    setStartDate(date);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    const newDate = new Date(date);
-    newDate.setHours(23, 59, 59, 999);
-    setEndDate(newDate);
+    setEndDate(date);
     setShouldFetch(true);
   };
 

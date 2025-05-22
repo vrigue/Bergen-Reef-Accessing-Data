@@ -440,17 +440,13 @@ export default function BoxPlot() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    const newDate = new Date(date);
-    newDate.setHours(0, 0, 0, 0);
-    setStartDate(newDate);
+    setStartDate(date);
     setRangeMode("custom");
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    const newDate = new Date(date);
-    newDate.setHours(23, 59, 59, 999);
-    setEndDate(newDate);
+    setEndDate(date);
     setRangeMode("custom");
     setShouldFetch(true);
   };
@@ -495,28 +491,21 @@ export default function BoxPlot() {
   };
 
   const setRangeModeWithDates = (mode: "day" | "week" | "twoWeeks") => {
-    // Always update the date range and fetch, even if mode hasn't changed
     setRangeMode(mode);
     let newEndDate = new Date(endDate || new Date());
     let newStartDate = new Date(endDate || new Date());
 
     switch (mode) {
       case "day": {
-        // Set to the same day, start at 00:00:00, end at 23:59:59
-        newStartDate.setHours(0, 0, 0, 0);
-        newEndDate.setHours(23, 59, 59, 999);
+        newStartDate = new Date(newEndDate);
         break;
       }
       case "week": {
         newStartDate.setDate(newEndDate.getDate() - 6);
-        newStartDate.setHours(0, 0, 0, 0);
-        newEndDate.setHours(23, 59, 59, 999);
         break;
       }
       case "twoWeeks": {
         newStartDate.setDate(newEndDate.getDate() - 13);
-        newStartDate.setHours(0, 0, 0, 0);
-        newEndDate.setHours(23, 59, 59, 999);
         break;
       }
     }

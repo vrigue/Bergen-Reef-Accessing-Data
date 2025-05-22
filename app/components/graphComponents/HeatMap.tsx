@@ -532,24 +532,17 @@ export default function DataLineGraph() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    // Set time to 00:00:00
-    const newDate = new Date(date);
-    newDate.setHours(0, 0, 0, 0);
-    setStartDate(newDate);
+    setStartDate(date);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    // Set time to 23:59:59
-    const newDate = new Date(date);
-    newDate.setHours(23, 59, 59, 999);
-    setEndDate(newDate);
+    setEndDate(date);
     setShouldFetch(true);
   };
 
   const handleWeeksChange = (weeks: number) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
     let newNumWeeks = weeks;
     let newEndDate = new Date(endDate);
     if (newEndDate > today) {
