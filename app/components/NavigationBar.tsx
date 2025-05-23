@@ -96,14 +96,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/boxplot">
-                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-base text-gray font-semibold hover:bg-gray-100">
                         Box Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/heatmap">
-                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-base text-gray font-semibold hover:bg-gray-100">
                         Heat Map
                       </button>
                     </a>
