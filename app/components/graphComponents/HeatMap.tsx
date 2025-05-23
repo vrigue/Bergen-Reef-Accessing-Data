@@ -162,13 +162,13 @@ export default function DataLineGraph() {
     // Calculate the start of the first week
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
-    // No +5 hours here
+    
     // Create a map to store values for each week/day combination
     const valueMap = new Map<string, number[]>();
+    
     // Group data by week and day
     nameData.forEach((d) => {
       const date = new Date(d.datetime);
-      // No +5 hours here
       const week = Math.floor(
         (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
       );
@@ -286,9 +286,6 @@ export default function DataLineGraph() {
     const cellWidth = width / numWeeks;
     const cellHeight = height / 7;
 
-    // Define days array
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
     // Create all possible week-day combinations
     const allCells = [];
     for (let week = 0; week < numWeeks; week++) {
@@ -297,15 +294,18 @@ export default function DataLineGraph() {
       }
     }
 
-    // Calculate the day index of the startDate (0=Sun, 1=Mon, ...)
-    const startDayIndex = startDate.getDay();
-
-    // Calculate the actual day labels for the y-axis (starting from startDate's day)
-    const yAxisDays = d3.range(7).map((i) => {
+    // Calculate week start dates
+    const weekStartDates = d3.range(numWeeks).map((week) => {
       const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
-      return d3.timeFormat("%a")(date); // Short day name
+      date.setDate(startDate.getDate() + week * 7);
+      date.setHours(0, 0, 0, 0);
+      return date;
     });
+
+    // For the y-axis, generate labels by cycling from the first week's start day
+    const firstDayOfWeek = weekStartDates[0].getDay();
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const yAxisDays = d3.range(7).map((i) => days[(firstDayOfWeek + i) % 7]);
 
     // Add background cells for all positions
     g.selectAll(".background-cell")
@@ -321,8 +321,9 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        const cellDate = new Date(startDate);
-        cellDate.setDate(startDate.getDate() + d.week * 7 + (d.day - startDayIndex));
+        // Calculate the actual date for this cell
+        const cellDate = new Date(weekStartDates[d.week]);
+        cellDate.setDate(cellDate.getDate() + d.day);
         cellDate.setHours(0, 0, 0, 0);
         const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
@@ -357,8 +358,9 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        const cellDate = new Date(startDate);
-        cellDate.setDate(startDate.getDate() + d.week * 7 + (d.day - startDayIndex));
+        // Calculate the actual date for this cell
+        const cellDate = new Date(weekStartDates[d.week]);
+        cellDate.setDate(cellDate.getDate() + d.day);
         cellDate.setHours(0, 0, 0, 0);
         const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
@@ -418,7 +420,7 @@ export default function DataLineGraph() {
       .style("font-size", "18px")
       .text((d) => d);
 
-    // Add day labels (y-axis), starting from startDate's day
+    // Add day labels (y-axis), starting from the first week's start day
     g.selectAll(".day-label")
       .data(yAxisDays)
       .enter()
