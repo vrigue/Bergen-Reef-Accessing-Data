@@ -535,11 +535,19 @@ export default function DataLineGraph() {
 
   const handleStartDateChange = (date: Date) => {
     setStartDate(date);
+    // Set end date to keep the range
+    const newEndDate = new Date(date);
+    newEndDate.setDate(date.getDate() + numWeeks * 7);
+    setEndDate(newEndDate);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
     setEndDate(date);
+    // Set start date to keep the range
+    const newStartDate = new Date(date);
+    newStartDate.setDate(date.getDate() - numWeeks * 7);
+    setStartDate(newStartDate);
     setShouldFetch(true);
   };
 
