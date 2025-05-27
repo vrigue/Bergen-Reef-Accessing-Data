@@ -20,7 +20,7 @@ interface DataPoint {
 const units = {
   Salinity: "ppt",
   ORP: "mV",
-  Temperature: "°C",
+  Temperature: "°F",
   Alkalinity: "dKH",
   Calcium: "ppm",
 };
@@ -37,6 +37,7 @@ export default function DataLineGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [useInterpolation, setUseInterpolation] = useState(true);
+  const [windowHeight, setWindowHeight] = useState(0);
   const [lastFetchedRange, setLastFetchedRange] = useState<{
     start: Date;
     end: Date;
@@ -56,13 +57,33 @@ export default function DataLineGraph() {
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 1220);
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
     };
 
+    // Initial resize
     handleResize();
+
+    // Add event listener for window resize
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    // Add ResizeObserver to handle container size changes
+    const resizeObserver = new ResizeObserver(() => {
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
+    });
+
+    if (svgRef.current) {
+      resizeObserver.observe(svgRef.current.parentElement!);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
+    };
+  }, [data]);
 
   useEffect(() => {
     if (!lastFetchedRange) {
@@ -103,17 +124,21 @@ export default function DataLineGraph() {
     setShouldFetch(true);
   }, []);
 
+  // Add window height calculation
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+
+  const availableHeight = windowHeight - 120
+
   async function fetchData() {
     try {
-      // Create a copy of the dates for timezone adjustment
-      const adjustedStartDate = new Date(startDate);
-      const adjustedEndDate = new Date(endDate);
-      adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
-      adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
-
-      const queryString = `startDate=${adjustedStartDate.toISOString()}&endDate=${adjustedEndDate.toISOString()}&names=${selectedNames.join(
-        ","
-      )}`;
+      const queryString = `startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&names=${selectedNames.join(",")}`;
 
       // Check if we're fetching the same data again
       if (queryString === lastFetchParams) {
@@ -144,17 +169,29 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Get the current dimensions of the container
+    const containerWidth = parseInt(d3.select(svgRef.current.parentElement).style("width"), 10);
+    const containerHeight = parseInt(d3.select(svgRef.current.parentElement).style("height"), 10);
+
+    // Set the SVG dimensions to match the container independently
+    svg
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .attr("preserveAspectRatio", "none"); // Remove aspect ratio constraint
+
     // Calculate margins based on whether we have one or two series
     const rightMargin = selectedNames.length > 1 ? 90 : 60;
     const margin = { top: 20, right: rightMargin, bottom: 60, left: 90 };
-    const width = svgRef.current.clientWidth - margin.left - margin.right;
-    const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
 
     // Center the graph group within the SVG
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Use raw start and end dates for axis and plotting
     const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
 
     // Calculate y-axis for the first selected name
@@ -276,7 +313,7 @@ export default function DataLineGraph() {
         .attr("fill", d3.schemeCategory10[1])
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", width + margin.right + 10)
+        .attr("y", width + margin.right - 10)
         .attr("text-anchor", "middle")
         .style("font-size", "24px")
         .style("font-weight", "bold")
@@ -326,8 +363,7 @@ export default function DataLineGraph() {
         .attr("fill", "none")
         .attr("stroke", d3.schemeCategory10[index])
         .attr("stroke-width", 1.5)
-        .attr("d", lineFunction)
-        .attr("transform", `translate(${margin.left / 4},0)`);
+        .attr("d", lineFunction);
 
       // Draw dotted line for gaps in data
       const gapsLineFunction = createLine(index === 1).defined((d) => true);
@@ -339,7 +375,6 @@ export default function DataLineGraph() {
         .attr("stroke-dasharray", "3,3") // creates dotted line
         .attr("d", gapsLineFunction)
         .attr("opacity", 0.5)
-        .attr("transform", `translate(${margin.left / 4},0)`)
         .style("display", (d) => {
           // Only show if there are gaps in the data
           const hasGaps = d.some((_, i) => {
@@ -356,8 +391,7 @@ export default function DataLineGraph() {
       // Only add points if not using interpolation
       if (!useInterpolation) {
         const pointsGroup = g
-          .append("g")
-          .attr("transform", `translate(${margin.left / 4},0)`);
+          .append("g");
         pointsGroup
           .selectAll(`circle.series-${index}`)
           .data(nameData)
@@ -371,11 +405,14 @@ export default function DataLineGraph() {
           .attr("r", 4)
           .attr("fill", d3.schemeCategory10[index])
           .on("mouseover", (event, d) => {
+            // Tooltip can show shifted time if desired
+            const displayDate = new Date(d.datetime);
+            displayDate.setHours(displayDate.getHours() + 5); // Only for display
             tooltip
               .style("visibility", "visible")
               .html(
                 `ID: ${d.id}<br>Date: ${d3.timeFormat("%Y-%m-%d %H:%M")(
-                  new Date(d.datetime)
+                  displayDate
                 )}<br>Name: ${d.name}<br>Unit: ${d.unit}<br>Value: ${d.value}`
               );
           })
@@ -410,20 +447,28 @@ export default function DataLineGraph() {
     setShouldFetch(true);
   }, []);
 
+  const handleStartDateChange = (date: Date) => {
+    setStartDate(date);
+    setShouldFetch(true);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    setEndDate(date);
+    setShouldFetch(true);
+  };
+
   return (
-    <div className="grid grid-cols-4 gap-7 h-full p-5">
-      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
-        <div className="w-full h-full">
+    <div className="grid grid-cols-4 gap-4 p-4 h-full">
+      <div className="col-span-3 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg justify-center items-center" style={{ height: `${availableHeight}px` }}>
+        <div className="w-full h-full relative"> 
           <svg
             ref={svgRef}
-            width="100%"
-            height="100%"
-            className="overflow-visible"
+            style={{ width: '100%', height: '100%' }}
           ></svg>
         </div>
       </div>
 
-      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg" style={{ maxHeight: `${availableHeight}px` }}>
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Line Plot
         </h1>
@@ -434,21 +479,26 @@ export default function DataLineGraph() {
               key={index}
               className="relative inline-block text-left m-3"
             >
-              <MenuButton className="inline-flex w-full justify-center outline outline-1 outline-medium-blue rounded-xl bg-light-blue px-3 py-2 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50">
-                <span className="text-blue font-semibold">
+              <MenuButton className={(index === 0) 
+                                    ? "outline-medium-blue bg-light-blue inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2" 
+                                    : "outline-medium-red-orange bg-light-red-orange inline-flex w-full justify-center outline outline-1 rounded-xl font-semibold px-3 py-2"}>
+                <span style={{ color: colorScale(index) }}>
                   {name || "Select Name"}
                 </span>
-                <ChevronDownIcon className="-mr-1 size-6 text-blue" />
+                <ChevronDownIcon className="-mr-1 size-6" style={{ color: colorScale(index) }}/>
               </MenuButton>
-              <MenuItems className="w-full z-50 right-1/2 transform mt-2 w-56 bg-light-blue rounded-xl shadow-lg ring-1 ring-black/5">
+              <MenuItems className={(index === 0) 
+                                    ? "absolute left-1/2 -translate-x-1/2 bg-light-blue w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5" 
+                                    : "absolute left-1/2 -translate-x-1/2 bg-light-red-orange w-full z-50 right-1/2 transform mt-2 w-56 rounded-xl shadow-lg ring-1 ring-black/5"}>
                 {availableNames
                   .filter((n) => !selectedNames.includes(n))
                   .map((n) => (
                     <MenuItem key={n}>
                       <button
                         onClick={() => handleNameSelect(index, n)}
-                        className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
-                      >
+                        className={(index === 0) 
+                                    ? "text-blue block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"
+                                    : "text-red-orange block w-full px-4 py-2 text-md font-semibold hover:bg-medium-orange"}>
                         {n}
                       </button>
                     </MenuItem>
@@ -475,8 +525,8 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-left">
-            Enter Date Constraints
+          <div className="bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center mx-auto w-fit">
+            Date Constraints
           </div>
           <div
             className={`flex items-center ${
@@ -485,10 +535,7 @@ export default function DataLineGraph() {
           >
             <DateBoundElement
               value={startDate}
-              onChange={(date) => {
-                setStartDate(date);
-                setShouldFetch(true);
-              }}
+              onChange={handleStartDateChange}
             />
 
             <div className="bg-teal p-1 pl-2 pr-2 mt-3 mb-3 rounded-lg">
@@ -497,10 +544,7 @@ export default function DataLineGraph() {
 
             <DateBoundElement
               value={endDate}
-              onChange={(date) => {
-                setEndDate(date);
-                setShouldFetch(true);
-              }}
+              onChange={handleEndDateChange}
             />
           </div>
 

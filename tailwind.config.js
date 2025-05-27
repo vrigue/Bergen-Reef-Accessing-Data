@@ -11,6 +11,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        'lightest-teal': '#d5eef1',
         'light-teal': '#A2D9D9',
         'teal': '#68BFC6',
         'medium-teal': '#58b0b8',
@@ -26,6 +27,9 @@ module.exports = {
         'blue': '#1f77b4',
         'medium-blue': '#3290D2',
         'light-blue': '#ECF6FF',
+        'red-orange': '#ff7f0e',
+        'medium-red-orange': '#F78B2C',
+        'light-red-orange': '#FBE8D8',
       },
       dropShadow: {
         'orange': '0 5px 5px #ffb734',

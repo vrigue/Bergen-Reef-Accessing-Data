@@ -51,10 +51,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                       className={clsx(
                         "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative
-                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                           : selected
                           ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                       )}
                     >
                       Home
@@ -67,10 +67,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                   className={clsx(
                     "tab-item px-6 py-2 rounded-xl transition flex items-center justify-between",
                     isDefaultIndexNegative
-                      ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                      ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                       : defaultIndex === 1
                       ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                      : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                      : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                   )}
                 >
                   <span>Graphs</span>
@@ -96,14 +96,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/boxplot">
-                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-base text-gray font-semibold hover:bg-gray-100">
                         Box Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/heatmap">
-                      <button className="block w-full px-4 py-2 text-sm text-gray font-semibold hover:bg-gray-100">
+                      <button className="block w-full px-4 py-2 text-base text-gray font-semibold hover:bg-gray-100">
                         Heat Map
                       </button>
                     </a>
@@ -117,10 +117,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                       className={clsx(
                         "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative
-                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                           : selected
                           ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                       )}
                     >
                       History
@@ -140,10 +140,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                       className={clsx(
                         "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative
-                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                           : selected
                           ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                       )}
                     >
                       Home
@@ -156,10 +156,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                   className={clsx(
                     "tab-item px-6 py-2 rounded-xl transition flex items-center justify-between",
                     isDefaultIndexNegative
-                      ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                      ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                       : defaultIndex === 1
                       ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                      : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                      : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                   )}
                 >
                   <span>Graphs</span>
@@ -171,28 +171,28 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                 >
                   <MenuItem>
                     <a href="/data/linegraph">
-                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-medium-orange">
                         Line Graph
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/twodimgraph">
-                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-medium-orange">
                         Two Dimension Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/boxplot">
-                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-medium-orange">
                         Box Plot
                       </button>
                     </a>
                   </MenuItem>
                   <MenuItem>
                     <a href="/data/heatmap">
-                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-orange">
+                      <button className="block w-full px-2 py-2 text-base text-gray font-semibold hover:bg-medium-orange">
                         Heat Map
                       </button>
                     </a>
@@ -206,10 +206,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ defaultIndex, username })
                       className={clsx(
                         "tab-item px-6 py-2 rounded-xl transition",
                         isDefaultIndexNegative || defaultIndex === 1
-                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          ? "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                           : selected
                           ? "bg-orange outline outline-2 outline-dark-orange text-white font-bold"
-                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-orange"
+                          : "bg-light-gray outline outline-1 outline-medium-gray drop-shadow-xl text-gray font-semibold hover:bg-medium-orange"
                       )}
                     >
                       History

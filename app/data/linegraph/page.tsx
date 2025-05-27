@@ -9,10 +9,10 @@ export default function Page() {
   const { user } = useUser();
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       <NavigationBar defaultIndex={1} username={(user) ? user.name : "Guest"}/>
-      <div className="flex-1">
-      <DataLineGraph />
+      <div className="flex-1 overflow-hidden">
+        <DataLineGraph />
       </div>
     </div>
   );

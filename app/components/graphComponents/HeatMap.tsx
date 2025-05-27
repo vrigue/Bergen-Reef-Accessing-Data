@@ -28,7 +28,7 @@ interface HeatMapData {
 const units = {
   Salinity: "ppt",
   ORP: "mV",
-  Temperature: "°C",
+  Temperature: "°F",
   Alkalinity: "dKH",
   Calcium: "ppm",
   pH: "no unit",
@@ -36,11 +36,15 @@ const units = {
 
 // Helper to format date as YYYY-MM-DDTHH:mm:ss in local time
 function formatLocalDateTime(date: Date) {
+  // Create a new date object to avoid modifying the original
+  const adjustedDate = new Date(date);
+  // Add 5 hours for local time offset
+  adjustedDate.setHours(adjustedDate.getHours() + 5);
   const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-    date.getDate()
-  )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-    date.getSeconds()
+  return `${adjustedDate.getFullYear()}-${pad(adjustedDate.getMonth() + 1)}-${pad(
+    adjustedDate.getDate()
+  )}T${pad(adjustedDate.getHours())}:${pad(adjustedDate.getMinutes())}:${pad(
+    adjustedDate.getSeconds()
   )}`;
 }
 
@@ -53,6 +57,7 @@ export default function DataLineGraph() {
   const [numWeeks, setNumWeeks] = useState(7);
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(0);
 
   const [zoom, setZoom] = useState(1);
   const [step, setStep] = useState(1);
@@ -69,13 +74,33 @@ export default function DataLineGraph() {
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 1220);
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
     };
 
+    // Initial resize
     handleResize();
+
+    // Add event listener for window resize
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    // Add ResizeObserver to handle container size changes
+    const resizeObserver = new ResizeObserver(() => {
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
+    });
+
+    if (svgRef.current) {
+      resizeObserver.observe(svgRef.current.parentElement!);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
+    };
+  }, [data]);
 
   useEffect(() => {
     const today = new Date();
@@ -100,6 +125,18 @@ export default function DataLineGraph() {
     }
   }, [data, selectedName, startDate, endDate, shouldFetch]);
 
+  // Add window height calculation
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  const availableHeight = windowHeight - 120;
+
   async function fetchData() {
     try {
       const response = await fetch(
@@ -122,25 +159,22 @@ export default function DataLineGraph() {
   const processDataForHeatMap = (): HeatMapData[] => {
     const heatMapData: HeatMapData[] = [];
     const nameData = data.filter((d) => d.name === selectedName);
-
     // Calculate the start of the first week
     const firstWeekStart = new Date(startDate);
     firstWeekStart.setHours(0, 0, 0, 0);
-
+    
     // Create a map to store values for each week/day combination
     const valueMap = new Map<string, number[]>();
-
+    
     // Group data by week and day
     nameData.forEach((d) => {
       const date = new Date(d.datetime);
       const week = Math.floor(
         (date.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
       );
-      // Only process data for the selected number of weeks
       if (week >= 0 && week < numWeeks) {
         const day = date.getDay();
         const key = `${week}-${day}`;
-
         if (!valueMap.has(key)) {
           valueMap.set(key, [d.value]);
         } else {
@@ -180,12 +214,29 @@ export default function DataLineGraph() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Get the current dimensions of the container
+    const containerWidth = parseInt(
+      d3.select(svgRef.current.parentElement).style("width"),
+      10
+    );
+    const containerHeight = parseInt(
+      d3.select(svgRef.current.parentElement).style("height"),
+      10
+    );
+
+    // Set the SVG dimensions to match the container independently
+    svg
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .attr("preserveAspectRatio", "none"); // Remove aspect ratio constraint
+
     // Remove any existing tooltips
     d3.selectAll(".tooltip").remove();
 
     const margin = { top: 30, right: 150, bottom: 60, left: 70 };
-    const width = svgRef.current.clientWidth - margin.left - margin.right;
-    const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
 
     const g = svg
       .append("g")
@@ -235,9 +286,6 @@ export default function DataLineGraph() {
     const cellWidth = width / numWeeks;
     const cellHeight = height / 7;
 
-    // Define days array
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
     // Create all possible week-day combinations
     const allCells = [];
     for (let week = 0; week < numWeeks; week++) {
@@ -245,6 +293,19 @@ export default function DataLineGraph() {
         allCells.push({ week, day });
       }
     }
+
+    // Calculate week start dates
+    const weekStartDates = d3.range(numWeeks).map((week) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + week * 7);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    });
+
+    // For the y-axis, generate labels by cycling from the first week's start day
+    const firstDayOfWeek = weekStartDates[0].getDay();
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const yAxisDays = d3.range(7).map((i) => days[(firstDayOfWeek + i) % 7]);
 
     // Add background cells for all positions
     g.selectAll(".background-cell")
@@ -260,15 +321,15 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        const weekStart = new Date(startDate);
-        weekStart.setDate(startDate.getDate() + d.week * 7);
-        const dayName = days[d.day];
+        // Calculate the actual date for this cell
+        const cellDate = new Date(weekStartDates[d.week]);
+        cellDate.setDate(cellDate.getDate() + d.day);
+        cellDate.setHours(0, 0, 0, 0);
+        const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
-            `${dayName}, Week of ${d3.timeFormat("%m-%d")(
-              weekStart
-            )}<br/>No data available`
+            `${formattedDate}<br/>No data available`
           )
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
@@ -297,13 +358,15 @@ export default function DataLineGraph() {
       .attr("stroke", "white")
       .attr("stroke-width", 1)
       .on("mouseover", function (event, d) {
-        const weekStart = new Date(startDate);
-        weekStart.setDate(startDate.getDate() + d.week * 7);
-        const dayName = days[d.day];
+        // Calculate the actual date for this cell
+        const cellDate = new Date(weekStartDates[d.week]);
+        cellDate.setDate(cellDate.getDate() + d.day);
+        cellDate.setHours(0, 0, 0, 0);
+        const formattedDate = d3.timeFormat("%Y-%m-%d")(cellDate);
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(
-            `${dayName}, Week of ${d3.timeFormat("%m-%d")(weekStart)}<br/>
+            `${formattedDate}<br/>
           Median: ${d.value.toFixed(2)} ${units[selectedName]}<br/>
           Min: ${d.minValue.toFixed(2)} ${units[selectedName]}<br/>
           Max: ${d.maxValue.toFixed(2)} ${units[selectedName]}${
@@ -330,32 +393,41 @@ export default function DataLineGraph() {
       .style("fill", "#666")
       .text("Gray cells = No data");
 
-    // Add week labels with actual dates
+    // Add week labels with actual dates (top cell of each column)
     const weekLabels = d3.range(numWeeks).map((week) => {
-      const weekStart = new Date(startDate);
-      weekStart.setDate(startDate.getDate() + week * 7);
-      return d3.timeFormat("%m-%d")(weekStart);
+      const topCellDate = new Date(startDate);
+      topCellDate.setDate(startDate.getDate() + week * 7);
+      topCellDate.setHours(0, 0, 0, 0);
+      return d3.timeFormat("%m-%d")(topCellDate);
     });
 
+    // Filter week labels if needed
+    const filteredWeekLabels = isSmallScreen && numWeeks > 7 
+      ? weekLabels.filter((_, i) => i % 2 === 0)
+      : weekLabels;
+
     g.selectAll(".week-label")
-      .data(weekLabels)
+      .data(filteredWeekLabels)
       .enter()
       .append("text")
       .attr("class", "week-label")
-      .attr("x", (d, i) => i * cellWidth + cellWidth / 2)
+      .attr("x", (d, i) => {
+        const weekIndex = isSmallScreen && numWeeks > 7 ? i * 2 : i;
+        return weekIndex * cellWidth + cellWidth / 2;
+      })
       .attr("y", -5)
       .attr("text-anchor", "middle")
       .style("font-size", "18px")
       .text((d) => d);
 
-    // Add day labels
+    // Add day labels (y-axis), starting from the first week's start day
     g.selectAll(".day-label")
-      .data(days)
+      .data(yAxisDays)
       .enter()
       .append("text")
       .attr("class", "day-label")
       .attr("x", -5)
-      .attr("y", (d) => days.indexOf(d) * cellHeight + cellHeight / 2)
+      .attr("y", (d, i) => i * cellHeight + cellHeight / 2)
       .attr("text-anchor", "end")
       .style("font-size", "18px")
       .text((d) => d);
@@ -462,24 +534,25 @@ export default function DataLineGraph() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - 7);
     setStartDate(date);
+    // Set end date to keep the range
+    const newEndDate = new Date(date);
+    newEndDate.setDate(date.getDate() + numWeeks * 7);
+    setEndDate(newEndDate);
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - 7);
     setEndDate(date);
+    // Set start date to keep the range
+    const newStartDate = new Date(date);
+    newStartDate.setDate(date.getDate() - numWeeks * 7);
+    setStartDate(newStartDate);
     setShouldFetch(true);
   };
 
   const handleWeeksChange = (weeks: number) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
     let newNumWeeks = weeks;
     let newEndDate = new Date(endDate);
     if (newEndDate > today) {
@@ -495,11 +568,23 @@ export default function DataLineGraph() {
 
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg">
-        <svg ref={svgRef} width="100%" height="100%"></svg>
+      <div
+        className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center"
+        style={{ height: `${availableHeight}px` }}
+      >
+        <div className="w-full h-full relative overflow-hidden">
+          <svg
+            ref={svgRef}
+            className="w-full h-full"
+            style={{ position: "absolute", top: 0, left: 0 }}
+          ></svg>
+        </div>
       </div>
 
-      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+      <div
+        className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg"
+        style={{ height: `${availableHeight}px` }}
+      >
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Heat Map
         </h1>
@@ -516,7 +601,7 @@ export default function DataLineGraph() {
                 <MenuItem key={name}>
                   <button
                     onClick={() => handleNameSelect(name)}
-                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
+                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-medium-orange"
                   >
                     {name}
                   </button>
@@ -527,8 +612,8 @@ export default function DataLineGraph() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-left group relative">
-            Enter Date Constraints
+          <div className="bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center mx-auto w-fit group relative">
+            Date Constraints
             <div className="absolute left-1/2 top-full z-10 mt-2 w-[290px] -translate-x-1/3 bg-white p-3 rounded-lg self-left shadow-sm text-center text-sm text-medium-teal opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               Note: The date range will always be the weeks represented.
             </div>

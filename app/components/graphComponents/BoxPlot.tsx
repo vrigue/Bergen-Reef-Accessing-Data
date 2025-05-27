@@ -29,7 +29,7 @@ interface BoxPlotData {
 const units = {
   Salinity: "ppt",
   ORP: "mV",
-  Temperature: "°C",
+  Temperature: "°F",
   Alkalinity: "dKH",
   Calcium: "ppm",
   pH: "no unit",
@@ -47,6 +47,7 @@ export default function BoxPlot() {
   >("twoWeeks");
   const svgRef = useRef<SVGSVGElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(0);
 
   // Add refs to track previous state
   const prevParamsRef = useRef({
@@ -86,13 +87,33 @@ export default function BoxPlot() {
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 1220);
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
     };
 
+    // Initial resize
     handleResize();
+
+    // Add event listener for window resize
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    // Add ResizeObserver to handle container size changes
+    const resizeObserver = new ResizeObserver(() => {
+      if (data.length > 0 && svgRef.current) {
+        drawChart();
+      }
+    });
+
+    if (svgRef.current) {
+      resizeObserver.observe(svgRef.current.parentElement!);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
+    };
+  }, [data]);
 
   useEffect(() => {
     if (shouldFetch && hasParamsChanged()) {
@@ -120,12 +141,27 @@ export default function BoxPlot() {
     setShouldFetch(true);
   }, []);
 
+  // Add window height calculation
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  const availableHeight = windowHeight - 120;
+
   async function fetchData() {
     try {
-      startDate?.setHours(startDate.getHours() - 5);
-      endDate?.setHours(endDate.getHours() - 5);
+      // Only adjust for local time offset here
+      const adjustedStartDate = startDate ? new Date(startDate) : null;
+      const adjustedEndDate = endDate ? new Date(endDate) : null;
+      if (adjustedStartDate) adjustedStartDate.setHours(adjustedStartDate.getHours() - 5);
+      if (adjustedEndDate) adjustedEndDate.setHours(adjustedEndDate.getHours() - 5);
       const response = await fetch(
-        `/api/searchDataByDateType?startDate=${startDate?.toISOString()}&endDate=${endDate?.toISOString()}&names=${selectedName}`
+        `/api/searchDataByDateType?startDate=${adjustedStartDate?.toISOString()}&endDate=${adjustedEndDate?.toISOString()}&names=${selectedName}`
       );
 
       if (!response.ok) {
@@ -175,9 +211,26 @@ export default function BoxPlot() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Get the current dimensions of the container
+    const containerWidth = parseInt(
+      d3.select(svgRef.current.parentElement).style("width"),
+      10
+    );
+    const containerHeight = parseInt(
+      d3.select(svgRef.current.parentElement).style("height"),
+      10
+    );
+
+    // Set the SVG dimensions to match the container independently
+    svg
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .attr("preserveAspectRatio", "none"); // Remove aspect ratio constraint
+
     const margin = { top: 40, right: 90, bottom: 40, left: 90 };
-    const width = svgRef.current.clientWidth - margin.left - margin.right;
-    const height = svgRef.current.clientHeight - margin.top - margin.bottom;
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
 
     // Add tooltip div
     const tooltip = d3
@@ -387,20 +440,14 @@ export default function BoxPlot() {
   };
 
   const handleStartDateChange = (date: Date) => {
-    if (date.toISOString() === startDate?.toISOString()) {
-      return; // Don't update if date hasn't changed
-    }
     setStartDate(date);
-    setRangeMode("custom"); // Set to custom when manually changing dates
+    setRangeMode("custom");
     setShouldFetch(true);
   };
 
   const handleEndDateChange = (date: Date) => {
-    if (date.toISOString() === endDate?.toISOString()) {
-      return; // Don't update if date hasn't changed
-    }
     setEndDate(date);
-    setRangeMode("custom"); // Set to custom when manually changing dates
+    setRangeMode("custom");
     setShouldFetch(true);
   };
 
@@ -444,28 +491,21 @@ export default function BoxPlot() {
   };
 
   const setRangeModeWithDates = (mode: "day" | "week" | "twoWeeks") => {
-    // Always update the date range and fetch, even if mode hasn't changed
     setRangeMode(mode);
     let newEndDate = new Date(endDate || new Date());
     let newStartDate = new Date(endDate || new Date());
 
     switch (mode) {
       case "day": {
-        // Set to the same day, start at 00:00:00, end at 23:59:59
-        newStartDate.setHours(0, 0, 0, 0);
-        newEndDate.setHours(23, 59, 59, 999);
+        newStartDate = new Date(newEndDate);
         break;
       }
       case "week": {
         newStartDate.setDate(newEndDate.getDate() - 6);
-        newStartDate.setHours(0, 0, 0, 0);
-        newEndDate.setHours(23, 59, 59, 999);
         break;
       }
       case "twoWeeks": {
         newStartDate.setDate(newEndDate.getDate() - 13);
-        newStartDate.setHours(0, 0, 0, 0);
-        newEndDate.setHours(23, 59, 59, 999);
         break;
       }
     }
@@ -477,18 +517,23 @@ export default function BoxPlot() {
 
   return (
     <div className="grid grid-cols-3 gap-7 h-full p-5">
-      <div className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center">
-        <div className="w-full h-full">
+      <div
+        className="col-span-2 bg-white ml-8 pr-8 pt-3 pb-3 rounded-lg flex justify-center items-center"
+        style={{ height: `${availableHeight}px` }}
+      >
+        <div className="w-full h-full relative overflow-hidden">
           <svg
             ref={svgRef}
-            width="100%"
-            height="100%"
-            className="overflow-visible"
+            className="w-full h-full"
+            style={{ position: "absolute", top: 0, left: 0 }}
           ></svg>
         </div>
       </div>
 
-      <div className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg">
+      <div
+        className="flex flex-col col-span-1 bg-white drop-shadow-md mr-8 pb-3 flex flex-col space-y-6 rounded-lg"
+        style={{ height: `${availableHeight}px` }}
+      >
         <h1 className="text-xl bg-teal drop-shadow-xl text-white text-center font-semibold rounded-lg p-4">
           Box Plot
         </h1>
@@ -505,7 +550,7 @@ export default function BoxPlot() {
                 <MenuItem key={name}>
                   <button
                     onClick={() => handleNameSelect(name)}
-                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-orange"
+                    className="block w-full px-4 py-2 text-md text-blue font-semibold hover:bg-medium-orange"
                   >
                     {name}
                   </button>
@@ -516,15 +561,15 @@ export default function BoxPlot() {
         </div>
 
         <div className="flex flex-col bg-light-teal m-3 pb-5 rounded-lg">
-          <div className="w-1/2 bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-left">
-            Enter Date Constraints
+          <div className="bg-teal text-white font-semibold text-center p-2 m-4 mb-2 rounded-xl self-center mx-auto w-fit">
+            Date Constraints
           </div>
           <div className="flex items-center justify-center space-x-2 px-3">
             <button
               onClick={() => adjustDateRange("backward")}
-              className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+              className="bg-white p-2 rounded-lg hover:bg-medium-teal disabled:opacity-50"
             >
-              <ChevronLeftIcon className="h-5 w-5 text-teal" />
+              <ChevronLeftIcon className="h-5 w-5 text-teal hover:text-white" />
             </button>
             <div
               className={`flex items-center flex-col justify-center rounded-lg pt-2 m-3 mt-1 text-lg text-neutral-700`}
@@ -545,10 +590,10 @@ export default function BoxPlot() {
             </div>
             <button
               onClick={() => adjustDateRange("forward")}
-              className="bg-white p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+              className="bg-white p-2 rounded-lg hover:bg-medium-teal disabled:opacity-50"
               disabled={now && endDate && endDate >= now}
             >
-              <ChevronRightIcon className="h-5 w-5 text-teal" />
+              <ChevronRightIcon className="h-5 w-5 text-teal hover:text-white" />
             </button>
           </div>
 
@@ -558,7 +603,7 @@ export default function BoxPlot() {
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 rangeMode === "day"
                   ? "bg-teal text-white"
-                  : "bg-white text-teal hover:bg-gray-100"
+                  : "bg-white text-teal hover:bg-medium-teal hover:text-white"
               }`}
             >
               Day
@@ -568,7 +613,7 @@ export default function BoxPlot() {
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 rangeMode === "week"
                   ? "bg-teal text-white"
-                  : "bg-white text-teal hover:bg-gray-100"
+                  : "bg-white text-teal hover:bg-medium-teal hover:text-white"
               }`}
             >
               Week
@@ -578,7 +623,7 @@ export default function BoxPlot() {
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 rangeMode === "twoWeeks"
                   ? "bg-teal text-white"
-                  : "bg-white text-teal hover:bg-gray-100"
+                  : "bg-white text-teal hover:bg-medium-teal hover:text-white"
               }`}
             >
               Two Weeks

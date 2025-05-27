@@ -124,8 +124,6 @@ export default function Page() {
           <ResponsiveContainer width={"100%"} height={"auto"}>
             <HomePageGraph selectedType={selectedType} onTypeSelectAction={setSelectedType} />
           </ResponsiveContainer>
-
-          {/*TEXT AREA BELOW GRAPH*/}
         </div>
       </div>
     </div>
