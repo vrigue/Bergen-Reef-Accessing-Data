@@ -120,7 +120,7 @@ const UserList = () => {
               {user.email}
               <select
                 value={
-                  ["coralreeves760@gmail.com", "anaghaajesh2010@gmail.com", "vrielleguevarra@gmail.com", "wukimberley98@gmail.com"].includes(user.email)
+                  ["pive@gmail.com", "coralreeves760@gmail.com", "anaghaajesh2010@gmail.com", "vrielleguevarra@gmail.com", "wukimberley98@gmail.com"].includes(user.email)
                     ? 'admin'
                     : 'user'
                 }
