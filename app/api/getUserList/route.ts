@@ -5,16 +5,6 @@ import { blockJack } from "actions/blockJack";
 import { isUserAdmin } from "actions/isUserAdmin";
 
 export const GET = async () => {
-  
-  //if (!jack) {
-   // return Response.json({ error: 'Unauthorized' }, { status: 400 });
-  //}
-
-  //const roles = await getUsersRoles();
-  //console.log("roles:", roles)
-
-  //const jack = await blockJack();
-
   try {
     const users = await getUsers();
 
