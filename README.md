@@ -46,6 +46,12 @@ An interactive web application that not only displays graphical representations 
 - [Axios](https://www.npmjs.com/package/axios)
     A promise-based HTTP client that simplifies making API requests in React application
 
+- [Google Sheets](https://workspace.google.com/products/sheets/)
+    Used for the database backup, with tabs to keep track of recenty backed-up data and soft-deleted data
+
+- [Google App Scripts](https://developers.google.com/apps-script)
+    Used alongside Google Sheets for database backups (not in sync with the Cron Job)
+
 ## Installation and Setup
 
 ### Prerequisites
@@ -151,5 +157,5 @@ The application is deployed on Vercel @ [https://bergen-reef-accessing-data-cora
 ### Additional Notes
 - The application requires a running MySQL server
 - The Raspberry Pi must be configured with the correct network access to reach both Apex Fusion and the database server
-- Regular database backups are recommended
+- Database backups occur separately from the data pushed to the base
 - The application is designed to be displayed on TVs in the Makerspace
