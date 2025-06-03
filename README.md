@@ -43,6 +43,9 @@ An interactive web application that not only displays graphical representations 
 - [Auth0](https://auth0.com/)
     An authorization and authentication service
 
+- [Axios](https://www.npmjs.com/package/axios)
+    A promise-based HTTP client that simplifies making API requests in React application
+
 ## Installation and Setup
 
 ### Prerequisites
